@@ -1,0 +1,40 @@
+parent_dir = "exp/orig-micro-retry/tvae/"
+real_data_path = "data/orig-micro-retry/"
+seed = 0
+device = "cuda:0"
+
+[train_params]
+lr = 0.0019173764049232895
+epochs = 1000
+embedding_dim = 256
+batch_size = 256
+loss_factor = 8.591323816501708
+compress_dims = [
+    128,
+    512,
+    512,
+    512,
+]
+decompress_dims = [
+    128,
+    512,
+    512,
+    512,
+]
+
+[sample]
+seed = 0
+num_samples = 127406
+
+[eval.type]
+eval_model = "catboost"
+eval_type = "synthetic"
+
+[eval.T]
+seed = 0
+normalization = "__none__"
+num_nan_policy = "__none__"
+cat_nan_policy = "__none__"
+cat_min_frequency = "__none__"
+cat_encoding = "__none__"
+y_policy = "default"

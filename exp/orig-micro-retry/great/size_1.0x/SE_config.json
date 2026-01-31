@@ -1,0 +1,1 @@
+{"dwm": {}, "pca": {"preprocess": "mean"}, "cio": {"confidence": 95}, "corr_diff": {"mixed_corr": true}, "mi_diff": {}, "ks_test": {"sig_lvl": 0.05, "n_perms": 1000}, "h_dist": {}, "p_mse": {"k_folds": 5, "max_iter": 100, "solver": "liblinear"}, "q_mse": {"num_quants": 10, "cat_mse": false}, "mia": {"num_eval_iter": 5}}

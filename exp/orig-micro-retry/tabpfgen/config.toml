@@ -1,0 +1,27 @@
+parent_dir = "exp/orig-micro-retry/tabpfgen/"
+real_data_path = "data/orig-micro-retry/"
+seed = 0
+device = "cuda:0"
+
+[train_params]
+n_sgld_steps = 3000
+sgld_step_size = 0.010678493235736601
+sgld_noise_scale = 0.018216465853797693
+balance_classes = true
+
+[sample]
+seed = 0
+num_samples = 31851
+
+[eval.type]
+eval_model = "catboost"
+eval_type = "synthetic"
+
+[eval.T]
+seed = 0
+normalization = "__none__"
+num_nan_policy = "__none__"
+cat_nan_policy = "__none__"
+cat_min_frequency = "__none__"
+cat_encoding = "__none__"
+y_policy = "default"

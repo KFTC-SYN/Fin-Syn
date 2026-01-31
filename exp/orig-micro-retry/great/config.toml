@@ -1,0 +1,41 @@
+parent_dir = "exp/orig-micro-retry/great/"
+real_data_path = "data/orig-micro-retry/"
+seed = 0
+device = "cuda:0"
+
+[train_params]
+llm = "gpt2"
+epochs = 20
+batch_size = 8
+float_precision = 2
+save_strategy = "no"
+save_steps = 1000000
+save_total_limit = 0
+load_best_model_at_end = false
+logging_steps = 10
+learning_rate = 0.0003140276597012327
+weight_decay = 0.058127287263585875
+warmup_ratio = 0.08817353618548529
+lr_scheduler_type = "cosine"
+guided_sampling = false
+temperature = 0.9317593896368287
+max_length = 100
+random_feature_order = false
+random_conditional_col = true
+
+[sample]
+seed = 0
+num_samples = 63703
+
+[eval.type]
+eval_model = "catboost"
+eval_type = "synthetic"
+
+[eval.T]
+seed = 0
+normalization = "__none__"
+num_nan_policy = "__none__"
+cat_nan_policy = "__none__"
+cat_min_frequency = "__none__"
+cat_encoding = "__none__"
+y_policy = "default"

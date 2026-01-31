@@ -1,0 +1,3 @@
+﻿Label,Label_Value,Original_Count,Original_Proportion,Synthetic_Count,Synthetic_Proportion,Difference
+Benign,0,62482,0.9808329278055978,124964,0.9808329278055978,0.0
+Suspicious,1,1221,0.019167072194402147,2442,0.019167072194402147,0.0

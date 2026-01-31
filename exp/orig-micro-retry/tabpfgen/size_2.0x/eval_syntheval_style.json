@@ -1,0 +1,58 @@
+{
+    "nndr": {
+        "avg": 0.999985038387517,
+        "err": 6.232872650991863e-08,
+        "priv_loss": 1.490756383892844e-07,
+        "priv_loss_err": 1.6062484961476066e-07
+    },
+    "avg_nndr": {
+        "metric": "avg_nndr",
+        "dim": "p",
+        "val": 0.999985038387517,
+        "err": 6.232872650991863e-08,
+        "n_val": 0.999985038387517,
+        "n_err": 6.232872650991863e-08
+    },
+    "priv_loss_nndr": {
+        "metric": "priv_loss_nndr",
+        "dim": "p",
+        "val": 1.490756383892844e-07,
+        "err": 1.6062484961476066e-07,
+        "n_val": 0.9999998509243616,
+        "n_err": 6.232872650991863e-08
+    },
+    "dcr": {
+        "mDCR": 0
+    },
+    "median_DCR": {
+        "metric": "median_DCR",
+        "dim": "p",
+        "val": 0,
+        "n_val": 0.0
+    },
+    "hit_rate": {
+        "hit rate": 0.0
+    },
+    "eps_risk": {
+        "eps_risk": 0.0,
+        "priv_loss": 0.0
+    },
+    "eps_identif_risk": {
+        "metric": "eps_identif_risk",
+        "dim": "p",
+        "val": 0.0,
+        "n_val": 1.0
+    },
+    "priv_loss_eps": {
+        "metric": "priv_loss_eps",
+        "dim": "p",
+        "val": 0.0,
+        "n_val": 1.0
+    },
+    "_execution_times": {
+        "nndr": 187.49946522712708,
+        "dcr": 236.6572082042694,
+        "hit_rate": 705.9456861019135,
+        "eps_risk": 580.339567899704
+    }
+}

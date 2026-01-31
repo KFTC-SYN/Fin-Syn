@@ -1,0 +1,56 @@
+seed = 0
+parent_dir = "exp/orig-micro-retry/many-exps/19"
+real_data_path = "data/orig-micro-retry/"
+model_type = "resnet"
+num_numerical_features = 1
+device = "cuda:0"
+
+[model_params]
+num_classes = 2
+is_y_cond = true
+dim_t = 256
+
+[model_params.rtdl_params]
+n_blocks = 3
+d_main = 256
+d_hidden = 1024
+dropout_first = 0.2813945807645912
+dropout_second = 0.10108718142915125
+
+[diffusion_params]
+num_timesteps = 100
+gaussian_loss_type = "mse"
+scheduler = "cosine"
+
+[train.main]
+steps = 40000
+lr = 0.00010720697424442486
+weight_decay = 1e-05
+batch_size = 256
+
+[train.T]
+seed = 0
+normalization = "quantile"
+num_nan_policy = "__none__"
+cat_nan_policy = "__none__"
+cat_min_frequency = "__none__"
+cat_encoding = "__none__"
+y_policy = "default"
+
+[sample]
+num_samples = 127406
+batch_size = 10000
+seed = 4
+
+[eval.type]
+eval_model = "catboost"
+eval_type = "synthetic"
+
+[eval.T]
+seed = 0
+normalization = "__none__"
+num_nan_policy = "__none__"
+cat_nan_policy = "__none__"
+cat_min_frequency = "__none__"
+cat_encoding = "__none__"
+y_policy = "default"

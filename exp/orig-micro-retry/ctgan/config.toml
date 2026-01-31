@@ -1,0 +1,39 @@
+parent_dir = "exp/orig-micro-retry/ctgan/"
+real_data_path = "data/orig-micro-retry/"
+seed = 0
+device = "cuda:0"
+
+[train_params]
+generator_lr = 0.0005558017209109293
+discriminator_lr = 1.1991372360736431e-05
+generator_decay = 3.2263610314044996e-07
+discriminator_decay = 1.306346303317833e-07
+epochs = 3000
+embedding_dim = 128
+batch_size = 2000
+discriminator_steps = 3
+generator_dim = [
+    256,
+]
+discriminator_dim = [
+    256,
+]
+pac = 5
+log_frequency = true
+
+[sample]
+seed = 0
+num_samples = 63703
+
+[eval.type]
+eval_model = "catboost"
+eval_type = "synthetic"
+
+[eval.T]
+seed = 0
+normalization = "__none__"
+num_nan_policy = "__none__"
+cat_nan_policy = "__none__"
+cat_min_frequency = "__none__"
+cat_encoding = "__none__"
+y_policy = "default"
