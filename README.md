@@ -1,128 +1,128 @@
 # Fin-Syn: Financial Synthetic Data Generation Framework
 
-금융 데이터를 포함한 테이블 형식 데이터에 대한 합성 데이터 생성 및 평가를 위한 통합 프레임워크입니다.
+A unified framework for synthetic data generation and evaluation for tabular data, including financial datasets.
 
-## 목차
+## Table of Contents
 
-- [주요 기능](#주요-기능)
-- [프로젝트 구조](#프로젝트-구조)
-- [설치](#설치)
-- [빠른 시작](#빠른-시작)
-- [워크플로우](#워크플로우)
-- [모델별 사용법](#모델별-사용법)
-- [평가 메트릭](#평가-메트릭)
-- [설정 파일](#설정-파일)
-- [주의사항](#주의사항)
-- [참고 자료](#참고-자료)
-
----
-
-## 주요 기능
-
-### 지원하는 합성 데이터 생성 모델
-
-| 모델 | 타입 | 설명 | 디렉토리 |
-|------|------|------|----------|
-| **TabDDPM** | Diffusion | Denoising Diffusion 기반 테이블 데이터 생성 | `tab_ddpm/`, `scripts/` |
-| **CTGAN** | GAN | Conditional GAN 기반 생성 | `CTGAN/` |
-| **TVAE** | VAE | Variational Autoencoder 기반 생성 | `CTGAN/` |
-| **CTAB-GAN** | GAN | 테이블 데이터 특화 GAN | `CTAB-GAN/` |
-| **CTAB-GAN-Plus** | GAN | CTAB-GAN의 개선 버전 (프라이버시 기능 포함) | `CTAB-GAN-Plus/` |
-| **GReaT** | Transformer | GPT-2 기반 생성 모델 | `be_great/` |
-| **TabPFGen** | Energy Model | TabPFN 기반 에너지 모델 생성 | `TabPFGen/` |
-| **SMOTE** | Oversampling | 오버샘플링 기반 데이터 증강 | `smote/` |
-
-### 평가 방법
-
-- **MLE (Machine Learning Efficacy)**: CatBoost/MLP 분류기를 사용한 다운스트림 태스크 성능 평가
-- **SynthEval**: 통계적 유사성, 분포 유사성 등 종합 평가 메트릭
-- **Privacy**: 개인정보 보호 수준 평가 (IR, DCR, NNDR, TCAP)
-- **Fidelity**: 레이블 분포 및 조건부 패턴 보존 분석
-- **Scale**: 다양한 크기의 합성 데이터에 대한 성능 분석
+- [Key Features](#key-features)
+- [Project Structure](#project-structure)
+- [Installation](#installation)
+- [Quick Start](#quick-start)
+- [Workflow](#workflow)
+- [Model-Specific Usage](#model-specific-usage)
+- [Evaluation Metrics](#evaluation-metrics)
+- [Configuration Files](#configuration-files)
+- [Notes and Caveats](#notes-and-caveats)
+- [References](#references)
 
 ---
 
-## 프로젝트 구조
+## Key Features
+
+### Supported Synthetic Data Generation Models
+
+| Model | Type | Description | Directory |
+|-------|------|-------------|-----------|
+| **TabDDPM** | Diffusion | Denoising Diffusion-based tabular data generation | `tab_ddpm/`, `scripts/` |
+| **CTGAN** | GAN | Conditional GAN-based generation | `CTGAN/` |
+| **TVAE** | VAE | Variational Autoencoder-based generation | `CTGAN/` |
+| **CTAB-GAN** | GAN | GAN specialized for tabular data | `CTAB-GAN/` |
+| **CTAB-GAN-Plus** | GAN | Improved version of CTAB-GAN (with privacy features) | `CTAB-GAN-Plus/` |
+| **GReaT** | Transformer | GPT-2 based generation model | `be_great/` |
+| **TabPFGen** | Energy Model | TabPFN-based energy model generation | `TabPFGen/` |
+| **SMOTE** | Oversampling | Oversampling-based data augmentation | `smote/` |
+
+### Evaluation Methods
+
+- **MLE (Machine Learning Efficacy)**: Downstream task performance evaluation using CatBoost/MLP classifiers
+- **SynthEval**: Comprehensive evaluation metrics including statistical similarity and distribution similarity
+- **Privacy**: Privacy protection level evaluation (IR, DCR, NNDR, TCAP)
+- **Fidelity**: Label distribution and conditional pattern preservation analysis
+- **Scale**: Performance analysis across various synthetic data sizes
+
+---
+
+## Project Structure
 
 ```
 Fin-Syn/
-├── scripts/                    # 주요 실행 스크립트
-│   ├── pipeline.py             # TabDDPM 파이프라인 (학습/생성/평가)
-│   ├── train.py                # TabDDPM 학습
-│   ├── sample.py               # TabDDPM 샘플링
-│   ├── tune_ddpm.py            # TabDDPM 하이퍼파라미터 튜닝
-│   ├── tune_evaluation_model.py # 평가 모델 튜닝
-│   ├── eval_catboost.py        # CatBoost 기반 평가
-│   ├── eval_mlp.py             # MLP 기반 평가
-│   ├── eval_simple.py          # 간단한 모델 평가 (tree, rf, lr, mlp)
-│   ├── eval_seeds.py           # 다중 시드 평가 (CatBoost/MLP)
-│   ├── eval_seeds_simple.py    # 다중 시드 평가 (간단한 모델)
-│   ├── eval_syntheval_style.py # SynthEval 스타일 평가 (직접 구현)
-│   ├── eval_syntheval_total.py # SynthEval 공식 라이브러리 평가
-│   ├── eval_privacy.py         # Privacy 평가 (IR, DCR, NNDR, TCAP)
-│   ├── eval_fraud_fidelity.py  # Fraud 레이블 충실도 분석
-│   ├── sample_and_eval_scale.py # 크기별 스케일 평가
-│   ├── plot_scale_mle.py       # 크기별 평가 결과 시각화
-│   ├── resample_privacy.py     # 프라이버시 리샘플링
-│   └── utils_train.py          # 학습 유틸리티 함수
+├── scripts/                    # Main execution scripts
+│   ├── pipeline.py             # TabDDPM pipeline (train/sample/eval)
+│   ├── train.py                # TabDDPM training
+│   ├── sample.py               # TabDDPM sampling
+│   ├── tune_ddpm.py            # TabDDPM hyperparameter tuning
+│   ├── tune_evaluation_model.py # Evaluation model tuning
+│   ├── eval_catboost.py        # CatBoost-based evaluation
+│   ├── eval_mlp.py             # MLP-based evaluation
+│   ├── eval_simple.py          # Simple model evaluation (tree, rf, lr, mlp)
+│   ├── eval_seeds.py           # Multi-seed evaluation (CatBoost/MLP)
+│   ├── eval_seeds_simple.py    # Multi-seed evaluation (simple models)
+│   ├── eval_syntheval_style.py # SynthEval-style evaluation (custom impl.)
+│   ├── eval_syntheval_total.py # Official SynthEval library evaluation
+│   ├── eval_privacy.py         # Privacy evaluation (IR, DCR, NNDR, TCAP)
+│   ├── eval_fraud_fidelity.py  # Fraud label fidelity analysis
+│   ├── sample_and_eval_scale.py # Scale-based evaluation
+│   ├── plot_scale_mle.py       # Scale evaluation result visualization
+│   ├── resample_privacy.py     # Privacy resampling
+│   └── utils_train.py          # Training utility functions
 │
-├── lib/                        # 공통 유틸리티 라이브러리
-│   ├── data.py                 # 데이터 전처리 및 로딩
-│   ├── deep.py                 # 딥러닝 모델 유틸리티
-│   ├── metrics.py              # 평가 지표 계산
-│   ├── util.py                 # 설정/파일 관리 유틸리티
-│   └── env.py                  # 환경 설정
+├── lib/                        # Common utility library
+│   ├── data.py                 # Data preprocessing and loading
+│   ├── deep.py                 # Deep learning model utilities
+│   ├── metrics.py              # Evaluation metric computation
+│   ├── util.py                 # Config/file management utilities
+│   └── env.py                  # Environment settings
 │
-├── tab_ddpm/                   # TabDDPM 모델 구현
-│   ├── gaussian_multinomial_diffsuion.py  # Diffusion 모델
-│   ├── modules.py              # MLP/ResNet 모듈
-│   └── utils.py                # 유틸리티
+├── tab_ddpm/                   # TabDDPM model implementation
+│   ├── gaussian_multinomial_diffsuion.py  # Diffusion model
+│   ├── modules.py              # MLP/ResNet modules
+│   └── utils.py                # Utilities
 │
-├── CTGAN/                      # CTGAN/TVAE 구현
-│   ├── pipeline_ctgan.py       # CTGAN 파이프라인
-│   ├── pipeline_tvae.py        # TVAE 파이프라인
-│   ├── tune_ctgan.py           # CTGAN 튜닝
-│   ├── tune_tvae.py            # TVAE 튜닝
-│   ├── train_sample_ctgan.py   # CTGAN 학습/샘플링
-│   └── train_sample_tvae.py    # TVAE 학습/샘플링
+├── CTGAN/                      # CTGAN/TVAE implementation
+│   ├── pipeline_ctgan.py       # CTGAN pipeline
+│   ├── pipeline_tvae.py        # TVAE pipeline
+│   ├── tune_ctgan.py           # CTGAN tuning
+│   ├── tune_tvae.py            # TVAE tuning
+│   ├── train_sample_ctgan.py   # CTGAN train/sample
+│   └── train_sample_tvae.py    # TVAE train/sample
 │
-├── CTAB-GAN/                   # CTAB-GAN 구현
-│   ├── pipeline_ctabgan.py     # 파이프라인
-│   └── model/                  # 모델 구현
+├── CTAB-GAN/                   # CTAB-GAN implementation
+│   ├── pipeline_ctabgan.py     # Pipeline
+│   └── model/                  # Model implementation
 │
-├── CTAB-GAN-Plus/              # CTAB-GAN-Plus 구현
-│   ├── pipeline_ctabganp.py    # 파이프라인
-│   └── model/                  # 모델 구현 (privacy_utils 포함)
+├── CTAB-GAN-Plus/              # CTAB-GAN-Plus implementation
+│   ├── pipeline_ctabganp.py    # Pipeline
+│   └── model/                  # Model implementation (incl. privacy_utils)
 │
-├── be_great/                   # GReaT 구현
-│   ├── pipeline_great.py       # 파이프라인
-│   ├── tune_great.py           # 튜닝
-│   └── be_great/               # 모델 구현
+├── be_great/                   # GReaT implementation
+│   ├── pipeline_great.py       # Pipeline
+│   ├── tune_great.py           # Tuning
+│   └── be_great/               # Model implementation
 │
-├── TabPFGen/                   # TabPFGen 구현
-│   ├── pipeline_tabpfgen.py    # 파이프라인
-│   ├── tune_tabpfgen.py        # 튜닝
-│   └── src/                    # 모델 구현
+├── TabPFGen/                   # TabPFGen implementation
+│   ├── pipeline_tabpfgen.py    # Pipeline
+│   ├── tune_tabpfgen.py        # Tuning
+│   └── src/                    # Model implementation
 │
-├── smote/                      # SMOTE 구현
-│   ├── pipeline_smote.py       # 파이프라인
-│   ├── tune_smote.py           # 튜닝
-│   └── sample_smote.py         # 샘플링
+├── smote/                      # SMOTE implementation
+│   ├── pipeline_smote.py       # Pipeline
+│   ├── tune_smote.py           # Tuning
+│   └── sample_smote.py         # Sampling
 │
-├── exp/                        # 실험 결과 저장 디렉토리
-│   └── [dataset_name]/         # 데이터셋별 디렉토리
-│       └── [model_name]/       # 모델별 디렉토리
-│           ├── config.toml     # 설정 파일
-│           ├── *.obj / *.pt    # 학습된 모델
-│           ├── X_*.npy, y_*.npy # 합성 데이터
-│           ├── eval_*.json     # 평가 결과
-│           └── size_*/         # 크기별 결과
+├── exp/                        # Experiment results directory
+│   └── [dataset_name]/         # Per-dataset directory
+│       └── [model_name]/       # Per-model directory
+│           ├── config.toml     # Configuration file
+│           ├── *.obj / *.pt    # Trained model
+│           ├── X_*.npy, y_*.npy # Synthetic data
+│           ├── eval_*.json     # Evaluation results
+│           └── size_*/         # Scale-specific results
 │
-├── tuned_models/               # 튜닝된 평가 모델 저장
-│   ├── catboost/               # CatBoost 하이퍼파라미터
-│   └── mlp/                    # MLP 하이퍼파라미터
+├── tuned_models/               # Tuned evaluation model storage
+│   ├── catboost/               # CatBoost hyperparameters
+│   └── mlp/                    # MLP hyperparameters
 │
-├── run_orig_*.sh               # 모델별 실행 스크립트
+├── run_orig_*.sh               # Per-model execution scripts
 │   ├── run_orig_ddpm.sh        # TabDDPM
 │   ├── run_orig_ctgan.sh       # CTGAN
 │   ├── run_orig_tvae.sh        # TVAE
@@ -132,42 +132,42 @@ Fin-Syn/
 │   ├── run_orig_tabpfgen.sh    # TabPFGen
 │   └── run_orig_smote.sh       # SMOTE
 │
-├── requirements.txt            # Python 의존성
-└── LICENSE.md                  # MIT 라이선스
+├── requirements.txt            # Python dependencies
+└── LICENSE.md                  # MIT License
 ```
 
 ---
 
-## 설치
+## Installation
 
-### 요구사항
+### Requirements
 
 - Python 3.9+
-- PyTorch 1.10.1+ (CUDA 지원 권장)
-- NumPy < 2.0 (PyArrow 호환성)
+- PyTorch 1.10.1+ (CUDA support recommended)
+- NumPy < 2.0 (PyArrow compatibility)
 
-### Conda 환경 설정
+### Conda Environment Setup
 
-프로젝트는 여러 Conda 환경을 사용합니다:
+The project uses multiple Conda environments:
 
 ```bash
-# 메인 환경 (TabDDPM, CTGAN, TVAE, CTAB-GAN, TabPFGen 등)
+# Main environment (TabDDPM, CTGAN, TVAE, CTAB-GAN, TabPFGen, etc.)
 conda create -n tddpm python=3.9
 conda activate tddpm
 pip install -r requirements.txt
 
-# GReaT 모델용 환경 (transformers 버전 충돌로 별도 환경 필요)
+# GReaT model environment (separate due to transformers version conflicts)
 conda create -n tddpm2 python=3.9
 conda activate tddpm2
 pip install -r be_great/requirements.txt
 
-# SynthEval 라이브러리 평가용 환경
+# SynthEval library evaluation environment
 conda create -n finsyn python=3.9
 conda activate finsyn
 pip install syntheval
 ```
 
-### 주요 의존성
+### Key Dependencies
 
 ```
 catboost==1.0.3
@@ -182,27 +182,27 @@ rdt==0.6.4               # TVAE
 
 ---
 
-## 빠른 시작
+## Quick Start
 
-### 1. 데이터 준비
+### 1. Data Preparation
 
-데이터는 다음 형식으로 `exp/[dataset_name]/` 디렉토리에 준비합니다:
+Prepare data in the following format under `exp/[dataset_name]/` directory:
 
 ```
 exp/[dataset_name]/
-├── info.json           # 데이터셋 메타정보
-├── X_num_train.npy     # 수치형 피처 (optional)
-├── X_cat_train.npy     # 범주형 피처 (optional)
-├── y_train.npy         # 타겟 변수
-├── X_num_val.npy       # 검증 수치형 피처
-├── X_cat_val.npy       # 검증 범주형 피처
-├── y_val.npy           # 검증 타겟
-├── X_num_test.npy      # 테스트 수치형 피처
-├── X_cat_test.npy      # 테스트 범주형 피처
-└── y_test.npy          # 테스트 타겟
+├── info.json           # Dataset metadata
+├── X_num_train.npy     # Numerical features (optional)
+├── X_cat_train.npy     # Categorical features (optional)
+├── y_train.npy         # Target variable
+├── X_num_val.npy       # Validation numerical features
+├── X_cat_val.npy       # Validation categorical features
+├── y_val.npy           # Validation target
+├── X_num_test.npy      # Test numerical features
+├── X_cat_test.npy      # Test categorical features
+└── y_test.npy          # Test target
 ```
 
-`info.json` 예시:
+`info.json` example:
 ```json
 {
     "task_type": "binclass",
@@ -214,83 +214,83 @@ exp/[dataset_name]/
 }
 ```
 
-### 2. 평가 모델 튜닝
+### 2. Evaluation Model Tuning
 
 ```bash
-# CatBoost 튜닝
+# CatBoost tuning
 python scripts/tune_evaluation_model.py [dataset_name] catboost cv cuda:0
 
-# MLP 튜닝
+# MLP tuning
 python scripts/tune_evaluation_model.py [dataset_name] mlp cv cuda:0
 ```
 
-### 3. 합성 데이터 생성 및 평가
+### 3. Synthetic Data Generation and Evaluation
 
 ```bash
-# TabDDPM 예시
+# TabDDPM example
 python scripts/tune_ddpm.py [dataset_name] [train_size] synthetic catboost ddpm_cb
 python scripts/pipeline.py --config exp/[dataset_name]/ddpm_cb_best/config.toml --train --sample --eval
 
-# CTGAN 예시
+# CTGAN example
 python CTGAN/tune_ctgan.py exp/[dataset_name]/ [train_size] synthetic cuda:0
 python CTGAN/pipeline_ctgan.py --config exp/[dataset_name]/ctgan/config.toml --train --sample --eval
 ```
 
 ---
 
-## 워크플로우
+## Workflow
 
-### 전체 파이프라인
+### Full Pipeline
 
 ```
-1. 데이터 준비
+1. Data Preparation
        ↓
-2. 평가 모델 튜닝 (CatBoost/MLP)
+2. Evaluation Model Tuning (CatBoost/MLP)
        ↓
-3. 생성 모델 하이퍼파라미터 튜닝
+3. Generation Model Hyperparameter Tuning
        ↓
-4. 모델 학습 (--train)
+4. Model Training (--train)
        ↓
-5. 합성 데이터 생성 (--sample)
+5. Synthetic Data Generation (--sample)
        ↓
-6. 평가 (--eval)
+6. Evaluation (--eval)
        ↓
-7. 다중 시드 평가 (eval_seeds.py)
+7. Multi-seed Evaluation (eval_seeds.py)
        ↓
-8. 크기별 스케일 평가 (sample_and_eval_scale.py)
+8. Scale-based Evaluation (sample_and_eval_scale.py)
        ↓
-9. SynthEval/Privacy 평가
+9. SynthEval/Privacy Evaluation
 ```
 
-### 공통 명령어 인자
+### Common Command Arguments
 
-모든 파이프라인 스크립트는 다음 인자를 지원합니다:
+All pipeline scripts support the following arguments:
 
-| 인자 | 설명 |
-|------|------|
-| `--config` | 설정 파일 경로 (config.toml) |
-| `--train` | 모델 학습 실행 |
-| `--sample` | 합성 데이터 생성 |
-| `--eval` | 평가 실행 |
-| `--change_val` | 검증 데이터 분할 변경 |
+| Argument | Description |
+|----------|-------------|
+| `--config` | Configuration file path (config.toml) |
+| `--train` | Execute model training |
+| `--sample` | Generate synthetic data |
+| `--eval` | Execute evaluation |
+| `--change_val` | Change validation data split |
 
 ---
 
-## 모델별 사용법
+## Model-Specific Usage
 
 ### TabDDPM (Diffusion Model)
 
 ```bash
-# 튜닝
+# Tuning
 python scripts/tune_ddpm.py orig-micro-retry 63703 synthetic catboost ddpm_cb
 
-# 학습/생성/평가
+# Train/Sample/Eval
 python scripts/pipeline.py --config exp/orig-micro-retry/ddpm_cb_best/config.toml --train --sample --eval
 
-# 다중 시드 평가
+# Multi-seed evaluation
 python scripts/eval_seeds.py --config exp/orig-micro-retry/ddpm_cb_best/config.toml 10 ddpm synthetic catboost 5
 
-# 크기별 평가
+# Scale-based evaluation
 python scripts/sample_and_eval_scale.py --config exp/orig-micro-retry/ddpm_cb_best/config.toml \
     --model_type ddpm --sizes 1.0 1.5 2.0 --seed 0 --change_val --n_seeds 5
 ```
@@ -298,13 +298,13 @@ python scripts/sample_and_eval_scale.py --config exp/orig-micro-retry/ddpm_cb_be
 ### CTGAN
 
 ```bash
-# 튜닝
+# Tuning
 python CTGAN/tune_ctgan.py exp/orig-micro-retry/ 63703 synthetic cuda:0
 
-# 학습/생성/평가
+# Train/Sample/Eval
 python CTGAN/pipeline_ctgan.py --config exp/orig-micro-retry/ctgan/config.toml --train --sample --eval
 
-# 크기별 평가
+# Scale-based evaluation
 python scripts/sample_and_eval_scale.py --config exp/orig-micro-retry/ctgan/config.toml \
     --model_type ctgan --sizes 1.0 1.5 2.0 --seed 0 --change_val --n_seeds 5
 ```
@@ -330,7 +330,7 @@ python CTAB-GAN-Plus/pipeline_ctabganp.py --config exp/orig-micro-retry/ctabgan-
 
 ### GReaT (Transformer)
 
-> **주의**: GReaT는 별도의 conda 환경(`tddpm2`)에서 실행해야 합니다.
+> **Note**: GReaT must be run in a separate conda environment (`tddpm2`).
 
 ```bash
 conda activate tddpm2
@@ -348,32 +348,32 @@ python TabPFGen/pipeline_tabpfgen.py --config exp/orig-micro-retry/tabpfgen/conf
 ### SMOTE
 
 ```bash
-# SMOTE는 학습 단계 없이 바로 샘플링
+# SMOTE samples directly without a training step
 python smote/tune_smote.py exp/orig-micro-retry/ synthetic
 python smote/pipeline_smote.py --config exp/orig-micro-retry/smote/config.toml --sample --eval
 ```
 
 ---
 
-## 평가 메트릭
+## Evaluation Metrics
 
-### MLE (Machine Learning Efficacy) 메트릭
+### MLE (Machine Learning Efficacy) Metrics
 
-| 메트릭 | 설명 |
-|--------|------|
-| `acc` | 정확도 |
-| `f1` | F1 스코어 |
-| `f1_0`, `f1_1` | 클래스별 F1 스코어 |
-| `f1_weighted` | 가중 F1 스코어 |
-| `balanced_acc` | 균형 정확도 |
-| `mcc` | Matthews 상관계수 |
+| Metric | Description |
+|--------|-------------|
+| `acc` | Accuracy |
+| `f1` | F1 Score |
+| `f1_0`, `f1_1` | Per-class F1 Score |
+| `f1_weighted` | Weighted F1 Score |
+| `balanced_acc` | Balanced Accuracy |
+| `mcc` | Matthews Correlation Coefficient |
 | `kappa` | Cohen's Kappa |
 | `roc_auc` | ROC AUC |
 
-### SynthEval 메트릭
+### SynthEval Metrics
 
-| 메트릭 | 설명 |
-|--------|------|
+| Metric | Description |
+|--------|-------------|
 | `dwm` | Distance to Closest Record (DCR) |
 | `p_mse` | Predictive Mean Squared Error |
 | `corr_diff` | Correlation Difference |
@@ -386,20 +386,20 @@ python smote/pipeline_smote.py --config exp/orig-micro-retry/smote/config.toml -
 | `theils_u` | Theil's U |
 
 ```bash
-# SynthEval 스타일 평가 (직접 구현)
+# SynthEval-style evaluation (custom implementation)
 python scripts/eval_syntheval_style.py --config exp/[dataset]/[model]/config.toml \
     --metrics dwm p_mse corr_diff ks_test
 
-# SynthEval 공식 라이브러리 평가 (finsyn 환경 필요)
+# Official SynthEval library evaluation (requires finsyn environment)
 conda activate finsyn
 python scripts/eval_syntheval_total.py --config exp/[dataset]/[model]/config.toml \
     --preset full_eval --change_val --exclude nnaa
 ```
 
-### Privacy 메트릭
+### Privacy Metrics
 
-| 메트릭 | 설명 |
-|--------|------|
+| Metric | Description |
+|--------|-------------|
 | `ir` | Identity Risk |
 | `dcr` | Distance to Closest Record |
 | `nndr` | Nearest Neighbor Distance Ratio |
@@ -410,9 +410,9 @@ python scripts/eval_privacy.py --config exp/[dataset]/[model]/config.toml \
     --metrics ir dcr nndr tcap
 ```
 
-### Fraud Fidelity 분석
+### Fraud Fidelity Analysis
 
-레이블 분포 보존 및 조건부 패턴 비교 분석:
+Label distribution preservation and conditional pattern comparison analysis:
 
 ```bash
 python scripts/eval_fraud_fidelity.py --exp_dir exp/[dataset] \
@@ -423,11 +423,11 @@ python scripts/eval_fraud_fidelity.py --exp_dir exp/[dataset] \
 
 ---
 
-## 설정 파일
+## Configuration Files
 
-각 실험은 `config.toml` 파일로 관리됩니다.
+Each experiment is managed via a `config.toml` file.
 
-### TabDDPM config.toml 예시
+### TabDDPM config.toml Example
 
 ```toml
 seed = 0
@@ -470,7 +470,7 @@ eval_model = "catboost"
 eval_type = "synthetic"
 ```
 
-### CTGAN config.toml 예시
+### CTGAN config.toml Example
 
 ```toml
 parent_dir = "exp/orig-micro-retry/ctgan/"
@@ -500,36 +500,36 @@ eval_type = "synthetic"
 
 ---
 
-## 주의사항
+## Notes and Caveats
 
-### 환경별 실행
+### Environment-Specific Execution
 
-| 모델/평가 | 환경 |
-|-----------|------|
+| Model/Evaluation | Environment |
+|------------------|-------------|
 | TabDDPM, CTGAN, TVAE, CTAB-GAN, TabPFGen, SMOTE | `tddpm` |
 | GReaT | `tddpm2` |
-| SynthEval 공식 라이브러리 평가 | `finsyn` |
+| Official SynthEval library evaluation | `finsyn` |
 
-### 알려진 이슈
+### Known Issues
 
-1. **NVIDIA L40 GPU**: JIT 컴파일 오류로 인해 일부 학습 실패 가능
-   - 오류: `nvrtc: error: invalid value for --gpu-architecture`
+1. **NVIDIA L40 GPU**: Some training may fail due to JIT compilation errors
+   - Error: `nvrtc: error: invalid value for --gpu-architecture`
 
-2. **SynthEval ks_test**: CPU/메모리 오버플로우 이슈
-   - 해결: `--exclude nnaa` 옵션 사용 또는 `eval_syntheval_style.py`로 별도 평가
+2. **SynthEval ks_test**: CPU/memory overflow issues
+   - Solution: Use `--exclude nnaa` option or evaluate separately with `eval_syntheval_style.py`
 
-3. **NumPy 버전**: PyArrow 호환성을 위해 NumPy < 2.0 사용 필요
+3. **NumPy Version**: NumPy < 2.0 required for PyArrow compatibility
 
-4. **메모리 제한**: 큰 데이터셋의 경우 배치 크기 조정 필요
+4. **Memory Limitations**: Adjust batch size for large datasets
 
-### 결과 시각화
+### Result Visualization
 
 ```bash
-# 크기별 MLE 평가 결과 플롯
+# Scale-based MLE evaluation result plots
 python scripts/plot_scale_mle.py --base_dir exp/[dataset]/[model]
 ```
 
-생성되는 플롯:
+Generated plots:
 - `scale_mle_accuracy.png`
 - `scale_mle_f1_neg.png`
 - `scale_mle_f1_pos.png`
@@ -537,24 +537,24 @@ python scripts/plot_scale_mle.py --base_dir exp/[dataset]/[model]
 
 ---
 
-## 참고 자료
+## References
 
-### 논문
+### Papers
 
 - **TabDDPM**: [TabDDPM: Modelling Tabular Data with Diffusion Models](https://arxiv.org/abs/2209.15421)
 - **CTGAN/TVAE**: [Modeling Tabular data using Conditional GAN](https://arxiv.org/abs/1907.00503)
 - **CTAB-GAN**: [CTAB-GAN: Effective Table Data Synthesizing](https://arxiv.org/abs/2102.08369)
 - **GReaT**: [Language Models are Realistic Tabular Data Generators](https://arxiv.org/abs/2210.06280)
 
-### 라이브러리
+### Libraries
 
-- [SynthEval](https://github.com/schneiderkamplab/syntheval) - 합성 데이터 평가 라이브러리
-- [SDV (Synthetic Data Vault)](https://github.com/sdv-dev/SDV) - CTGAN/TVAE 구현
+- [SynthEval](https://github.com/schneiderkamplab/syntheval) - Synthetic data evaluation library
+- [SDV (Synthetic Data Vault)](https://github.com/sdv-dev/SDV) - CTGAN/TVAE implementation
 
 ---
 
-## 라이선스
+## License
 
-MIT License - 자세한 내용은 [LICENSE.md](LICENSE.md)를 참조하세요.
+MIT License - See [LICENSE.md](LICENSE.md) for details.
 
-각 서브모듈의 라이선스는 해당 디렉토리의 LICENSE 파일을 확인하세요.
+For submodule licenses, please refer to the LICENSE file in each directory.
