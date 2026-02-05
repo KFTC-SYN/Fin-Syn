@@ -500,29 +500,7 @@ eval_type = "synthetic"
 
 ---
 
-## Notes and Caveats
-
-### Environment-Specific Execution
-
-| Model/Evaluation | Environment |
-|------------------|-------------|
-| TabDDPM, CTGAN, TVAE, CTAB-GAN, TabPFGen, SMOTE | `tddpm` |
-| GReaT | `tddpm2` |
-| Official SynthEval library evaluation | `finsyn` |
-
-### Known Issues
-
-1. **NVIDIA L40 GPU**: Some training may fail due to JIT compilation errors
-   - Error: `nvrtc: error: invalid value for --gpu-architecture`
-
-2. **SynthEval ks_test**: CPU/memory overflow issues
-   - Solution: Use `--exclude nnaa` option or evaluate separately with `eval_syntheval_style.py`
-
-3. **NumPy Version**: NumPy < 2.0 required for PyArrow compatibility
-
-4. **Memory Limitations**: Adjust batch size for large datasets
-
-### Result Visualization
+## Result Visualization
 
 ```bash
 # Scale-based MLE evaluation result plots
