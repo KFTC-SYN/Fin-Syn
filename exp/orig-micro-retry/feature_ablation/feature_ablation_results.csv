@@ -1,0 +1,4 @@
+Condition,Features,Accuracy,F1-score (Neg.),F1-score (Pos.),ROC-AUC,MCC
+Full (all features),9,0.9999,0.9999,0.9962,1.0,0.9961
+- Account IDs,7,0.9989,0.9994,0.9722,1.0,0.972
+- Account IDs - FI IDs,5,0.9952,0.9975,0.8826,0.9953,0.8822

@@ -1,0 +1,9 @@
+Model,Suspicious_Count,Total,Suspicious_Ratio(%),Delta(%p),ROC-AUC,Failure_Mode
+SMOTE,1186,61883,1.92,0.0,0.9997,Faithful
+CTGAN,6438,63703,10.11,8.19,0.7592,Label collapse
+TVAE,1862,63703,2.92,1.01,0.6378,Mild distortion
+CTAB-GAN,1692,63703,2.66,0.74,0.7407,Mild distortion
+CTAB-GAN+,4212,63703,6.61,4.7,0.8458,Label collapse
+TabDDPM,1226,63703,1.92,0.01,0.9995,Faithful
+GReaT,1080,63703,1.7,0.22,0.9987,Faithful
+TabPFGen,21863,63702,34.32,32.4,0.7368,Label collapse

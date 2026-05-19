@@ -218,7 +218,7 @@ def normalize(
         normalizer = sklearn.preprocessing.QuantileTransformer(
             output_distribution='normal',
             n_quantiles=max(min(X['train'].shape[0] // 30, 1000), 10),
-            subsample=1e9,  # 2025.12.21 None으로 설정하면 모든 데이터를 사용 (이전에는 1e9로 설정했으나 float 값은 최신 scikit-learn에서 허용되지 않음)
+            subsample=int(1e9),  # int로 변환 (최신 scikit-learn에서 float 허용되지 않음)
             random_state=seed,
         )
         # noise = 1e-3

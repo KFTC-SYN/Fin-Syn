@@ -1,0 +1,201 @@
+{
+  "original": {
+    "total": 63703,
+    "suspicious": 1221,
+    "ratio_pct": 1.917
+  },
+  "models": {
+    "SMOTE": {
+      "ratio": {
+        "Model": "SMOTE",
+        "Suspicious_Count": 1186,
+        "Total": 61883,
+        "Suspicious_Ratio(%)": 1.92,
+        "Delta(%p)": 0.0,
+        "ROC-AUC": 0.9997,
+        "Failure_Mode": "Faithful"
+      },
+      "js_divergence": {
+        "Model": "SMOTE",
+        "Amount": 0.004,
+        "Date": 0.119,
+        "Time": 0.002,
+        "WD Bank": 0.004,
+        "WD Acct": 0.144,
+        "DP Bank": 0.017,
+        "DP Acct": 0.176,
+        "Media": 0.003,
+        "Fund": 0.0,
+        "Mean_JS": 0.052
+      }
+    },
+    "CTGAN": {
+      "ratio": {
+        "Model": "CTGAN",
+        "Suspicious_Count": 6438,
+        "Total": 63703,
+        "Suspicious_Ratio(%)": 10.11,
+        "Delta(%p)": 8.19,
+        "ROC-AUC": 0.7592,
+        "Failure_Mode": "Label collapse"
+      },
+      "js_divergence": {
+        "Model": "CTGAN",
+        "Amount": 0.109,
+        "Date": 0.214,
+        "Time": 0.028,
+        "WD Bank": 0.042,
+        "WD Acct": 0.238,
+        "DP Bank": 0.067,
+        "DP Acct": 0.223,
+        "Media": 0.021,
+        "Fund": 0.003,
+        "Mean_JS": 0.105
+      }
+    },
+    "TVAE": {
+      "ratio": {
+        "Model": "TVAE",
+        "Suspicious_Count": 1862,
+        "Total": 63703,
+        "Suspicious_Ratio(%)": 2.92,
+        "Delta(%p)": 1.01,
+        "ROC-AUC": 0.6378,
+        "Failure_Mode": "Mild distortion"
+      },
+      "js_divergence": {
+        "Model": "TVAE",
+        "Amount": 0.106,
+        "Date": 0.54,
+        "Time": 0.271,
+        "WD Bank": 0.114,
+        "WD Acct": 0.495,
+        "DP Bank": 0.25,
+        "DP Acct": 0.57,
+        "Media": 0.074,
+        "Fund": 0.0,
+        "Mean_JS": 0.269
+      }
+    },
+    "CTAB-GAN": {
+      "ratio": {
+        "Model": "CTAB-GAN",
+        "Suspicious_Count": 1692,
+        "Total": 63703,
+        "Suspicious_Ratio(%)": 2.66,
+        "Delta(%p)": 0.74,
+        "ROC-AUC": 0.7407,
+        "Failure_Mode": "Mild distortion"
+      },
+      "js_divergence": {
+        "Model": "CTAB-GAN",
+        "Amount": 0.045,
+        "Date": 0.559,
+        "Time": 0.103,
+        "WD Bank": 0.214,
+        "WD Acct": 0.527,
+        "DP Bank": 0.307,
+        "DP Acct": 0.577,
+        "Media": 0.138,
+        "Fund": 0.006,
+        "Mean_JS": 0.275
+      }
+    },
+    "CTAB-GAN+": {
+      "ratio": {
+        "Model": "CTAB-GAN+",
+        "Suspicious_Count": 4212,
+        "Total": 63703,
+        "Suspicious_Ratio(%)": 6.61,
+        "Delta(%p)": 4.7,
+        "ROC-AUC": 0.8458,
+        "Failure_Mode": "Label collapse"
+      },
+      "js_divergence": {
+        "Model": "CTAB-GAN+",
+        "Amount": 0.077,
+        "Date": 0.346,
+        "Time": 0.016,
+        "WD Bank": 0.029,
+        "WD Acct": 0.253,
+        "DP Bank": 0.043,
+        "DP Acct": 0.301,
+        "Media": 0.009,
+        "Fund": 0.001,
+        "Mean_JS": 0.12
+      }
+    },
+    "TabDDPM": {
+      "ratio": {
+        "Model": "TabDDPM",
+        "Suspicious_Count": 1226,
+        "Total": 63703,
+        "Suspicious_Ratio(%)": 1.92,
+        "Delta(%p)": 0.01,
+        "ROC-AUC": 0.9995,
+        "Failure_Mode": "Faithful"
+      },
+      "js_divergence": {
+        "Model": "TabDDPM",
+        "Amount": 0.012,
+        "Date": 0.05,
+        "Time": 0.003,
+        "WD Bank": 0.007,
+        "WD Acct": 0.074,
+        "DP Bank": 0.01,
+        "DP Acct": 0.098,
+        "Media": 0.006,
+        "Fund": 0.0,
+        "Mean_JS": 0.029
+      }
+    },
+    "GReaT": {
+      "ratio": {
+        "Model": "GReaT",
+        "Suspicious_Count": 1080,
+        "Total": 63703,
+        "Suspicious_Ratio(%)": 1.7,
+        "Delta(%p)": 0.22,
+        "ROC-AUC": 0.9987,
+        "Failure_Mode": "Faithful"
+      },
+      "js_divergence": {
+        "Model": "GReaT",
+        "Amount": 0.0,
+        "Date": 0.048,
+        "Time": 0.001,
+        "WD Bank": 0.004,
+        "WD Acct": 0.056,
+        "DP Bank": 0.008,
+        "DP Acct": 0.083,
+        "Media": 0.002,
+        "Fund": 0.0,
+        "Mean_JS": 0.023
+      }
+    },
+    "TabPFGen": {
+      "ratio": {
+        "Model": "TabPFGen",
+        "Suspicious_Count": 21863,
+        "Total": 63702,
+        "Suspicious_Ratio(%)": 34.32,
+        "Delta(%p)": 32.4,
+        "ROC-AUC": 0.7368,
+        "Failure_Mode": "Label collapse"
+      },
+      "js_divergence": {
+        "Model": "TabPFGen",
+        "Amount": 0.009,
+        "Date": 0.693,
+        "Time": 0.599,
+        "WD Bank": 0.693,
+        "WD Acct": 0.693,
+        "DP Bank": 0.693,
+        "DP Acct": 0.693,
+        "Media": 0.585,
+        "Fund": 0.0,
+        "Mean_JS": 0.518
+      }
+    }
+  }
+}

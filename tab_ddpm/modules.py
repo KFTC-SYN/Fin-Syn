@@ -554,7 +554,7 @@ class MLPDiffusion(nn.Module):
                 y = y.squeeze()
             else:
                 y = y.resize(y.size(0), 1).float()
-            emb += F.silu(self.label_emb(y))
+            emb = emb + F.silu(self.label_emb(y))
         x = self.proj(x) + emb
         return self.mlp(x)
 
@@ -593,7 +593,7 @@ class ResNetDiffusion(nn.Module):
     def forward(self, x, timesteps, y=None):
         emb = self.time_embed(timestep_embedding(timesteps, self.dim_t))
         if y is not None and self.num_classes > 0:
-            emb += self.label_emb(y.squeeze())
+            emb = emb + self.label_emb(y.squeeze())
         
         # emb를 x의 차원으로 projection하여 더함
         # return self.resnet(x, emb)  

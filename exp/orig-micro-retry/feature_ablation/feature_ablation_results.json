@@ -1,0 +1,29 @@
+[
+  {
+    "Condition": "Full (all features)",
+    "Features": 9,
+    "Accuracy": 0.9999,
+    "F1-score (Neg.)": 0.9999,
+    "F1-score (Pos.)": 0.9962,
+    "ROC-AUC": 1.0,
+    "MCC": 0.9961
+  },
+  {
+    "Condition": "- Account IDs",
+    "Features": 7,
+    "Accuracy": 0.9989,
+    "F1-score (Neg.)": 0.9994,
+    "F1-score (Pos.)": 0.9722,
+    "ROC-AUC": 1.0,
+    "MCC": 0.972
+  },
+  {
+    "Condition": "- Account IDs - FI IDs",
+    "Features": 5,
+    "Accuracy": 0.9952,
+    "F1-score (Neg.)": 0.9975,
+    "F1-score (Pos.)": 0.8826,
+    "ROC-AUC": 0.9953,
+    "MCC": 0.8822
+  }
+]
