@@ -127,9 +127,9 @@ def plot_label_distribution_comparison(
     ax.set_ylim([0, max(max(orig_vals), max(syn_vals)) * 1.2])
     
     plt.tight_layout()
-    plt.savefig(out_path, dpi=150, bbox_inches='tight')
+    plt.savefig(out_path, dpi=300, bbox_inches='tight')
     plt.close()
-    
+
     # CSV 파일로 저장
     csv_path = out_path.replace('.png', '.csv')
     csv_data = []
@@ -337,7 +337,7 @@ def plot_label_conditioned_feature_orig_vs_syn(
     ax.grid(True, alpha=0.3, linestyle=':')
 
     plt.tight_layout()
-    plt.savefig(out_path, dpi=150, bbox_inches='tight')
+    plt.savefig(out_path, dpi=300, bbox_inches='tight')
     plt.close()
 
 

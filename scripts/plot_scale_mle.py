@@ -162,7 +162,7 @@ def plot_size_metrics(base_parent_dir, eval_type='synthetic'):
         # 파일명에서 특수문자 제거
         filename_key = key.replace('_', '_').replace('-', '_')
         output_path = base_dir / f'scale_mle_{filename_key}_{eval_type}_{dir_suffix}.png'
-        plt.savefig(output_path, dpi=150, bbox_inches='tight')
+        plt.savefig(output_path, dpi=300, bbox_inches='tight')
         saved_paths.append(output_path)
         print(f"메트릭 plot 저장: {output_path}")
         
