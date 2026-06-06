@@ -515,6 +515,70 @@ Generated plots:
 
 ---
 
+## Reproducing Paper Results
+
+All results in the paper use the `orig-micro-retry` dataset
+(train / validation / test = 63,703 / 13,651 / 13,651). Run commands from the
+repository root in the `tddpm` environment unless noted otherwise.
+
+> **Data availability.** The released synthetic datasets are provided under
+> `exp/orig-micro-retry/*_syn_data*.csv`, so all synthetic-data evaluations are
+> fully reproducible. The real source transactions (`data/orig-micro-retry/`)
+> cannot be redistributed due to financial-privacy regulations; steps that
+> require the real data are marked with †.
+
+### Step 0 — tune the downstream evaluator (CatBoost)
+
+```bash
+python scripts/tune_evaluation_model.py orig-micro-retry catboost cv cuda:0
+```
+
+### Step 1 — generate and evaluate every model
+
+```bash
+bash run_orig_smote.sh
+bash run_orig_ctgan.sh
+bash run_orig_tvae.sh
+bash run_orig_ctab.sh
+bash run_orig_ctabp.sh
+bash run_orig_ddpm.sh
+bash run_orig_great.sh        # run in the tddpm2 environment
+bash run_orig_tabpfgen.sh
+```
+
+### Headline results — downstream fraud detection (paper Table IV)
+
+CatBoost trained on each synthetic set and evaluated on the real held-out test
+split. Produced by the Step 1 runs → `exp/orig-micro-retry/<model>/eval_catboost.json`.
+
+| Model            | F1 (Pos.) | ROC-AUC |
+|------------------|----------:|--------:|
+| Original (real)  |    0.9992 |  1.0000 |
+| SMOTE            |    0.9900 |  0.9997 |
+| CTGAN            |    0.1077 |  0.7592 |
+| TVAE             |    0.0502 |  0.6378 |
+| CTAB-GAN         |    0.0679 |  0.7407 |
+| CTAB-GAN+        |    0.1389 |  0.8458 |
+| TabDDPM          |    0.7509 |  0.9995 |
+| GReaT            |    0.6816 |  0.9987 |
+| TabPFGen         |    0.1107 |  0.7368 |
+
+### Per-table / per-figure commands
+
+| Paper item | Command | Output file |
+|---|---|---|
+| **Table III & V** (utility + privacy) | `conda activate finsyn`; `python scripts/eval_syntheval_total.py --config exp/orig-micro-retry/<model>/config.toml --preset full_eval --change_val --exclude nnaa` | `exp/orig-micro-retry/<model>/size_1.0x/eval_syntheval_total.json` |
+| **Table IV** (downstream) | Step 1 runs above | `exp/orig-micro-retry/<model>/eval_catboost.json` |
+| **Table VI** (feature ablation) † | `python scripts/eval_feature_ablation.py --data_dir data/orig-micro-retry --exp_dir exp/orig-micro-retry` | `exp/orig-micro-retry/feature_ablation/feature_ablation_results.json` |
+| **Tables VIII & X** (failure mode + feature-wise JS) † | `python scripts/eval_failure_mode.py --data_dir data/orig-micro-retry --exp_dir exp/orig-micro-retry` | `exp/orig-micro-retry/failure_mode_analysis/failure_mode_summary.json` |
+| **Figure 4** (effect of data scale) | `python scripts/sample_and_eval_scale.py --config exp/orig-micro-retry/ddpm_cb_best/config.toml --model_type ddpm --sizes 1.0 1.5 2.0 --seed 0 --change_val --n_seeds 5`; then `python scripts/plot_scale_mle.py --base_dir exp/orig-micro-retry/ddpm_cb_best` | `exp/orig-micro-retry/ddpm_cb_best/size_*/`, `scale_mle_*.png` |
+| **Table VII** (DP privacy–utility) | DP-enabled TabDDPM training with budgets ε ∈ {8, 4, 1}; configs and outputs are provided under `exp/orig-micro-retry/dp/` | `exp/orig-micro-retry/dp/dp_summary.csv` |
+
+Reported numbers are the mean over five independent runs; Figure 4 additionally
+shows the standard deviation as error bars.
+
+---
+
 ## References
 
 ### Papers
