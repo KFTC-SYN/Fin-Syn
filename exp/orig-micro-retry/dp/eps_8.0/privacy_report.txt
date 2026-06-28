@@ -1,0 +1,6 @@
+target_epsilon: 8.0
+final_epsilon: 7.990513
+delta: 1e-05
+max_grad_norm: 0.1
+noise_multiplier: 0.803223
+steps: 2480
