@@ -1,0 +1,79 @@
+{
+ "_baseline": {
+  "dcr_holdout_to_train": 0.3989601284265518,
+  "n_holdout": 20000,
+  "n_members": 20000
+ },
+ "smote": {
+  "copy_rate": 0.008884424003641672,
+  "dcr_syn_to_train": 0.16314321011304855,
+  "dcr_holdout_to_train": 0.3989601284265518,
+  "dcr_ratio": 0.408921088822747,
+  "dcr_share": 0.64925,
+  "mia_auc": 0.58630499625
+ },
+ "tabddpm": {
+  "copy_rate": 0.0,
+  "dcr_syn_to_train": 0.38031864166259766,
+  "dcr_holdout_to_train": 0.3989601284265518,
+  "dcr_ratio": 0.9532748126047738,
+  "dcr_share": 0.5433749999999999,
+  "mia_auc": 0.5247080712500001
+ },
+ "great": {
+  "copy_rate": 0.0,
+  "dcr_syn_to_train": 0.4094918817281723,
+  "dcr_holdout_to_train": 0.3989601284265518,
+  "dcr_ratio": 1.026398009603507,
+  "dcr_share": 0.49522499999999997,
+  "mia_auc": 0.49152555875000004
+ },
+ "tabpfgen": {
+  "copy_rate": 0.0,
+  "dcr_syn_to_train": 1.8521405458450317,
+  "dcr_holdout_to_train": 0.3989601284265518,
+  "dcr_ratio": 4.642420166520497,
+  "dcr_share": 0.29155000000000003,
+  "mia_auc": 0.4295693625
+ },
+ "tabpfgen-prior": {
+  "copy_rate": 0.0,
+  "dcr_syn_to_train": 1.8754212260246277,
+  "dcr_holdout_to_train": 0.3989601284265518,
+  "dcr_ratio": 4.700773567075616,
+  "dcr_share": 0.291975,
+  "mia_auc": 0.4302086275
+ },
+ "ctgan": {
+  "copy_rate": 0.0,
+  "dcr_syn_to_train": 1.560374140739441,
+  "dcr_holdout_to_train": 0.3989601284265518,
+  "dcr_ratio": 3.911102963830894,
+  "dcr_share": 0.4733,
+  "mia_auc": 0.45132091375
+ },
+ "tvae": {
+  "copy_rate": 0.0,
+  "dcr_syn_to_train": 0.6650326550006866,
+  "dcr_holdout_to_train": 0.3989601284265518,
+  "dcr_ratio": 1.666915081523287,
+  "dcr_share": 0.494375,
+  "mia_auc": 0.49805160249999997
+ },
+ "ctabgan": {
+  "copy_rate": 0.0,
+  "dcr_syn_to_train": 1.9441526532173157,
+  "dcr_holdout_to_train": 0.3989601284265518,
+  "dcr_ratio": 4.873049998466782,
+  "dcr_share": 0.47547500000000004,
+  "mia_auc": 0.45202931250000006
+ },
+ "ctabgan-plus": {
+  "copy_rate": 0.0,
+  "dcr_syn_to_train": 1.7331398129463196,
+  "dcr_holdout_to_train": 0.3989601284265518,
+  "dcr_ratio": 4.344142909171408,
+  "dcr_share": 0.4988,
+  "mia_auc": 0.46512938249999997
+ }
+}

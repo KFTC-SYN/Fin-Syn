@@ -7,13 +7,27 @@ from model.ctabgan import CTABGAN
 import torch
 import pickle
 
+
+def _seed_all(seed):
+    """학습을 재현 가능하게 만든다: 파이썬/넘파이/토치 RNG를 모두 고정.
+    원 구현은 학습 시드를 받지 않아 재실행마다 가중치 초기화가 달라졌다."""
+    import random
+    random.seed(seed)
+    np.random.seed(seed)
+    torch.manual_seed(seed)
+    if torch.cuda.is_available():
+        torch.cuda.manual_seed_all(seed)
+
+
 def train_ctabgan(
     parent_dir,
     real_data_path,
     train_params = {"batch_size": 512},
     change_val=False,
-    device = "cpu"
+    device = "cpu",
+    seed=0,
 ):
+    _seed_all(seed)
     real_data_path = Path(real_data_path)
     parent_dir = Path(parent_dir)
     device = torch.device(device)

@@ -415,11 +415,13 @@ class TabPFGen:
             x_synth = torch.cat(x_synth_list, dim=0)
             y_synth = torch.cat(y_synth_list, dim=0)
         else:
+            # (fin-syn 수정) np.unique(cuda tensor)가 TypeError를 내던 버그만 수정. 동작은 원본과 동일.
+            classes = np.unique(y_train.cpu().numpy())
             x_synth = (
                 torch.randn(n_samples, X_train.shape[1], device=self.device) * 0.01
             )
             y_synth = torch.randint(
-                0, len(np.unique(y_train)), (n_samples,), device=self.device
+                0, len(classes), (n_samples,), device=self.device
             )
 
         # SGLD iterations

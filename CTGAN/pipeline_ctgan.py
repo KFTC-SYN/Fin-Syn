@@ -39,7 +39,8 @@ def main():
             real_data_path=raw_config['real_data_path'],
             train_params=raw_config['train_params'],
             change_val=args.change_val,
-            device=raw_config['device']
+            device=raw_config['device'],
+            seed=raw_config['seed']
         )
     if args.sample:
         sample_ctgan(

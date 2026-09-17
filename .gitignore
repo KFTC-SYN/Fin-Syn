@@ -4,3 +4,11 @@ _manuscript/
 data/
 __pycache__/
 catboost_info/
+
+# v2 실험 산출물: 용량이 크고(생성기 체크포인트·합성 npy·예측값) 저장소에 둘 이유가 없다.
+# 결과 JSON(results/fidelity/noise_floor/표준지표 등)만 골라 커밋한다.
+exp/*/gen/
+exp/*/synth/
+exp/*/_backup_preseed/
+exp/*/logs/
+exp/*/leaderboard_*/pred_*.npy

@@ -1,0 +1,84 @@
+{"model": "tvae", "part": "train", "rc": 0, "minutes": 0.8, "device": "cuda:0"}
+{"model": "tvae", "part": "val", "rc": 0, "minutes": 0.3, "device": "cuda:0"}
+{"model": "tvae", "part": "test", "rc": 0, "minutes": 0.4, "device": "cuda:0"}
+{"model": "ctgan", "part": "train", "rc": 0, "minutes": 1.6, "device": "cuda:0"}
+{"model": "ctgan", "part": "val", "rc": 0, "minutes": 0.6, "device": "cuda:0"}
+{"model": "ctgan", "part": "test", "rc": 0, "minutes": 0.6, "device": "cuda:0"}
+{"model": "tabddpm", "part": "train", "rc": 0, "minutes": 56.9, "device": "cuda:0"}
+{"model": "tabddpm", "part": "val", "rc": 0, "minutes": 38.9, "device": "cuda:0"}
+{"model": "tabddpm", "part": "test", "rc": 0, "minutes": 38.2, "device": "cuda:0"}
+{"model": "ctabgan-plus", "part": "train", "rc": 0, "minutes": 2.1, "device": "cuda:0"}
+{"model": "ctabgan-plus", "part": "val", "rc": 0, "minutes": 1.1, "device": "cuda:0"}
+{"model": "ctabgan-plus", "part": "test", "rc": 0, "minutes": 1.0, "device": "cuda:0"}
+{"model": "ctabgan", "part": "train", "rc": 0, "minutes": 3.5, "device": "cuda:0"}
+{"model": "ctabgan", "part": "val", "rc": 0, "minutes": 2.4, "device": "cuda:0"}
+{"model": "ctabgan", "part": "test", "rc": 0, "minutes": 2.5, "device": "cuda:0"}
+{"model": "tabpfgen", "part": "train", "rc": 0, "minutes": 16.6, "device": "cuda:0"}
+{"model": "tabpfgen", "part": "val", "rc": 0, "minutes": 4.2, "device": "cuda:0"}
+{"model": "tabpfgen", "part": "test", "rc": 0, "minutes": 4.2, "device": "cuda:0"}
+{"model": "great", "part": "train", "rc": 0, "minutes": 394, "device": "cuda:0"}
+{"model": "tabpfgen-nobal", "part": "train", "rc": 1, "minutes": 0.1, "device": "cuda:0"}
+{"model": "tabpfgen-nobal", "part": "val", "rc": 1, "minutes": 0.1, "device": "cuda:0"}
+{"model": "tabpfgen-nobal", "part": "test", "rc": 1, "minutes": 0.1, "device": "cuda:0"}
+{"model": "great", "part": "val", "rc": 0, "minutes": 80, "device": "cuda:0"}
+{"model": "tabpfgen-nobal", "part": "train", "rc": 0, "minutes": 16.8, "device": "cuda:0"}
+{"model": "tabpfgen-nobal", "part": "val", "rc": 0, "minutes": 4.2, "device": "cuda:0"}
+{"model": "tabpfgen-nobal", "part": "test", "rc": 0, "minutes": 4.0, "device": "cuda:0"}
+{"model": "great", "part": "test", "rc": 0, "minutes": 97, "device": "cuda:0"}
+{"model": "tabpfgen-prior", "part": "train", "rc": 0, "minutes": 14.4, "device": "cuda:0"}
+{"model": "tabpfgen-prior", "part": "val", "rc": 0, "minutes": 3.6, "device": "cuda:0"}
+{"model": "tabpfgen-prior", "part": "test", "rc": 0, "minutes": 3.6, "device": "cuda:0"}
+{"model": "tabddpm", "part": "train", "seed": 1, "rc": 0, "minutes": 7.7, "device": "cuda:0"}
+{"model": "tabddpm", "part": "val", "seed": 1, "rc": 0, "minutes": 7.4, "device": "cuda:0"}
+{"model": "tabddpm", "part": "test", "seed": 1, "rc": 0, "minutes": 7.7, "device": "cuda:0"}
+{"model": "tabpfgen", "part": "train", "seed": 1, "rc": 0, "minutes": 7.3, "device": "cuda:0"}
+{"model": "tabpfgen", "part": "val", "seed": 1, "rc": 0, "minutes": 2.0, "device": "cuda:0"}
+{"model": "tabpfgen", "part": "test", "seed": 1, "rc": 0, "minutes": 1.9, "device": "cuda:0"}
+{"model": "tabpfgen-prior", "part": "train", "seed": 1, "rc": 0, "minutes": 15.0, "device": "cuda:0"}
+{"model": "tabpfgen-prior", "part": "val", "seed": 1, "rc": 0, "minutes": 3.8, "device": "cuda:0"}
+{"model": "tabpfgen-prior", "part": "test", "seed": 1, "rc": 0, "minutes": 3.9, "device": "cuda:0"}
+{"model": "ctgan", "part": "train", "seed": 1, "rc": 0, "minutes": 3.6, "device": "cuda:0"}
+{"model": "ctgan", "part": "val", "seed": 1, "rc": 0, "minutes": 2.9, "device": "cuda:0"}
+{"model": "ctgan", "part": "test", "seed": 1, "rc": 0, "minutes": 2.8, "device": "cuda:0"}
+{"model": "tvae", "part": "train", "seed": 1, "rc": 0, "minutes": 4.4, "device": "cuda:0"}
+{"model": "tvae", "part": "val", "seed": 1, "rc": 0, "minutes": 4.1, "device": "cuda:0"}
+{"model": "tvae", "part": "test", "seed": 1, "rc": 0, "minutes": 4.1, "device": "cuda:0"}
+{"model": "ctabgan", "part": "train", "seed": 1, "rc": 0, "minutes": 7.1, "device": "cuda:0"}
+{"model": "ctabgan", "part": "val", "seed": 1, "rc": 0, "minutes": 4.8, "device": "cuda:0"}
+{"model": "ctabgan", "part": "test", "seed": 1, "rc": 0, "minutes": 4.5, "device": "cuda:0"}
+{"model": "ctabgan-plus", "part": "train", "seed": 1, "rc": 0, "minutes": 6.4, "device": "cuda:0"}
+{"model": "ctabgan-plus", "part": "val", "seed": 1, "rc": 0, "minutes": 4.7, "device": "cuda:0"}
+{"model": "ctabgan-plus", "part": "test", "seed": 1, "rc": 0, "minutes": 4.7, "device": "cuda:0"}
+{"model": "tabddpm", "part": "train", "seed": 2, "rc": 0, "minutes": 10.1, "device": "cuda:0"}
+{"model": "tabddpm", "part": "val", "seed": 2, "rc": 0, "minutes": 9.5, "device": "cuda:0"}
+{"model": "tabddpm", "part": "test", "seed": 2, "rc": 0, "minutes": 10.6, "device": "cuda:0"}
+{"model": "tabpfgen", "part": "train", "seed": 2, "rc": 0, "minutes": 8.3, "device": "cuda:0"}
+{"model": "tabpfgen", "part": "val", "seed": 2, "rc": 0, "minutes": 2.1, "device": "cuda:0"}
+{"model": "tabpfgen", "part": "test", "seed": 2, "rc": 0, "minutes": 2.1, "device": "cuda:0"}
+{"model": "tabpfgen-prior", "part": "train", "seed": 2, "rc": 0, "minutes": 15.3, "device": "cuda:0"}
+{"model": "tabpfgen-prior", "part": "val", "seed": 2, "rc": 0, "minutes": 4.0, "device": "cuda:0"}
+{"model": "tabpfgen-prior", "part": "test", "seed": 2, "rc": 0, "minutes": 4.1, "device": "cuda:0"}
+{"model": "ctgan", "part": "train", "seed": 2, "rc": 0, "minutes": 7.5, "device": "cuda:0"}
+{"model": "ctgan", "part": "val", "seed": 2, "rc": 0, "minutes": 6.7, "device": "cuda:0"}
+{"model": "ctgan", "part": "test", "seed": 2, "rc": 0, "minutes": 6.8, "device": "cuda:0"}
+{"model": "tvae", "part": "train", "seed": 2, "rc": 0, "minutes": 8.5, "device": "cuda:0"}
+{"model": "tvae", "part": "val", "seed": 2, "rc": 0, "minutes": 6.5, "device": "cuda:0"}
+{"model": "tvae", "part": "test", "seed": 2, "rc": 0, "minutes": 6.9, "device": "cuda:0"}
+{"model": "ctabgan", "part": "train", "seed": 2, "rc": 0, "minutes": 10.1, "device": "cuda:0"}
+{"model": "ctabgan", "part": "val", "seed": 2, "rc": 0, "minutes": 7.3, "device": "cuda:0"}
+{"model": "ctabgan", "part": "test", "seed": 2, "rc": 0, "minutes": 7.0, "device": "cuda:0"}
+{"model": "ctabgan-plus", "part": "train", "seed": 2, "rc": 0, "minutes": 9.7, "device": "cuda:0"}
+{"model": "ctabgan-plus", "part": "val", "seed": 2, "rc": 0, "minutes": 3.8, "device": "cuda:0"}
+{"model": "ctabgan-plus", "part": "test", "seed": 2, "rc": 0, "minutes": 3.3, "device": "cuda:0"}
+{"model": "ctgan", "part": "train", "seed": 0, "rc": 0, "minutes": 1.1, "device": "cuda:0"}
+{"model": "ctgan", "part": "val", "seed": 0, "rc": 0, "minutes": 0.3, "device": "cuda:0"}
+{"model": "ctgan", "part": "test", "seed": 0, "rc": 0, "minutes": 0.4, "device": "cuda:0"}
+{"model": "tvae", "part": "train", "seed": 0, "rc": 0, "minutes": 1.0, "device": "cuda:0"}
+{"model": "tvae", "part": "val", "seed": 0, "rc": 0, "minutes": 0.3, "device": "cuda:0"}
+{"model": "tvae", "part": "test", "seed": 0, "rc": 0, "minutes": 0.4, "device": "cuda:0"}
+{"model": "ctabgan", "part": "train", "seed": 0, "rc": 0, "minutes": 1.3, "device": "cuda:0"}
+{"model": "ctabgan", "part": "val", "seed": 0, "rc": 0, "minutes": 0.5, "device": "cuda:0"}
+{"model": "ctabgan", "part": "test", "seed": 0, "rc": 0, "minutes": 0.6, "device": "cuda:0"}
+{"model": "ctabgan-plus", "part": "train", "seed": 0, "rc": 0, "minutes": 1.5, "device": "cuda:0"}
+{"model": "ctabgan-plus", "part": "val", "seed": 0, "rc": 0, "minutes": 0.5, "device": "cuda:0"}
+{"model": "ctabgan-plus", "part": "test", "seed": 0, "rc": 0, "minutes": 0.5, "device": "cuda:0"}
