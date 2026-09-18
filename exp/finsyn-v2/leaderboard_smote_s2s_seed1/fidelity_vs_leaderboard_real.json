@@ -1,8 +1,8 @@
 {
  "n_models": 11,
- "kendall_tau": 0.7454545454545454,
+ "kendall_tau": 0.7090909090909091,
  "tau_ceiling_real_bootstrap": 0.9098545454545454,
- "sig_pair_order_kept": 0.9318181818181818,
+ "sig_pair_order_kept": 0.9545454545454546,
  "n_sig_pairs": 44,
  "cand_top1": "catboost",
  "cand_top1_in_real_top_tier": true,
@@ -14,16 +14,16 @@
  ],
  "selection_regret_pr_auc": 0.010508122398159236,
  "cand_scores": {
-  "catboost": 0.9292,
-  "lgbm": 0.9285,
-  "xgb": 0.9282,
-  "mlp": 0.9267,
-  "rf": 0.9215,
-  "hgb": 0.9036,
-  "et": 0.8937,
+  "catboost": 0.9339,
+  "rf": 0.9273,
+  "lgbm": 0.9258,
+  "xgb": 0.9227,
+  "mlp": 0.9174,
+  "hgb": 0.9129,
+  "et": 0.8938,
   "dt": 0.8457,
-  "lr": 0.8291,
-  "knn": 0.7875,
-  "nb": 0.4623
+  "lr": 0.8322,
+  "knn": 0.7916,
+  "nb": 0.4613
  }
 }

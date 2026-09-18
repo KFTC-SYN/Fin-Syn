@@ -57,7 +57,13 @@ def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--wait-pid", type=int, default=0)
     ap.add_argument("--jobs", type=int, default=4)
+    ap.add_argument("--models", default=None, help="이 실행에서 다룰 생성기(기본: 전체)")
+    ap.add_argument("--all-models", default=None, help="상관분석에 포함할 전체 목록(기본: --models)")
     args = ap.parse_args()
+    global MODELS, GPU_MODELS
+    if args.models:
+        MODELS = args.models.split(',')
+        GPU_MODELS = [m for m in MODELS if m != 'smote']
     log = E / "logs/pipeline.txt"
     (E / "logs").mkdir(parents=True, exist_ok=True)
 
@@ -109,8 +115,15 @@ def main():
 
     # 상관 분석 (n=len(ok))
     sm = json.loads((E / "standard_metrics.json").read_text())
-    tau = {m: json.loads((E / f"leaderboard_{m}_s2s/fidelity_vs_leaderboard_real.json").read_text())["kendall_tau"]
-           for m in ok}
+    pool = (args.all_models.split(",") if args.all_models else sorted(sm))
+    tau = {}
+    for m in pool:
+        f = E / f"leaderboard_{m}_s2s/fidelity_vs_leaderboard_real.json"
+        if f.exists():
+            v = json.loads(f.read_text())["kendall_tau"]
+            if v == v:  # NaN 제외 (합성 test에 양성이 없어 tau가 정의되지 않는 릴리스)
+                tau[m] = v
+    ok = [m for m in tau if m in sm]
     nf = json.loads((E / "leaderboard_real/noise_floor.json").read_text())
     metrics = {"ks": [-sm[m]["ks_mean"] for m in ok], "tvd": [-sm[m]["tvd_mean"] for m in ok],
                "c2st": [-sm[m]["detection_auc"] for m in ok],

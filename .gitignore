@@ -12,3 +12,5 @@ exp/*/synth/
 exp/*/_backup_preseed/
 exp/*/logs/
 exp/*/leaderboard_*/pred_*.npy
+exp/*/_diag/
+exp/*/_unfiltered/

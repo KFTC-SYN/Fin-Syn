@@ -1,0 +1,31 @@
+{
+ "n_models": 11,
+ "kendall_tau": 0.7818181818181819,
+ "tau_ceiling_real_bootstrap": 0.7707999999999999,
+ "sig_pair_order_kept": 1.0,
+ "n_sig_pairs": 21,
+ "cand_top1": "xgb",
+ "cand_top1_in_real_top_tier": true,
+ "real_top_tier": [
+  "catboost",
+  "hgb",
+  "lgbm",
+  "mlp",
+  "rf",
+  "xgb"
+ ],
+ "selection_regret_pr_auc": 0.0,
+ "cand_scores": {
+  "xgb": 0.1175,
+  "hgb": 0.0955,
+  "lgbm": 0.0911,
+  "catboost": 0.0886,
+  "rf": 0.0811,
+  "et": 0.0751,
+  "nb": 0.0737,
+  "mlp": 0.0714,
+  "lr": 0.0672,
+  "dt": 0.0533,
+  "knn": 0.0461
+ }
+}

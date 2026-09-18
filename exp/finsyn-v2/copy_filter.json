@@ -1,0 +1,87 @@
+{
+ "smote/seed0": {
+  "train": {
+   "rows": 63707,
+   "copies": 566,
+   "copies_positive": 0
+  },
+  "val": {
+   "rows": 15427,
+   "copies": 72,
+   "copies_positive": 0
+  },
+  "test": {
+   "rows": 15767,
+   "copies": 72,
+   "copies_positive": 0
+  }
+ },
+ "smote/seed1": {
+  "train": {
+   "rows": 63707,
+   "copies": 553,
+   "copies_positive": 0
+  },
+  "val": {
+   "rows": 15427,
+   "copies": 96,
+   "copies_positive": 0
+  },
+  "test": {
+   "rows": 15767,
+   "copies": 70,
+   "copies_positive": 0
+  }
+ },
+ "smote/seed2": {
+  "train": {
+   "rows": 63707,
+   "copies": 557,
+   "copies_positive": 0
+  },
+  "val": {
+   "rows": 15427,
+   "copies": 83,
+   "copies_positive": 0
+  },
+  "test": {
+   "rows": 15767,
+   "copies": 57,
+   "copies_positive": 0
+  }
+ },
+ "tabddpm/seed1": {
+  "train": {
+   "rows": 63707,
+   "copies": 2,
+   "copies_positive": 0
+  },
+  "val": {
+   "rows": 15427,
+   "copies": 0,
+   "copies_positive": 0
+  },
+  "test": {
+   "rows": 15767,
+   "copies": 0,
+   "copies_positive": 0
+  }
+ },
+ "tabddpm/seed2": {
+  "train": {
+   "rows": 63707,
+   "copies": 2,
+   "copies_positive": 0
+  },
+  "val": {
+   "rows": 15427,
+   "copies": 0,
+   "copies_positive": 0
+  },
+  "test": {
+   "rows": 15767,
+   "copies": 0,
+   "copies_positive": 0
+  }
+ }
+}

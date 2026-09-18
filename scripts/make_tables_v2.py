@@ -225,6 +225,45 @@ def tstr_vs_tau(out):
         wrap(body, "TSTR and leaderboard fidelity of individual runs of the same generator.", "tab:tstrtau", note))
 
 
+def tabred(out):
+    """부록: 공개 데이터(TabReD homecredit-default)에서의 외부 재현."""
+    T = ROOT / "exp/tabred-hc"
+    if not (T / "standard_metrics.json").exists():
+        print("  (tabred 결과 없음, 건너뜀)")
+        return
+    sm = json.loads((T / "standard_metrics.json").read_text())
+    nf = json.loads((T / "leaderboard_real/noise_floor.json").read_text())
+
+    def tau(m, tag):
+        f = T / f"leaderboard_{m}_{tag}/fidelity_vs_leaderboard_real.json"
+        if not f.exists():
+            return None
+        v = json.loads(f.read_text())["kendall_tau"]
+        return v if v == v else None
+
+    rows = []
+    for m in sorted(sm, key=lambda m: -(tau(m, "s2s") if tau(m, "s2s") is not None else -9)):
+        v, a, b = sm[m], tau(m, "s2s"), tau(m, "s2r")
+        rows.append(f"{GEN.get(m, m)} & {v['ks_mean']:.3f} & {v['tvd_mean']:.3f} & {v['corr_rmse']:.3f} & "
+                    f"{v['detection_auc']:.3f} & {100*v['pos_rate']:.2f} & {v['tstr_catboost_pr_auc']:.3f} & "
+                    + (f"{b:+.3f}" if b is not None else "---") + " & "
+                    + (f"{a:+.3f}" if a is not None else "undefined$^\\dagger$") + " \\\\")
+    body = ("\\begin{tabular}{lccccccc c}\n\\toprule\n & \\multicolumn{4}{c}{Standard metrics} & "
+            "\\multicolumn{2}{c}{Label / utility} & \\multicolumn{2}{c}{Leaderboard fidelity} \\\\\n"
+            "\\cmidrule(lr){2-5}\\cmidrule(lr){6-7}\\cmidrule(lr){8-9}\n"
+            "Generator & KS & TVD & corr & C2ST & pos.\\ \\% & TSTR & $\\tau_{S\\to R}$ & $\\tau_{S\\to S}$ \\\\\n"
+            "\\midrule\n" + "\n".join(rows) + "\n\\bottomrule\n\\end{tabular}")
+    note = (f"Public replication on TabReD homecredit-default (32{{,}}076 / 7{{,}}924 / 10{{,}}000 rows by time, "
+            f"5.0 / 3.3 / 2.3\\% positive), same protocol at a reduced budget (one generator seed, 10 tuning trials, "
+            f"three detector seeds). The noise floor here is lower than on our benchmark: bootstrap $\\tau$ ceiling "
+            f"{nf['tau_vs_full_mean']:.3f} (5th percentile {nf['tau_vs_full_q05']:.3f}) against 0.910 (0.818), and only "
+            f"{sum(1 for v in nf['pairwise_win_prob'].values() if v >= 0.975 or v <= 0.025)} of "
+            f"{len(nf['pairwise_win_prob'])} detector pairs are separable. "
+            "$^\\dagger$The synthetic test split contains no positive row, so no metric, and hence no ranking, is defined.")
+    (out / "tab_tabred.tex").write_text(
+        wrap(body, "External replication of the protocol on public data.", "tab:tabred", note))
+
+
 if __name__ == "__main__":
     ap = argparse.ArgumentParser()
     ap.add_argument("--out", default=str(ROOT.parent / "Fin-Syn-paper/202609_iclr/tables"))
@@ -238,4 +277,5 @@ if __name__ == "__main__":
     augmentation(out)
     appendix_tables(out)
     tstr_vs_tau(out)
+    tabred(out)
     print("wrote:", *(p.name for p in sorted(out.glob("*.tex"))))

@@ -5,12 +5,12 @@
   "n_members": 20000
  },
  "smote": {
-  "copy_rate": 0.008884424003641672,
-  "dcr_syn_to_train": 0.16314321011304855,
+  "copy_rate": 0.0,
+  "dcr_syn_to_train": 0.16649648547172546,
   "dcr_holdout_to_train": 0.3989601284265518,
-  "dcr_ratio": 0.408921088822747,
-  "dcr_share": 0.64925,
-  "mia_auc": 0.58630499625
+  "dcr_ratio": 0.4173261276217413,
+  "dcr_share": 0.649875,
+  "mia_auc": 0.58379878625
  },
  "tabddpm": {
   "copy_rate": 0.0,
