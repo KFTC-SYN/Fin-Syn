@@ -71,6 +71,9 @@ class Prep:
 
 # ---------------------------------------------------------------- models
 def space(name, trial):
+    if name == "tabm":
+        from tabm_detector import space_tabm
+        return space_tabm(trial)
     if name == "lr":
         return dict(C=trial.suggest_float("C", 1e-3, 1e2, log=True), class_weight=trial.suggest_categorical("cw", [None, "balanced"]))
     if name == "dt":
@@ -107,6 +110,9 @@ def space(name, trial):
 
 def fit_predict(name, params, prep, Xtr, ytr, Xva, yva, Xte, seed):
     """학습 후 (튜닝 split 점수용 예측, 평가 split 예측) 반환. 부스팅은 튜닝 split으로 early stopping."""
+    if name == "tabm":  # GPU. 튜닝 split PR-AUC로 early stopping (tabm_detector.py)
+        from tabm_detector import fit_predict_tabm
+        return fit_predict_tabm(params, prep, Xtr, ytr, Xva, yva, Xte, seed)
     if name in ("lgbm", "xgb", "catboost"):
         A, B, C = prep.native(Xtr), prep.native(Xva), prep.native(Xte)
         if name == "lgbm":
@@ -257,6 +263,8 @@ def main():
               f"R@1%FPR {summ['recall@1%fpr'][0]:.3f}  ROC {summ['roc_auc'][0]:.3f}  ({res[name]['minutes']} min)", flush=True)
 
     done = [m for m in models if m in res]
+    if len(done) < 2:  # 단일 모델(예: --models tabm 부가 실행)은 순위 노이즈를 정의할 수 없다
+        return
     preds = {m: np.load(out / f"pred_test_{m}.npy") for m in done}
     noise = bootstrap_noise(yte, preds)
     # seed 노이즈: seed별 리더보드끼리의 τ

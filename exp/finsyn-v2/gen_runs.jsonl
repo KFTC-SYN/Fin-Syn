@@ -82,3 +82,203 @@
 {"model": "ctabgan-plus", "part": "train", "seed": 0, "rc": 0, "minutes": 1.5, "device": "cuda:0"}
 {"model": "ctabgan-plus", "part": "val", "seed": 0, "rc": 0, "minutes": 0.5, "device": "cuda:0"}
 {"model": "ctabgan-plus", "part": "test", "seed": 0, "rc": 0, "minutes": 0.5, "device": "cuda:0"}
+{"model": "tabsyn", "part": "train", "seed": 0, "rc": 0, "minutes": 172.2, "device": "cuda:0", "budget": {"vae_epochs": 1300, "diff_epochs": 2500}, "rows": 63707, "positive_rate": 0.01174, "samples": "_new_models/tabsyn/synthetic/finsyn-v2-train-s0/tabsyn_seed0.csv"}
+{"model": "tabdiff", "part": "train", "seed": 0, "rc": 0, "minutes": 261.7, "device": "cuda:0", "budget": {"steps": 1100}, "rows": 63707, "positive_rate": 0.01072, "samples": "_new_models/TabDiff/tabdiff/result/finsyn-v2-train-s0/seed0/1098/samples.csv"}
+{"model": "tabdiff", "part": "val", "seed": 0, "rc": "timeout", "minutes": 270.0, "device": "cuda:0", "budget": {"steps": 4400}}
+{"model": "tabsyn", "part": "val", "seed": 0, "rc": 0, "minutes": 154.6, "device": "cuda:0", "budget": {"vae_epochs": 4000, "diff_epochs": 10001}, "rows": 15427, "positive_rate": 0.01847, "samples": "_new_models/tabsyn/synthetic/finsyn-v2-val-s0/tabsyn_seed0.csv"}
+{"model": "tabsyn", "part": "test", "seed": 0, "rc": 0, "minutes": 152.2, "device": "cuda:0", "budget": {"vae_epochs": 4000, "diff_epochs": 10001}, "rows": 15767, "positive_rate": 0.01097, "samples": "_new_models/tabsyn/synthetic/finsyn-v2-test-s0/tabsyn_seed0.csv"}
+{"model": "tabdiff", "part": "test", "seed": 0, "rc": 0, "minutes": 175.0, "device": "cuda:0", "budget": {"steps": 4400}, "rows": 15767, "positive_rate": 0.00653, "samples": "_new_models/TabDiff/tabdiff/result/finsyn-v2-test-s0/seed0/3956/samples.csv"}
+{"model": "tabdiff", "part": "train", "seed": 1, "rc": 0, "minutes": 209.2, "device": "cuda:0", "budget": {"steps": 1100}, "rows": 63707, "positive_rate": 0.00794, "samples": "_new_models/TabDiff/tabdiff/result/finsyn-v2-train-s1/seed1/1100/samples.csv"}
+{"model": "tabsyn", "part": "train", "seed": 1, "rc": 0, "minutes": 146.2, "device": "cuda:0", "budget": {"vae_epochs": 1300, "diff_epochs": 2500}, "rows": 63707, "positive_rate": 0.00994, "samples": "_new_models/tabsyn/synthetic/finsyn-v2-train-s1/tabsyn_seed1.csv"}
+{"model": "tabdiff", "part": "val", "seed": 0, "rc": 0, "minutes": 331.2, "device": "cuda:0", "budget": {"steps": 4400}, "rows": 15427, "positive_rate": 0.01659, "samples": "_new_models/TabDiff/tabdiff/result/finsyn-v2-val-s0/seed0/3786/samples.csv"}
+{"model": "tabsyn", "part": "val", "seed": 1, "rc": 0, "minutes": 159.2, "device": "cuda:0", "budget": {"vae_epochs": 4000, "diff_epochs": 10001}, "rows": 15427, "positive_rate": 0.02172, "samples": "_new_models/tabsyn/synthetic/finsyn-v2-val-s1/tabsyn_seed1.csv"}
+{"model": "tabdiff", "part": "val", "seed": 1, "rc": 0, "minutes": 344.1, "device": "cuda:0", "budget": {"steps": 4400}, "rows": 15427, "positive_rate": 0.0151, "samples": "_new_models/TabDiff/tabdiff/result/finsyn-v2-val-s1/seed1/4030/samples.csv"}
+{"model": "tabsyn", "part": "test", "seed": 1, "rc": 0, "minutes": 153.7, "device": "cuda:0", "budget": {"vae_epochs": 4000, "diff_epochs": 10001}, "rows": 15767, "positive_rate": 0.00869, "samples": "_new_models/tabsyn/synthetic/finsyn-v2-test-s1/tabsyn_seed1.csv"}
+{"model": "tabdiff", "part": "test", "seed": 1, "rc": 0, "minutes": 341.8, "device": "cuda:0", "budget": {"steps": 4400}, "rows": 15767, "positive_rate": 0.0071, "samples": "_new_models/TabDiff/tabdiff/result/finsyn-v2-test-s1/seed1/3899/samples.csv"}
+{"model": "findiff", "part": "train", "seed": 0, "rc": 0, "minutes": 31.3, "device": "cuda:0", "budget": {"epochs": 100}, "rows": 63707, "positive_rate": 0.01276, "train_min": 30.5, "sample_min": 0.8}
+{"model": "findiff", "part": "val", "seed": 0, "rc": 0, "minutes": 6.7, "device": "cuda:0", "budget": {"epochs": 100}, "rows": 15427, "positive_rate": 0.02133, "train_min": 6.4, "sample_min": 0.2}
+{"model": "findiff", "part": "test", "seed": 0, "rc": 0, "minutes": 6.8, "device": "cuda:0", "budget": {"epochs": 100}, "rows": 15767, "positive_rate": 0.0111, "train_min": 6.6, "sample_min": 0.2}
+{"model": "findiff", "part": "train", "seed": 1, "rc": 0, "minutes": 28.2, "device": "cuda:0", "budget": {"epochs": 100}, "rows": 63707, "positive_rate": 0.01276, "train_min": 27.2, "sample_min": 0.9}
+{"model": "findiff", "part": "val", "seed": 1, "rc": 0, "minutes": 6.3, "device": "cuda:0", "budget": {"epochs": 100}, "rows": 15427, "positive_rate": 0.02133, "train_min": 6.1, "sample_min": 0.2}
+{"model": "tabsyn", "part": "train", "seed": 2, "rc": 0, "minutes": 208.7, "device": "cuda:0", "budget": {"vae_epochs": 1300, "diff_epochs": 2500}, "rows": 63707, "positive_rate": 0.01135, "samples": "_new_models/tabsyn/synthetic/finsyn-v2-train-s2/tabsyn_seed2.csv"}
+{"model": "findiff", "part": "test", "seed": 1, "rc": 0, "minutes": 5.5, "device": "cuda:0", "budget": {"epochs": 100}, "rows": 15767, "positive_rate": 0.0111, "train_min": 5.3, "sample_min": 0.1}
+{"model": "tabdiff", "part": "train", "seed": 2, "rc": 0, "minutes": 298.8, "device": "cuda:0", "budget": {"steps": 1100}, "rows": 63707, "positive_rate": 0.00929, "samples": "_new_models/TabDiff/tabdiff/result/finsyn-v2-train-s2/seed2/975/samples.csv"}
+{"model": "findiff", "part": "val", "seed": 2, "rc": 0, "minutes": 6.1, "device": "cuda:0", "budget": {"epochs": 100}, "rows": 15427, "positive_rate": 0.02133, "train_min": 5.8, "sample_min": 0.2}
+{"model": "findiff", "part": "train", "seed": 2, "rc": 0, "minutes": 25.0, "device": "cuda:0", "budget": {"epochs": 100}, "rows": 63707, "positive_rate": 0.01276, "train_min": 24.1, "sample_min": 0.8}
+{"model": "tabdiff", "part": "val", "seed": 2, "rc": 0, "minutes": 314.9, "device": "cuda:0", "budget": {"steps": 4400}, "rows": 15427, "positive_rate": 0.01439, "samples": "_new_models/TabDiff/tabdiff/result/finsyn-v2-val-s2/seed2/4263/samples.csv"}
+{"model": "tabsyn", "part": "val", "seed": 2, "rc": 0, "minutes": 153.9, "device": "cuda:0", "budget": {"vae_epochs": 4000, "diff_epochs": 10001}, "rows": 15427, "positive_rate": 0.02003, "samples": "_new_models/tabsyn/synthetic/finsyn-v2-val-s2/tabsyn_seed2.csv"}
+{"model": "findiff", "part": "test", "seed": 2, "rc": 0, "minutes": 5.9, "device": "cuda:0", "budget": {"epochs": 100}, "rows": 15767, "positive_rate": 0.0111, "train_min": 5.6, "sample_min": 0.2}
+{"model": "tabsyn", "part": "test", "seed": 2, "rc": 0, "minutes": 162.9, "device": "cuda:0", "budget": {"vae_epochs": 4000, "diff_epochs": 10001}, "rows": 15767, "positive_rate": 0.00805, "samples": "_new_models/tabsyn/synthetic/finsyn-v2-test-s2/tabsyn_seed2.csv"}
+{"model": "great", "part": "train", "seed": 1, "rc": 0, "minutes": 1536, "device": "cuda:0"}
+{"model": "tabdiff", "part": "test", "seed": 2, "rc": 0, "minutes": 273.9, "device": "cuda:0", "budget": {"steps": 4400}, "rows": 15767, "positive_rate": 0.0066, "samples": "_new_models/TabDiff/tabdiff/result/finsyn-v2-test-s2/seed2/3504/samples.csv"}
+{"model": "great", "part": "val", "seed": 1, "rc": 0, "minutes": 248, "device": "cuda:0"}
+{"model": "great", "part": "test", "seed": 1, "rc": 0, "minutes": 108, "device": "cuda:0"}
+{"model": "findiff", "part": "train", "seed": 3, "rc": 0, "minutes": 20.2, "device": "cuda:0", "budget": {"epochs": 100}, "rows": 63707, "positive_rate": 0.01276, "train_min": 19.4, "sample_min": 0.7}
+{"model": "tabsyn", "part": "val", "seed": 3, "rc": 0, "minutes": 110.9, "device": "cuda:0", "budget": {"vae_epochs": 4000, "diff_epochs": 10001}, "rows": 15427, "positive_rate": 0.02301, "samples": "_new_models/tabsyn/synthetic/finsyn-v2-val-s3/tabsyn_seed3.csv"}
+{"model": "findiff", "part": "val", "seed": 3, "rc": 0, "minutes": 5.0, "device": "cuda:0", "budget": {"epochs": 100}, "rows": 15427, "positive_rate": 0.02133, "train_min": 4.8, "sample_min": 0.2}
+{"model": "tabsyn", "part": "train", "seed": 3, "rc": 0, "minutes": 172.7, "device": "cuda:0", "budget": {"vae_epochs": 1300, "diff_epochs": 2500}, "rows": 63707, "positive_rate": 0.0105, "samples": "_new_models/tabsyn/synthetic/finsyn-v2-train-s3/tabsyn_seed3.csv"}
+{"model": "tabdiff", "part": "train", "seed": 3, "rc": 0, "minutes": 205.9, "device": "cuda:0", "budget": {"steps": 1100}, "rows": 63707, "positive_rate": 0.01342, "samples": "_new_models/TabDiff/tabdiff/result/finsyn-v2-train-s3/seed3/1094/samples.csv"}
+{"model": "findiff", "part": "test", "seed": 3, "rc": 0, "minutes": 4.3, "device": "cuda:0", "budget": {"epochs": 100}, "rows": 15767, "positive_rate": 0.0111, "train_min": 4.0, "sample_min": 0.1}
+{"model": "tabdiff", "part": "val", "seed": 3, "rc": 0, "minutes": 235.0, "device": "cuda:0", "budget": {"steps": 4400}, "rows": 15427, "positive_rate": 0.0153, "samples": "_new_models/TabDiff/tabdiff/result/finsyn-v2-val-s3/seed3/4067/samples.csv"}
+{"model": "tabsyn", "part": "test", "seed": 3, "rc": 0, "minutes": 117.2, "device": "cuda:0", "budget": {"vae_epochs": 4000, "diff_epochs": 10001}, "rows": 15767, "positive_rate": 0.00698, "samples": "_new_models/tabsyn/synthetic/finsyn-v2-test-s3/tabsyn_seed3.csv"}
+{"model": "findiff", "part": "train", "seed": 4, "rc": 0, "minutes": 20.9, "device": "cuda:0", "budget": {"epochs": 100}, "rows": 63707, "positive_rate": 0.01276, "train_min": 20.1, "sample_min": 0.7}
+{"model": "tabsyn", "part": "train", "seed": 4, "rc": 0, "minutes": 107.9, "device": "cuda:0", "budget": {"vae_epochs": 1300, "diff_epochs": 2500}, "rows": 63707, "positive_rate": 0.00934, "samples": "_new_models/tabsyn/synthetic/finsyn-v2-train-s4/tabsyn_seed4.csv"}
+{"model": "tabdiff", "part": "test", "seed": 3, "rc": 0, "minutes": 236.2, "device": "cuda:0", "budget": {"steps": 4400}, "rows": 15767, "positive_rate": 0.00736, "samples": "_new_models/TabDiff/tabdiff/result/finsyn-v2-test-s3/seed3/4067/samples.csv"}
+{"model": "findiff", "part": "val", "seed": 4, "rc": 0, "minutes": 4.5, "device": "cuda:0", "budget": {"epochs": 100}, "rows": 15427, "positive_rate": 0.02133, "train_min": 4.2, "sample_min": 0.1}
+{"model": "tabdiff", "part": "train", "seed": 4, "rc": 0, "minutes": 191.6, "device": "cuda:0", "budget": {"steps": 1100}, "rows": 63707, "positive_rate": 0.01248, "samples": "_new_models/TabDiff/tabdiff/result/finsyn-v2-train-s4/seed4/1095/samples.csv"}
+{"model": "tabsyn", "part": "val", "seed": 4, "rc": 0, "minutes": 115.9, "device": "cuda:0", "budget": {"vae_epochs": 4000, "diff_epochs": 10001}, "rows": 15427, "positive_rate": 0.00946, "samples": "_new_models/tabsyn/synthetic/finsyn-v2-val-s4/tabsyn_seed4.csv"}
+{"model": "findiff", "part": "test", "seed": 4, "rc": 0, "minutes": 4.2, "device": "cuda:0", "budget": {"epochs": 100}, "rows": 15767, "positive_rate": 0.0111, "train_min": 4.0, "sample_min": 0.1}
+{"model": "tabsyn", "part": "test", "seed": 4, "rc": 0, "minutes": 114.3, "device": "cuda:0", "budget": {"vae_epochs": 4000, "diff_epochs": 10001}, "rows": 15767, "positive_rate": 0.00939, "samples": "_new_models/tabsyn/synthetic/finsyn-v2-test-s4/tabsyn_seed4.csv"}
+{"model": "tabdiff", "part": "val", "seed": 4, "rc": 0, "minutes": 214.8, "device": "cuda:0", "budget": {"steps": 4400}, "rows": 15427, "positive_rate": 0.01543, "samples": "_new_models/TabDiff/tabdiff/result/finsyn-v2-val-s4/seed4/4002/samples.csv"}
+{"model": "tabdiff", "part": "test", "seed": 4, "rc": 0, "minutes": 197.9, "device": "cuda:0", "budget": {"steps": 4400}, "rows": 15767, "positive_rate": 0.00799, "samples": "_new_models/TabDiff/tabdiff/result/finsyn-v2-test-s4/seed4/4266/samples.csv"}
+{"model": "great", "part": "train", "seed": 2, "rc": 0, "minutes": 691, "device": "cuda:0"}
+{"model": "great", "part": "val", "seed": 2, "rc": 0, "minutes": 79, "device": "cuda:0"}
+{"model": "great", "part": "test", "seed": 2, "rc": 0, "minutes": 81, "device": "cuda:0"}
+{"model": "tvae", "part": "train", "seed": 0, "rc": 0, "minutes": 2.0, "device": "cuda:0"}
+{"model": "ctgan", "part": "train", "seed": 0, "rc": 0, "minutes": 2.2, "device": "cuda:0"}
+{"model": "ctabgan-plus", "part": "train", "seed": 0, "rc": 0, "minutes": 3.0, "device": "cuda:0"}
+{"model": "tvae", "part": "train", "seed": 0, "rc": 0, "minutes": 2.1, "device": "cuda:0"}
+{"model": "ctgan", "part": "train", "seed": 0, "rc": 0, "minutes": 2.4, "device": "cuda:0"}
+{"model": "ctabgan-plus", "part": "train", "seed": 0, "rc": 0, "minutes": 2.7, "device": "cuda:0"}
+{"model": "tvae", "part": "train", "seed": 0, "rc": 0, "minutes": 1.6, "device": "cuda:0"}
+{"model": "ctgan", "part": "train", "seed": 0, "rc": 0, "minutes": 2.0, "device": "cuda:0"}
+{"model": "tabpfgen", "part": "train", "seed": 0, "rc": 0, "minutes": 8.6, "device": "cuda:0"}
+{"model": "ctabgan-plus", "part": "train", "seed": 0, "rc": 0, "minutes": 2.6, "device": "cuda:0"}
+{"model": "tvae", "part": "train", "seed": 0, "rc": 0, "minutes": 1.0, "device": "cuda:0"}
+{"model": "tvae", "part": "train", "seed": 0, "rc": 0, "minutes": 2.0, "device": "cuda:0"}
+{"model": "ctgan", "part": "train", "seed": 0, "rc": 0, "minutes": 2.1, "device": "cuda:0"}
+{"model": "ctabgan-plus", "part": "train", "seed": 0, "rc": 0, "minutes": 2.9, "device": "cuda:0"}
+{"model": "tvae", "part": "train", "seed": 0, "rc": 0, "minutes": 2.0, "device": "cuda:0"}
+{"model": "ctgan", "part": "train", "seed": 0, "rc": 0, "minutes": 1.9, "device": "cuda:0"}
+{"model": "ctabgan-plus", "part": "train", "seed": 0, "rc": 0, "minutes": 2.8, "device": "cuda:0"}
+{"model": "tvae", "part": "train", "seed": 0, "rc": 0, "minutes": 1.7, "device": "cuda:0"}
+{"model": "ctgan", "part": "train", "seed": 0, "rc": 0, "minutes": 2.1, "device": "cuda:0"}
+{"model": "tvae", "part": "train", "seed": 0, "rc": 0, "minutes": 1.2, "device": "cuda:0"}
+{"model": "ctabgan-plus", "part": "train", "seed": 0, "rc": 0, "minutes": 2.4, "device": "cuda:0"}
+{"model": "tabpfgen", "part": "train", "seed": 0, "rc": 0, "minutes": 8.7, "device": "cuda:0"}
+{"model": "ctgan", "part": "train", "seed": 0, "rc": 0, "minutes": 1.4, "device": "cuda:0"}
+{"model": "tvae", "part": "train", "seed": 0, "rc": 0, "minutes": 1.8, "device": "cuda:0"}
+{"model": "ctgan", "part": "train", "seed": 0, "rc": 0, "minutes": 1.9, "device": "cuda:0"}
+{"model": "ctabgan-plus", "part": "train", "seed": 0, "rc": 0, "minutes": 2.9, "device": "cuda:0"}
+{"model": "tvae", "part": "train", "seed": 0, "rc": 0, "minutes": 1.8, "device": "cuda:0"}
+{"model": "ctgan", "part": "train", "seed": 0, "rc": 0, "minutes": 2.2, "device": "cuda:0"}
+{"model": "tvae", "part": "train", "seed": 0, "rc": 0, "minutes": 1.8, "device": "cuda:0"}
+{"model": "ctabgan-plus", "part": "train", "seed": 0, "rc": 0, "minutes": 2.9, "device": "cuda:0"}
+{"model": "tvae", "part": "train", "seed": 0, "rc": 0, "minutes": 1.8, "device": "cuda:0"}
+{"model": "ctgan", "part": "train", "seed": 0, "rc": 0, "minutes": 1.9, "device": "cuda:0"}
+{"model": "ctabgan-plus", "part": "train", "seed": 0, "rc": 0, "minutes": 2.8, "device": "cuda:0"}
+{"model": "tabpfgen", "part": "train", "seed": 0, "rc": 0, "minutes": 8.8, "device": "cuda:0"}
+{"model": "tvae", "part": "train", "seed": 0, "rc": 0, "minutes": 1.2, "device": "cuda:0"}
+{"model": "ctgan", "part": "train", "seed": 0, "rc": 0, "minutes": 1.3, "device": "cuda:0"}
+{"model": "ctabgan-plus", "part": "train", "seed": 0, "rc": 0, "minutes": 2.6, "device": "cuda:0"}
+{"model": "tvae", "part": "train", "seed": 0, "rc": 0, "minutes": 1.8, "device": "cuda:0"}
+{"model": "ctgan", "part": "train", "seed": 0, "rc": 0, "minutes": 1.9, "device": "cuda:0"}
+{"model": "tvae", "part": "train", "seed": 0, "rc": 0, "minutes": 2.0, "device": "cuda:0"}
+{"model": "ctgan", "part": "train", "seed": 0, "rc": 0, "minutes": 2.4, "device": "cuda:0"}
+{"model": "ctabgan-plus", "part": "train", "seed": 0, "rc": 0, "minutes": 3.4, "device": "cuda:0"}
+{"model": "tvae", "part": "train", "seed": 0, "rc": 0, "minutes": 1.7, "device": "cuda:0"}
+{"model": "ctgan", "part": "train", "seed": 0, "rc": 0, "minutes": 2.0, "device": "cuda:0"}
+{"model": "tvae", "part": "train", "seed": 0, "rc": 0, "minutes": 1.3, "device": "cuda:0"}
+{"model": "tabpfgen", "part": "train", "seed": 0, "rc": 0, "minutes": 8.7, "device": "cuda:0"}
+{"model": "ctabgan-plus", "part": "train", "seed": 0, "rc": 0, "minutes": 1.8, "device": "cuda:0"}
+{"model": "tvae", "part": "train", "seed": 0, "rc": 0, "minutes": 2.0, "device": "cuda:0"}
+{"model": "ctgan", "part": "train", "seed": 0, "rc": 0, "minutes": 2.2, "device": "cuda:0"}
+{"model": "ctabgan-plus", "part": "train", "seed": 0, "rc": 0, "minutes": 2.8, "device": "cuda:0"}
+{"model": "tvae", "part": "train", "seed": 0, "rc": 0, "minutes": 1.8, "device": "cuda:0"}
+{"model": "ctgan", "part": "train", "seed": 0, "rc": 0, "minutes": 2.3, "device": "cuda:0"}
+{"model": "tvae", "part": "train", "seed": 0, "rc": 0, "minutes": 1.7, "device": "cuda:0"}
+{"model": "ctabgan-plus", "part": "train", "seed": 0, "rc": 0, "minutes": 2.9, "device": "cuda:0"}
+{"model": "tvae", "part": "train", "seed": 0, "rc": 0, "minutes": 1.6, "device": "cuda:0"}
+{"model": "ctgan", "part": "train", "seed": 0, "rc": 0, "minutes": 2.0, "device": "cuda:0"}
+{"model": "tabpfgen", "part": "train", "seed": 0, "rc": 0, "minutes": 8.6, "device": "cuda:0"}
+{"model": "ctabgan-plus", "part": "train", "seed": 0, "rc": 0, "minutes": 2.7, "device": "cuda:0"}
+{"model": "tvae", "part": "train", "seed": 0, "rc": 0, "minutes": 1.0, "device": "cuda:0"}
+{"model": "tvae", "part": "train", "seed": 0, "rc": 0, "minutes": 2.0, "device": "cuda:0"}
+{"model": "ctgan", "part": "train", "seed": 0, "rc": 0, "minutes": 2.2, "device": "cuda:0"}
+{"model": "ctabgan-plus", "part": "train", "seed": 0, "rc": 0, "minutes": 2.9, "device": "cuda:0"}
+{"model": "tvae", "part": "train", "seed": 0, "rc": 0, "minutes": 1.9, "device": "cuda:0"}
+{"model": "ctgan", "part": "train", "seed": 0, "rc": 0, "minutes": 2.2, "device": "cuda:0"}
+{"model": "ctabgan-plus", "part": "train", "seed": 0, "rc": 0, "minutes": 2.8, "device": "cuda:0"}
+{"model": "tvae", "part": "train", "seed": 0, "rc": 0, "minutes": 1.8, "device": "cuda:0"}
+{"model": "tvae", "part": "train", "seed": 0, "rc": 0, "minutes": 1.7, "device": "cuda:0"}
+{"model": "ctgan", "part": "train", "seed": 0, "rc": 0, "minutes": 2.0, "device": "cuda:0"}
+{"model": "ctabgan-plus", "part": "train", "seed": 0, "rc": 0, "minutes": 2.5, "device": "cuda:0"}
+{"model": "tabpfgen", "part": "train", "seed": 0, "rc": 0, "minutes": 8.6, "device": "cuda:0"}
+{"model": "tvae", "part": "train", "seed": 0, "rc": 0, "minutes": 1.0, "device": "cuda:0"}
+{"model": "tvae", "part": "train", "seed": 0, "rc": 0, "minutes": 2.0, "device": "cuda:0"}
+{"model": "ctgan", "part": "train", "seed": 0, "rc": 0, "minutes": 2.2, "device": "cuda:0"}
+{"model": "ctabgan-plus", "part": "train", "seed": 0, "rc": 0, "minutes": 2.6, "device": "cuda:0"}
+{"model": "tvae", "part": "train", "seed": 0, "rc": 0, "minutes": 2.0, "device": "cuda:0"}
+{"model": "ctgan", "part": "train", "seed": 0, "rc": 0, "minutes": 2.2, "device": "cuda:0"}
+{"model": "ctabgan-plus", "part": "train", "seed": 0, "rc": 0, "minutes": 2.9, "device": "cuda:0"}
+{"model": "tvae", "part": "train", "seed": 0, "rc": 0, "minutes": 2.0, "device": "cuda:0"}
+{"model": "ctgan", "part": "train", "seed": 0, "rc": 0, "minutes": 1.7, "device": "cuda:0"}
+{"model": "ctabgan-plus", "part": "train", "seed": 0, "rc": 0, "minutes": 2.4, "device": "cuda:0"}
+{"model": "tabpfgen", "part": "train", "seed": 0, "rc": 0, "minutes": 8.6, "device": "cuda:0"}
+{"model": "tvae", "part": "train", "seed": 0, "rc": 0, "minutes": 1.2, "device": "cuda:0"}
+{"model": "ctgan", "part": "train", "seed": 0, "rc": 0, "minutes": 1.5, "device": "cuda:0"}
+{"model": "ctabgan-plus", "part": "train", "seed": 0, "rc": 0, "minutes": 2.5, "device": "cuda:0"}
+{"model": "tvae", "part": "train", "seed": 0, "rc": 0, "minutes": 1.8, "device": "cuda:0"}
+{"model": "ctgan", "part": "train", "seed": 0, "rc": 0, "minutes": 1.9, "device": "cuda:0"}
+{"model": "ctgan", "part": "train", "seed": 0, "rc": 0, "minutes": 2.1, "device": "cuda:0"}
+{"model": "tvae", "part": "train", "seed": 0, "rc": 0, "minutes": 2.2, "device": "cuda:0"}
+{"model": "ctabgan-plus", "part": "train", "seed": 0, "rc": 0, "minutes": 3.4, "device": "cuda:0"}
+{"model": "tvae", "part": "train", "seed": 0, "rc": 0, "minutes": 1.8, "device": "cuda:0"}
+{"model": "ctgan", "part": "train", "seed": 0, "rc": 0, "minutes": 2.1, "device": "cuda:0"}
+{"model": "tabpfgen", "part": "train", "seed": 0, "rc": 0, "minutes": 8.7, "device": "cuda:0"}
+{"model": "ctabgan-plus", "part": "train", "seed": 0, "rc": 0, "minutes": 1.9, "device": "cuda:0"}
+{"model": "tvae", "part": "train", "seed": 0, "rc": 0, "minutes": 1.0, "device": "cuda:0"}
+{"model": "ctgan", "part": "train", "seed": 0, "rc": 0, "minutes": 2.3, "device": "cuda:0"}
+{"model": "tvae", "part": "train", "seed": 0, "rc": 0, "minutes": 1.9, "device": "cuda:0"}
+{"model": "ctabgan-plus", "part": "train", "seed": 0, "rc": 0, "minutes": 3.3, "device": "cuda:0"}
+{"model": "tvae", "part": "train", "seed": 0, "rc": 0, "minutes": 2.0, "device": "cuda:0"}
+{"model": "ctgan", "part": "train", "seed": 0, "rc": 0, "minutes": 2.3, "device": "cuda:0"}
+{"model": "ctabgan-plus", "part": "train", "seed": 0, "rc": 0, "minutes": 2.5, "device": "cuda:0"}
+{"model": "tabpfgen", "part": "val", "seed": 3, "rc": 0, "minutes": 4.7, "device": "cuda:0"}
+{"model": "tabpfgen", "part": "test", "seed": 3, "rc": 0, "minutes": 4.8, "device": "cuda:0"}
+{"model": "tabpfgen", "part": "train", "seed": 3, "rc": 0, "minutes": 15.2, "device": "cuda:0"}
+{"model": "tabpfgen", "part": "train", "seed": 4, "rc": 0, "minutes": 12.4, "device": "cuda:0"}
+{"model": "tabddpm", "part": "val", "seed": 3, "rc": 0, "minutes": 40.7, "device": "cuda:0"}
+{"model": "tabpfgen", "part": "val", "seed": 4, "rc": 0, "minutes": 3.2, "device": "cuda:0"}
+{"model": "tabddpm", "part": "train", "seed": 3, "rc": 0, "minutes": 45.4, "device": "cuda:0"}
+{"model": "tabddpm", "part": "test", "seed": 3, "rc": 0, "minutes": 35.4, "device": "cuda:0"}
+{"model": "tabpfgen", "part": "test", "seed": 4, "rc": 0, "minutes": 3.4, "device": "cuda:0"}
+{"model": "tabddpm", "part": "train", "seed": 4, "rc": 0, "minutes": 28.6, "device": "cuda:0"}
+{"model": "tabddpm", "part": "val", "seed": 4, "rc": 0, "minutes": 18.6, "device": "cuda:0"}
+{"model": "tabddpm", "part": "test", "seed": 4, "rc": 0, "minutes": 18.3, "device": "cuda:0"}
+{"model": "ctgan", "part": "val", "seed": 3, "rc": 0, "minutes": 9.1, "device": "cuda:0"}
+{"model": "tvae", "part": "train", "seed": 3, "rc": 0, "minutes": 11.2, "device": "cuda:0"}
+{"model": "ctgan", "part": "train", "seed": 3, "rc": 0, "minutes": 11.4, "device": "cuda:0"}
+{"model": "ctabgan-plus", "part": "train", "seed": 3, "rc": 0, "minutes": 11.6, "device": "cuda:0"}
+{"model": "tvae", "part": "val", "seed": 3, "rc": 0, "minutes": 3.1, "device": "cuda:0"}
+{"model": "tvae", "part": "test", "seed": 3, "rc": 0, "minutes": 9.3, "device": "cuda:0"}
+{"model": "ctabgan-plus", "part": "val", "seed": 3, "rc": 0, "minutes": 9.3, "device": "cuda:0"}
+{"model": "ctgan", "part": "test", "seed": 3, "rc": 0, "minutes": 9.3, "device": "cuda:0"}
+{"model": "ctabgan-plus", "part": "test", "seed": 3, "rc": 0, "minutes": 7.8, "device": "cuda:0"}
+{"model": "ctgan", "part": "val", "seed": 4, "rc": 0, "minutes": 12.4, "device": "cuda:0"}
+{"model": "tvae", "part": "train", "seed": 4, "rc": 0, "minutes": 15.2, "device": "cuda:0"}
+{"model": "ctgan", "part": "train", "seed": 4, "rc": 0, "minutes": 15.3, "device": "cuda:0"}
+{"model": "ctabgan-plus", "part": "train", "seed": 4, "rc": 0, "minutes": 17.1, "device": "cuda:0"}
+{"model": "ctabgan", "part": "train", "seed": 3, "rc": 0, "minutes": 22.9, "device": "cuda:0"}
+{"model": "tvae", "part": "val", "seed": 4, "rc": 0, "minutes": 11.7, "device": "cuda:0"}
+{"model": "ctgan", "part": "test", "seed": 4, "rc": 0, "minutes": 12.6, "device": "cuda:0"}
+{"model": "tvae", "part": "test", "seed": 4, "rc": 0, "minutes": 11.9, "device": "cuda:0"}
+{"model": "ctabgan-plus", "part": "val", "seed": 4, "rc": 0, "minutes": 13.4, "device": "cuda:0"}
+{"model": "ctabgan-plus", "part": "test", "seed": 4, "rc": 0, "minutes": 7.2, "device": "cuda:0"}
+{"model": "ctabgan", "part": "val", "seed": 3, "rc": 0, "minutes": 15.1, "device": "cuda:0"}
+{"model": "tabpfgen-prior", "part": "train", "seed": 3, "rc": 0, "minutes": 47.3, "device": "cuda:0"}
+{"model": "tabpfgen-prior", "part": "val", "seed": 3, "rc": 0, "minutes": 15.7, "device": "cuda:0"}
+{"model": "ctabgan", "part": "test", "seed": 3, "rc": 0, "minutes": 9.2, "device": "cuda:0"}
+{"model": "tabpfgen-prior", "part": "test", "seed": 3, "rc": 0, "minutes": 17.6, "device": "cuda:0"}
+{"model": "ctabgan", "part": "val", "seed": 4, "rc": 0, "minutes": 17.3, "device": "cuda:0"}
+{"model": "tabpfgen-prior", "part": "val", "seed": 4, "rc": 0, "minutes": 19.7, "device": "cuda:0"}
+{"model": "ctabgan", "part": "train", "seed": 4, "rc": 0, "minutes": 19.7, "device": "cuda:0"}
+{"model": "ctabgan", "part": "test", "seed": 4, "rc": 0, "minutes": 11.3, "device": "cuda:0"}
+{"model": "tabpfgen-prior", "part": "test", "seed": 4, "rc": 0, "minutes": 13.1, "device": "cuda:0"}
+{"model": "tabpfgen-prior", "part": "train", "seed": 4, "rc": 0, "minutes": 49.4, "device": "cuda:0"}
+{"model": "great", "part": "train", "seed": 3, "rc": 0, "minutes": 206.8, "device": "cuda:0"}
+{"model": "great", "part": "val", "seed": 3, "rc": 0, "minutes": 45.9, "device": "cuda:0"}
+{"model": "great", "part": "test", "seed": 3, "rc": 0, "minutes": 46.0, "device": "cuda:0"}
+{"model": "great", "part": "train", "seed": 4, "rc": 0, "minutes": 185.7, "device": "cuda:0"}
+{"model": "great", "part": "val", "seed": 4, "rc": 0, "minutes": 45.9, "device": "cuda:0"}
+{"model": "great", "part": "test", "seed": 4, "rc": 0, "minutes": 46.8, "device": "cuda:0"}

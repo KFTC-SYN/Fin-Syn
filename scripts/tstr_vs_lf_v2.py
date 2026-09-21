@@ -24,9 +24,14 @@ from pathlib import Path
 import numpy as np
 from scipy.stats import rankdata
 
+import os
+# 논문 메인 표/그림은 생성기마다 같은 수의 공개본을 쓴다(사용자 지시 9/20). 기본 5시드.
+MAX_SEEDS = int(os.environ.get("FINSYN_MAX_SEEDS", "5"))
+
 ROOT = Path(__file__).resolve().parents[1]
 E = ROOT / "exp/finsyn-v2"
-MODELS = ["smote", "tabpfgen", "tabpfgen-prior", "tabddpm", "great", "tvae", "ctabgan", "ctgan", "ctabgan-plus"]
+MODELS = ["smote", "tabpfgen", "tabpfgen-prior", "tabddpm", "great", "tvae", "ctabgan", "ctgan", "ctabgan-plus",
+          "tabsyn", "tabdiff", "findiff"]  # 9/19: 12개
 COLLAPSED = {"tvae", "ctgan", "ctabgan", "ctabgan-plus"}
 DETS = ["nb", "dt", "lr", "knn", "mlp", "rf", "et", "hgb", "lgbm", "xgb", "catboost"]
 
@@ -36,7 +41,7 @@ def run_dir(model, tag, seed):
 
 
 def seeds_of(model):
-    return [s for s in (0, 1, 2) if (run_dir(model, "s2s", s) / "fidelity_vs_leaderboard_real.json").exists()]
+    return [s for s in range(MAX_SEEDS) if (run_dir(model, "s2s", s) / "fidelity_vs_leaderboard_real.json").exists()]
 
 
 def tau(model, seed):
@@ -77,8 +82,8 @@ def main():
     out = {}
 
     # (0) 기준: 전체 9개, TSTR(CatBoost, 시드 평균) / TSTR(best, 시드 평균)
-    t9 = [tau_mean[m] for m in MODELS]
-    out["all9"] = {"catboost": spearman([tstr_mean["catboost"][m] for m in MODELS], t9),
+    t9 = [tau_mean[m] for m in MODELS]  # 이름은 예전 그대로(all9), 내용은 MODELS 전체
+    out["all9"] = out["all"] = {"catboost": spearman([tstr_mean["catboost"][m] for m in MODELS], t9),
                    "best": spearman([tstr_best[m] for m in MODELS], t9)}
 
     # (1) 붕괴 릴리스 제외

@@ -1,0 +1,103 @@
+{
+ "_baseline": {
+  "dcr_holdout_to_train": 0.3404211848974228,
+  "n_holdout": 20000,
+  "n_members": 20000
+ },
+ "smote": {
+  "copy_rate": 0.0,
+  "dcr_syn_to_train": 0.16649648547172546,
+  "dcr_holdout_to_train": 0.3404211848974228,
+  "dcr_ratio": 0.489089671437149,
+  "dcr_share": 0.67015,
+  "mia_auc": 0.541113875
+ },
+ "tabpfgen": {
+  "copy_rate": 0.0,
+  "dcr_syn_to_train": 1.8522101640701294,
+  "dcr_holdout_to_train": 0.3404211848974228,
+  "dcr_ratio": 5.4409368342579665,
+  "dcr_share": 0.5246000000000001,
+  "mia_auc": 0.5945048749999999
+ },
+ "tabpfgen-prior": {
+  "copy_rate": 0.0,
+  "dcr_syn_to_train": 1.8731244206428528,
+  "dcr_holdout_to_train": 0.3404211848974228,
+  "dcr_ratio": 5.502373247444253,
+  "dcr_share": 0.512475,
+  "mia_auc": 0.596758325
+ },
+ "tabddpm": {
+  "copy_rate": 0.0,
+  "dcr_syn_to_train": 0.3819233328104019,
+  "dcr_holdout_to_train": 0.3404211848974228,
+  "dcr_ratio": 1.1219141162600816,
+  "dcr_share": 0.5816,
+  "mia_auc": 0.491762285
+ },
+ "great": {
+  "copy_rate": 0.0,
+  "dcr_syn_to_train": 0.4117213785648346,
+  "dcr_holdout_to_train": 0.3404211848974228,
+  "dcr_ratio": 1.209446993402882,
+  "dcr_share": 0.5737000000000001,
+  "mia_auc": 0.49266509625
+ },
+ "tvae": {
+  "copy_rate": 0.0,
+  "dcr_syn_to_train": 0.6640878915786743,
+  "dcr_holdout_to_train": 0.3404211848974228,
+  "dcr_ratio": 1.9507830917713895,
+  "dcr_share": 0.6578499999999999,
+  "mia_auc": 0.4850332325
+ },
+ "ctgan": {
+  "copy_rate": 0.0,
+  "dcr_syn_to_train": 1.5643202066421509,
+  "dcr_holdout_to_train": 0.3404211848974228,
+  "dcr_ratio": 4.59524928542129,
+  "dcr_share": 0.5767249999999999,
+  "mia_auc": 0.5561371450000001
+ },
+ "ctabgan": {
+  "copy_rate": 0.0,
+  "dcr_syn_to_train": 1.9498865008354187,
+  "dcr_holdout_to_train": 0.3404211848974228,
+  "dcr_ratio": 5.727864737392789,
+  "dcr_share": 0.5429999999999999,
+  "mia_auc": 0.54807099
+ },
+ "ctabgan-plus": {
+  "copy_rate": 0.0,
+  "dcr_syn_to_train": 1.7312631011009216,
+  "dcr_holdout_to_train": 0.3404211848974228,
+  "dcr_ratio": 5.085650300002902,
+  "dcr_share": 0.5649,
+  "mia_auc": 0.536455915
+ },
+ "tabsyn": {
+  "copy_rate": 0.0,
+  "dcr_syn_to_train": 0.4456162750720978,
+  "dcr_holdout_to_train": 0.3404211848974228,
+  "dcr_ratio": 1.3090145233069816,
+  "dcr_share": 0.56845,
+  "mia_auc": 0.484291295
+ },
+ "tabdiff": {
+  "copy_rate": 0.0,
+  "dcr_syn_to_train": 0.6336454451084137,
+  "dcr_holdout_to_train": 0.3404211848974228,
+  "dcr_ratio": 1.861357263354061,
+  "dcr_share": 0.5836,
+  "mia_auc": 0.50507348625
+ },
+ "findiff": {
+  "copy_rate": 0.0,
+  "dcr_syn_to_train": 1.9415322542190552,
+  "dcr_holdout_to_train": 0.3404211848974228,
+  "dcr_ratio": 5.703323824585377,
+  "dcr_share": 0.5627000000000001,
+  "mia_auc": 0.46786384375
+ }
+}

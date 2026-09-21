@@ -1,0 +1,91 @@
+{
+ "started": "2026-09-21 09:18:47",
+ "steps": [
+  {
+   "step": "pass4/standard_metrics",
+   "rc": 0,
+   "minutes": 1.0
+  },
+  {
+   "step": "pass4/standard_metrics_seeds",
+   "rc": 0,
+   "minutes": 0.2
+  },
+  {
+   "step": "pass4/privacy",
+   "rc": 0,
+   "minutes": 1.1
+  },
+  {
+   "step": "pass4/privacy_matched",
+   "rc": 0,
+   "minutes": 1.1
+  },
+  {
+   "step": "pass4/privacy_seeds",
+   "rc": 0,
+   "minutes": 4.4
+  },
+  {
+   "step": "pass4/augmentation",
+   "rc": 0,
+   "minutes": 0.0
+  },
+  {
+   "step": "pass4/augmentation_r1",
+   "rc": 0,
+   "minutes": 0.0
+  },
+  {
+   "step": "pass4/augmentation_r4",
+   "rc": 0,
+   "minutes": 0.0
+  },
+  {
+   "step": "pass4/lf_analysis",
+   "rc": 0,
+   "minutes": 0.1
+  },
+  {
+   "step": "pass4/tstr_vs_lf",
+   "rc": 0,
+   "minutes": 0.0
+  },
+  {
+   "step": "pass4/within_generator",
+   "rc": 0,
+   "minutes": 0.0
+  },
+  {
+   "step": "pass4/release_selection",
+   "rc": 0,
+   "minutes": 3.4
+  },
+  {
+   "step": "pass4/tabm_extension",
+   "rc": 0,
+   "minutes": 0.3
+  },
+  {
+   "step": "pass4/tables",
+   "rc": 0,
+   "minutes": 0.0
+  },
+  {
+   "step": "pass4/figure",
+   "rc": 0,
+   "minutes": 0.0
+  },
+  {
+   "step": "pass4/figure_metric",
+   "rc": 0,
+   "minutes": 0.0
+  },
+  {
+   "step": "pass4/figure_select",
+   "rc": 0,
+   "minutes": 0.0
+  }
+ ],
+ "extra_experiments": null
+}

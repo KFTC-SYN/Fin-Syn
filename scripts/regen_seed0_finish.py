@@ -88,7 +88,7 @@ def main():
     # 4) 표 / 그림
     sh([PY, "scripts/make_tables_v2.py"], log)
     sh([PY, "scripts/fig_leaderboard_fidelity.py", "--out",
-        str(ROOT.parent / "Fin-Syn-paper/202609_iclr/figures/leaderboard_fidelity.pdf")], log)
+        str(ROOT.parent / "Fin-Syn-paper/figures/leaderboard_fidelity.pdf")], log)
 
     # 5) 변경 요약
     print(f"\ndone in {(time.time()-t0)/3600:.1f} h\n\ntau_s2s before -> after")

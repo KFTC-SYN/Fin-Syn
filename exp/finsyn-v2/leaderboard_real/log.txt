@@ -1,0 +1,27 @@
+train 63,707 (1.28%) | tune 15,427 (2.13%) | test 15,767 (1.11%)
+nb        test PR-AUC 0.459±0.000  R@0.1%FPR 0.119  R@1%FPR 0.703  ROC 0.969  (0.0 min)
+dt        test PR-AUC 0.769±0.000  R@0.1%FPR 0.527  R@1%FPR 0.875  ROC 0.977  (0.1 min)
+lr        test PR-AUC 0.774±0.000  R@0.1%FPR 0.440  R@1%FPR 0.891  ROC 0.995  (0.4 min)
+knn       test PR-AUC 0.732±0.000  R@0.1%FPR 0.423  R@1%FPR 0.834  ROC 0.956  (0.5 min)
+mlp       test PR-AUC 0.833±0.015  R@0.1%FPR 0.584  R@1%FPR 0.913  ROC 0.997  (8.2 min)
+rf        test PR-AUC 0.915±0.001  R@0.1%FPR 0.826  R@1%FPR 0.944  ROC 0.998  (1.7 min)
+et        test PR-AUC 0.882±0.002  R@0.1%FPR 0.674  R@1%FPR 0.920  ROC 0.995  (2.7 min)
+hgb       test PR-AUC 0.907±0.002  R@0.1%FPR 0.782  R@1%FPR 0.938  ROC 0.998  (1.1 min)
+lgbm      test PR-AUC 0.922±0.003  R@0.1%FPR 0.814  R@1%FPR 0.950  ROC 0.998  (0.2 min)
+xgb       test PR-AUC 0.916±0.002  R@0.1%FPR 0.795  R@1%FPR 0.944  ROC 0.998  (0.5 min)
+catboost  test PR-AUC 0.912±0.002  R@0.1%FPR 0.771  R@1%FPR 0.951  ROC 0.998  (4.4 min)
+
+leaderboard (PR-AUC, seed-mean prediction CI95):
+  lgbm      0.922  CI95 0.894-0.952
+  xgb       0.916  CI95 0.884-0.945
+  rf        0.915  CI95 0.883-0.945
+  catboost  0.912  CI95 0.884-0.945
+  hgb       0.907  CI95 0.876-0.942
+  et        0.882  CI95 0.841-0.918
+  mlp       0.833  CI95 0.806-0.896
+  lr        0.774  CI95 0.721-0.828
+  dt        0.769  CI95 0.715-0.819
+  knn       0.732  CI95 0.670-0.795
+  nb        0.459  CI95 0.402-0.524
+bootstrap τ(full, boot) mean 0.910 (5% 0.818) | seed τ mean 0.971
+pairs separable at 95%: 44/55

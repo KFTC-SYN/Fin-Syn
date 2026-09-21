@@ -53,8 +53,10 @@ def main():
     n = args.n or len(df)
 
     t0 = time.time()
+    # HF Trainer는 기본 시드 42로 셔플·dropout을 고정한다. 생성기 시드를 학습에도 반영하되,
+    # 기존 seed 0 릴리스(Trainer 시드 42로 학습됨)가 그대로 재현되도록 42 + seed 로 둔다.
     model = GReaT(llm=args.llm, experiment_dir=str(out / "trainer_great"), epochs=args.epochs, batch_size=args.batch_size,
-                  save_strategy="no", logging_steps=50, report_to=[])
+                  save_strategy="no", logging_steps=50, report_to=[], seed=42 + args.seed, data_seed=42 + args.seed)
     model.fit(df)
     t_train = time.time() - t0
 

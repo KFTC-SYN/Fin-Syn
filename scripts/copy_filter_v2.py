@@ -150,7 +150,7 @@ def do_post():
     run([PY, "scripts/tstr_vs_lf_v2.py"])
     run([PY, "scripts/make_tables_v2.py"])
     run([PY, "scripts/fig_leaderboard_fidelity.py", "--out",
-         str(ROOT.parent / "Fin-Syn-paper/202609_iclr/figures/leaderboard_fidelity.pdf")])
+         str(ROOT.parent / "Fin-Syn-paper/figures/leaderboard_fidelity.pdf")])
     print("post-processing done", flush=True)
 
 

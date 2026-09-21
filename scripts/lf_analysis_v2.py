@@ -21,15 +21,21 @@ from pathlib import Path
 import numpy as np
 from scipy.stats import rankdata
 
+import os
+# 논문 메인 표/그림은 생성기마다 같은 수의 공개본을 쓴다(사용자 지시 9/20). 기본 5시드.
+MAX_SEEDS = int(os.environ.get("FINSYN_MAX_SEEDS", "5"))
+
 ROOT = Path(__file__).resolve().parents[1]
 E = ROOT / "exp/finsyn-v2"
-MODELS = ["smote", "tabpfgen", "tabpfgen-prior", "tabddpm", "great", "tvae", "ctabgan", "ctgan", "ctabgan-plus"]
+MODELS = ["smote", "tabpfgen", "tabpfgen-prior", "tabddpm", "great", "tvae", "ctabgan", "ctgan", "ctabgan-plus",
+          "tabsyn", "tabdiff", "findiff"]  # 9/19: TabSyn, TabDiff, FinDiff 추가(12개)
+COLLAPSED = {"tvae", "ctgan", "ctabgan", "ctabgan-plus"}
 RNG = np.random.default_rng(0)
 
 
 def seed_runs(model, tag):
     runs = []
-    for s in (0, 1, 2):
+    for s in range(MAX_SEEDS):  # 생성기마다 같은 수의 공개본만 집계한다
         d = E / (f"leaderboard_{model}_{tag}" if s == 0 else f"leaderboard_{model}_{tag}_seed{s}")
         f = d / "fidelity_vs_leaderboard_real.json"
         if f.exists():
@@ -57,14 +63,25 @@ def spearman(x, y):
     return float(np.corrcoef(rx, ry)[0, 1])
 
 
-PERMS = np.array(list(itertools.permutations(range(9))), dtype=np.int8)
+_PERMS = {}
+
+
+def perms(n):
+    """n <= 9면 모든 순열(정확 검정), 그보다 크면 무작위 순열 200,000개(몬테카를로 검정)."""
+    if n not in _PERMS:
+        if n <= 9:
+            _PERMS[n] = np.array(list(itertools.permutations(range(n))), dtype=np.int8)
+        else:
+            rng = np.random.default_rng(12345)
+            _PERMS[n] = np.array([rng.permutation(n) for _ in range(200_000)], dtype=np.int8)
+    return _PERMS[n]
 
 
 def perm_p(x, y):
-    """정확 순열검정: y의 순위를 모든 순열로 섞어 |rho| 이상이 나올 비율."""
+    """순열검정: y의 순위를 섞어 |rho| 이상이 나올 비율(n <= 9 정확, 그 이상 몬테카를로)."""
     rx, ry = rankdata(x), rankdata(y)
     rx = (rx - rx.mean()) / rx.std()
-    ryp = ry[PERMS]
+    ryp = ry[perms(len(ry))]
     ryp = (ryp - ryp.mean(axis=1, keepdims=True)) / ryp.std(axis=1, keepdims=True)
     rho = (ryp * rx).mean(axis=1)
     obs = float(np.mean(rx * (ry - ry.mean()) / ry.std()))
@@ -121,7 +138,20 @@ def main():
     pr = np.array([real[k]["summary"]["pr_auc"][0] for k in real])
     nf = json.loads((E / "leaderboard_real/noise_floor.json").read_text())
 
-    out = {"definition": "tau/pairs/regret = mean over generator seeds 0-2 (GReaT: seed 0 only)",
+    # 공개본 단위 변동: tau_S->S를 생성기 간 분산과 같은 생성기 안의 시드 간 분산으로 나눈다
+    def decompose(models):
+        runs = {m: rel[m]["s2s"]["tau"] for m in models if rel[m]["s2s"]["n_seeds"] >= 2}
+        allv = np.concatenate([np.asarray(v) for v in runs.values()])
+        within = float(np.mean([np.var(v, ddof=1) for v in runs.values()]))
+        between = float(np.var([np.mean(v) for v in runs.values()], ddof=1))
+        return {"generators": list(runs), "n_runs": int(len(allv)), "total_var": float(np.var(allv, ddof=1)),
+                "within_var": within, "between_var_of_means": between, "within_share": within / (within + between),
+                "within_sd": float(np.sqrt(within)),
+                "range_per_generator": {m: [float(min(v)), float(max(v))] for m, v in runs.items()}}
+    variance = {"all": decompose(MODELS), "non_collapsed": decompose([m for m in MODELS if m not in COLLAPSED])}
+
+    out = {"definition": f"tau/pairs/regret = mean over generator seeds 0-{MAX_SEEDS - 1}",
+           "variance_decomposition": variance,
            "releases": rel, "corr_with_tau_s2s": corr, "aug_gain_5pct": dict(zip(MODELS, g5)),
            "aug_corr": aug_corr, "random_choice_regret": float(pr.max() - pr.mean()),
            "noise_floor": {"q05": nf["tau_vs_full_q05"], "mean": nf["tau_vs_full_mean"]}}

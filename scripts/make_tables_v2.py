@@ -10,11 +10,16 @@ from pathlib import Path
 
 import numpy as np
 
+import os
+# 논문 메인 표/그림은 생성기마다 같은 수의 공개본을 쓴다(사용자 지시 9/20). 기본 5시드.
+MAX_SEEDS = int(os.environ.get("FINSYN_MAX_SEEDS", "5"))
+
 ROOT = Path(__file__).resolve().parents[1]
 E = ROOT / "exp/finsyn-v2"
 DET = {"nb": "Naive Bayes", "dt": "Decision tree", "lr": "Logistic regression", "knn": "$k$-NN", "mlp": "MLP",
        "rf": "Random forest", "et": "Extra trees", "hgb": "HistGB", "lgbm": "LightGBM", "xgb": "XGBoost", "catboost": "CatBoost"}
 GEN = {"smote": "SMOTE", "tvae": "TVAE", "ctgan": "CTGAN", "ctabgan": "CTAB-GAN", "ctabgan-plus": "CTAB-GAN+",
+       "tabsyn": "TabSyn", "tabdiff": "TabDiff", "findiff": "FinDiff",
        "tabddpm": "TabDDPM", "great": "GReaT", "tabpfgen": "TabPFGen", "tabpfgen-prior": "TabPFGen-prior", "tabpfgen-nobal": "TabPFGen (no class balancing)"}
 
 
@@ -25,8 +30,9 @@ def wrap(body, caption, label, note="", wrapwidth=None):
                 "\\caption{\\BLUE{" + caption + "}}\n\\label{" + label + "}\n")
         tail = "\n\\end{wraptable}\n"  # 각주는 캡션에 포함시킨다
     else:
-        head = "\\begin{table}[t]\n\\centering\n\\color{blue}\n\\caption{\\BLUE{" + caption + "}}\n\\label{" + label + "}\n"
-        tail = ("\n\\vspace{2pt}\\footnotesize " + note if note else "") + "\n\\end{table}\n"
+        cap = caption + ((" " + note) if note else "")  # 표 아래 각주를 쓰지 않고 캡션에 합친다(9/20 요청)
+        head = "\\begin{table}[t]\n\\centering\n\\color{blue}\n\\caption{\\BLUE{" + cap + "}}\n\\label{" + label + "}\n"
+        tail = "\n\\end{table}\n"
     return head + body + tail
 
 
@@ -38,19 +44,25 @@ def real_leaderboard(out):
     for m in order:
         s = r[m]["summary"]
         ci = n["pr_auc_ci95"][m]
-        rows.append(f"{DET[m]} & {s['pr_auc'][0]:.3f} & [{ci[0]:.3f}, {ci[1]:.3f}] & {s['recall@1%fpr'][0]:.3f} \\\\")
-    body = ("\\resizebox{\\linewidth}{!}{%\n\\begin{tabular}{lccc}\n\\toprule\nDetector & PR-AUC & 95\\% CI & R@1\\%FPR \\\\\n\\midrule\n"
-            + "\n".join(rows) + "\n\\bottomrule\n\\end{tabular}}")
-    cap = ("Reference leaderboard on the private test period. Seed means over five runs; CI from 1{,}000 stratified "
-           "bootstrap resamples. Recall at 0.1\\% FPR and ROC-AUC in Appendix~\\ref{app:extra}.")
-    (out / "tab_real_leaderboard.tex").write_text(wrap(body, cap, "tab:real", wrapwidth="0.52\\textwidth"))
+        rows.append(f"{DET[m]} & {s['pr_auc'][0]:.3f} & [{ci[0]:.3f}, {ci[1]:.3f}] \\\\")
+    # 본문 지면을 아끼려고 11행을 두 덩어리로 나란히 놓는다(9/21, 9쪽 제한).
+    half = (len(rows) + 1) // 2
+    left, right = rows[:half], rows[half:] + [" & & \\\\"] * (half - len(rows[half:]))
+    merged = [l.rstrip("\\ ").rstrip("\\") + " & " + r for l, r in zip(left, right)]
+    body = ("\\small\n\\setlength{\\tabcolsep}{4pt}\n\\begin{tabular}{lcc@{\\hspace{1.4em}}lcc}\n\\toprule\n"
+            "Detector & PR-AUC & 95\\% CI & Detector & PR-AUC & 95\\% CI \\\\\n\\midrule\n"
+            + "\n".join(merged) + "\n\\bottomrule\n\\end{tabular}")
+    cap = ("Reference leaderboard on the private test period. Test PR-AUC, mean over five detector seeds; 95\\% CI from "
+           "1{,}000 stratified bootstrap resamples of the test period. Resampling moves this ranking by $\\tau=0.910$, the "
+           "highest agreement a release can be expected to reach. Recall and ROC-AUC are in Appendix~\\ref{app:extra}.")
+    (out / "tab_real_leaderboard.tex").write_text(wrap(body, cap, "tab:real"))
 
 
 
 def tau_seeds(model, tag):
-    """생성기 시드 0,1,2의 tau 목록(없는 시드는 건너뜀)."""
+    """생성기 공개본들의 tau 목록(없는 시드는 건너뜀)."""
     out = []
-    for s in (0, 1, 2):
+    for s in range(MAX_SEEDS):
         d = E / (f"leaderboard_{model}_{tag}" if s == 0 else f"leaderboard_{model}_{tag}_seed{s}")
         f = d / "fidelity_vs_leaderboard_real.json"
         if f.exists():
@@ -59,40 +71,70 @@ def tau_seeds(model, tag):
 
 
 def generators(out):
+    """본문 표 2(핵심 열만)와 부록 표(나머지 표준지표). 9/19 스타일 점검: 15열을 축소해 넣던 표를 나눈다."""
     sm = json.loads((E / "standard_metrics.json").read_text())
     pv_path = E / "privacy.json"
     pv = json.loads(pv_path.read_text()) if pv_path.exists() else {}
     lf = json.loads((E / "lf_analysis.json").read_text())["releases"]  # 시드 평균 정의 (scripts/lf_analysis_v2.py)
-    rows = []
-    for m, v in sorted(sm.items(), key=lambda kv: -lf[kv[0]]["s2s"]["tau_mean"]):
-        p = pv.get(m, {})
-        priv = (f"{p['dcr_ratio']:.2f} & {p['mia_auc']:.3f}" if p else "--- & ---")
+    cf = json.loads((E / "copy_filter.json").read_text()) if (E / "copy_filter.json").exists() else {}
+    removed = {m: (cf[f"{m}/seed0"]["train"]["copies"] / cf[f"{m}/seed0"]["train"]["rows"] * 100
+                   if f"{m}/seed0" in cf else 0.0) for m in sm}  # 공개 전 제거한 완전 복제 행(%)
+    order = sorted(sm, key=lambda m: -lf[m]["s2s"]["tau_mean"])
+    best_tau = max(lf[m]["s2s"]["tau_mean"] for m in order)
+    counts = {lf[m]["s2s"]["n_seeds"] for m in order}
+    uniform = len(counts) == 1          # 메인 표는 생성기마다 같은 수의 공개본을 써야 한다(사용자 지시 9/20)
+    n_rel = next(iter(counts)) if uniform else None
+    if not uniform:
+        print("  [경고] 생성기별 공개본 수가 다릅니다:",
+              {GEN.get(m, m): lf[m]["s2s"]["n_seeds"] for m in order})
+
+    def num(x, fmt="{:.2f}", signed=False):
+        s = ("{:+.2f}" if signed else fmt).format(x)
+        return s.replace("-", "$-$")
+
+    main, appx = [], []
+    for m in order:
+        v, p = sm[m], pv.get(m, {})
         a, b = lf[m]["s2s"], lf[m]["s2r"]
-        dag = "$^\\dagger$" if m == "tvae" else ""
-        rng = f"{a['tau_min']:+.2f}, {a['tau_max']:+.2f}" if a["n_seeds"] > 1 else "one seed"
-        tau_cols = f"{b['tau_mean']:+.3f} & {a['tau_mean']:+.3f}{dag} & [{rng}]"
-        rows.append(f"{GEN.get(m, m)} & {v['ks_mean']:.3f} & {v['tvd_mean']:.3f} & {v['corr_rmse']:.3f} & {v['detection_auc']:.3f} & "
-                    f"{100*v['pos_rate']:.2f} & {v['tstr_best_pr_auc']:.3f} & {v['copy_rate']*100:.1f} & {priv} & "
-                    f"{tau_cols} & {a['pairs_mean']*100:.0f} & {a['regret_mean']:.3f} \\\\")
-    body = ("\\resizebox{\\textwidth}{!}{%\n\\begin{tabular}{lcccccccccccccc}\n\\toprule\n & \\multicolumn{4}{c}{Standard metrics} & "
-            "\\multicolumn{2}{c}{Label / utility} & \\multicolumn{3}{c}{Privacy} & \\multicolumn{5}{c}{Leaderboard fidelity} \\\\\n"
-            "\\cmidrule(lr){2-5}\\cmidrule(lr){6-7}\\cmidrule(lr){8-10}\\cmidrule(lr){11-15}\n"
-            "Generator & KS & TVD & corr & C2ST & pos.\\ \\% & TSTR & copy \\% & DCR & MIA & $\\tau_{S\\to R}$ & $\\tau_{S\\to S}$ & seed min, max & pairs \\% & regret \\\\\n\\midrule\n"
-            + "\n".join(rows) + "\n\\bottomrule\n\\end{tabular}}")
-    base = pv.get("_baseline", {}).get("dcr_holdout_to_train")
-    note = ("KS/TVD/corr: mean marginal and dependence error vs.\\ the private training period (lower is better); C2ST: real-vs-synthetic "
-            "detection AUC (0.5 is indistinguishable); pos.\\ \\%: synthetic positive rate (private: 1.28\\%); TSTR: best detector "
-            "PR-AUC when trained on synthetic and tested on private data; copy \\%: synthetic rows identical to a private training row; "
-            "DCR: median distance to the closest private training record, as a ratio to the same distance for real transfers of the same "
-            "period that are not in the benchmark (1.0 = as far as a fresh real sample"
-            + (f", baseline {base:.3f}" if base else "") + "); MIA: AUC of a nearest-neighbour membership-inference attack that sees only "
-            "the release (0.5 = no leakage). Leaderboard-fidelity columns are means over three generator seeds (GReaT: one): "
-            "$\\tau$, Kendall rank agreement with Table~\\ref{tab:real} (noise band from 0.818); seed min, max of $\\tau_{S\\to S}$; "
-            "pairs \\%, separable pairs whose order is kept; regret, private PR-AUC lost by deploying the public-leaderboard winner "
-            "(0.102 for a detector picked uniformly at random). Standard and privacy columns are computed on the seed-0 release. "
-            "$^\\dagger$TVAE releases contain one positive row per split, so seven of eleven detectors tie at the prevalence floor "
-            "and its $\\tau$ is not interpretable.")
-    (out / "tab_generators.tex").write_text(wrap(body, "Standard metrics, privacy risk, and leaderboard fidelity, sorted by $\\tau_{S\\to S}$.", "tab:gen", note))
+        rng = (f"[{num(a['tau_min'], signed=True)}, {num(a['tau_max'], signed=True)}]" if a["n_seeds"] > 1 else "one run")
+        tau_s2s = num(a["tau_mean"], signed=True)
+        if abs(a["tau_mean"] - best_tau) < 1e-9:
+            tau_s2s = "\\textbf{" + tau_s2s + "}"
+        priv = (f"{num(p['dcr_ratio'])} & {p['mia_auc']:.2f}" if p else "--- & ---")
+        name = GEN.get(m, m) + ("" if uniform else f" ({a['n_seeds']})")
+        main.append(f"{name} & {v['ks_mean']:.2f} & {v['tstr_catboost_pr_auc']:.2f} & "
+                    f"{tau_s2s} & {rng} & {num(b['tau_mean'], signed=True)} & {priv} \\\\")
+        appx.append(f"{GEN.get(m, m)} & {a['pairs_mean']*100:.0f} & {a['regret_mean']:.3f} & {v['tvd_mean']:.3f} & "
+                    f"{v['corr_rmse']:.3f} & {100*v['pos_rate']:.2f} & {v['tstr_best_pr_auc']:.3f} & "
+                    f"{removed[m]:.2f} & {p.get('dcr_share', float('nan')):.3f} \\\\")
+
+    body = ("\\small\n\\setlength{\\tabcolsep}{4.5pt}\n\\begin{tabular}{lccccccc}\n\\toprule\n"
+            " & \\multicolumn{2}{c}{Standard metrics} & \\multicolumn{3}{c}{Leaderboard fidelity} & "
+            "\\multicolumn{2}{c}{Privacy} \\\\\n\\cmidrule(lr){2-3}\\cmidrule(lr){4-6}\\cmidrule(lr){7-8}\n"
+            "Generator & KS $\\downarrow$ & TSTR $\\uparrow$ & $\\tau_{S\\to S}$ $\\uparrow$ & [min, max] & "
+            "$\\tau_{S\\to R}$ $\\uparrow$ & DCR $\\to 1$ & MIA $\\to .5$ \\\\\n\\midrule\n"
+            + "\n".join(main) + "\n\\bottomrule\n\\end{tabular}")
+    n_word = {3: "three", 4: "four", 5: "five", 10: "ten"}.get(n_rel, str(n_rel))
+    lead = (f"Every generator produced {n_word} releases, one per seed. " if uniform
+            else "The number of releases per generator is given in parentheses. ")
+    note = (lead + "$\\tau_{S\\to S}$ is the mean over them and "
+            "[min, max] their range; the other columns use the "
+            "released seed-0 run. Arrows give the better direction; DCR near 1.0 means as far from the private data as a fresh real "
+            "sample, and bold marks the highest $\\tau_{S\\to S}$. TVAE keeps one positive row per split, so its $\\tau$ is "
+            "not interpretable. Definitions are in Appendix~\\ref{app:metrics}; separable pairs, regret and the remaining "
+            "metrics are in Table~\\ref{tab:genfull}.")
+    (out / "tab_generators.tex").write_text(wrap(
+        body, "Leaderboard fidelity varies more between runs of one generator than between generators.", "tab:gen", note))
+
+    abody = ("\\small\n\\setlength{\\tabcolsep}{4pt}\n\\begin{tabular}{lcccccccc}\n\\toprule\n"
+             "Generator & Pairs \\% $\\uparrow$ & Regret $\\downarrow$ & TVD $\\downarrow$ & Dep. $\\downarrow$ & "
+             "Pos. \\% & TSTR $\\uparrow$ & Copies \\% & DCR sh. $\\to .5$ \\\\\n\\midrule\n"
+             + "\n".join(appx) + "\n\\bottomrule\n\\end{tabular}")
+    anote = ("Separable-pair preservation and selection regret are means over that generator's runs; the remaining columns use "
+             "the released run. \\emph{Copies removed} is the share of rows identical to a private record, deleted before "
+             "publication; only SMOTE produced such rows. The private prevalence is 1.28\\%.")
+    (out / "tab_generators_full.tex").write_text(wrap(
+        abody, "Remaining standard metrics for the seed-0 release of each generator.", "tab:genfull", anote))
 
 
 def conditions(out):
@@ -107,8 +149,8 @@ def conditions(out):
         f = json.loads((d / "fidelity_vs_leaderboard_real.json").read_text()) if tag != "real" else None
         rows.append(f"{name} & {r[best]['summary']['pr_auc'][0]:.3f} & {sat} & {sep}/{len(n['pairwise_win_prob'])} & "
                     + ("--- & --- & ---" if f is None else f"{f['kendall_tau']:.3f} & {DET[f['cand_top1']]} & {f['selection_regret_pr_auc']:.3f}") + " \\\\")
-    body = ("\\resizebox{\\textwidth}{!}{%\n\\begin{tabular}{lcccccc}\n\\toprule\nConstruction & best PR-AUC & detectors $\\ge$0.999 & separable pairs & $\\tau$ vs.\\ ours & top-1 detector & regret \\\\\n\\midrule\n"
-            + "\n".join(rows) + "\n\\bottomrule\n\\end{tabular}}")
+    body = ("\\small\n\\begin{tabular}{lcccccc}\n\\toprule\nConstruction & best PR-AUC & saturated & sep.\\ pairs & $\\tau$ & top-1 & regret \\\\\n\\midrule\n"
+            + "\n".join(rows) + "\n\\bottomrule\n\\end{tabular}")
     note = ("All three use the same transfers and features; only the split (and, in the last row, replication of 2{,}157 distinct rows to "
             "91{,}005 as in a naive construction) differ.")
     (out / "tab_conditions.tex").write_text(wrap(body, "Effect of dataset construction on the private-data leaderboard.", "tab:cond", note))
@@ -123,7 +165,8 @@ def ablation(out):
             for k, v in a.items()]
     body = ("\\begin{tabular}{lcccc}\n\\toprule\nFeature groups & \\# feat. & PR-AUC & R@0.1\\%FPR & ROC-AUC \\\\\n\\midrule\n"
             + "\n".join(rows) + "\n\\bottomrule\n\\end{tabular}")
-    note = "LightGBM, fixed configuration, five seeds, private test period. Bank codes and receiver cross-bank history are visible only to the clearing network, not to the sending bank."
+    note = ("LightGBM with a fixed configuration, five seeds, private test period. Only the receiver's cross-bank history "
+            "needs records the sending bank does not hold; bank codes and the sender's own history do not.")
     (out / "tab_ablation.tex").write_text(wrap(body, "Feature-group ablation: value of cross-institution information.", "tab:ablation", note))
 
 
@@ -162,6 +205,38 @@ def augmentation(out):
         wrap(body, "Augmenting scarce real labels with a synthetic release.", "tab:aug", note))
 
 
+def augmentation_ratio(out):
+    """부록: 합성/실제 비율을 1:1, 4:1, 기본(약 20:1)로 바꿨을 때 보강 이득의 부호와 순서가 유지되는가."""
+    import pandas as pd
+
+    rr = json.loads((E / "augmentation_ratio.json").read_text())
+    base_keys = [v for k, v in rr.items() if k.startswith("real|0.05|lgbm")]
+    base = sum(base_keys) / len(base_keys)
+    per = {}
+    for k, v in rr.items():
+        parts = k.split("|")
+        if len(parts) == 5 and parts[1] == "0.05" and parts[2] == "lgbm":
+            per.setdefault(parts[0], {}).setdefault(parts[4], []).append(v)
+    default = json.loads((E / "lf_analysis.json").read_text())["aug_gain_5pct"]
+    order = sorted(per, key=lambda m: -default.get(m, float("-inf")))
+    rows = []
+    for m in order:
+        r1 = sum(per[m].get("r1", [float("nan")])) / max(len(per[m].get("r1", [1])), 1) - base
+        r4 = sum(per[m].get("r4", [float("nan")])) / max(len(per[m].get("r4", [1])), 1) - base
+        d = default.get(m, float("nan"))
+        cells = " & ".join(f"{x:+.3f}".replace("-", "$-$") for x in (r1, r4, d))
+        rows.append(f"{GEN.get(m, m)} & {cells} \\\\")
+    body = ("\\small\n\\begin{tabular}{lccc}\n\\toprule\n"
+            "Release & 1:1 & 4:1 & unrestricted \\\\\n\\midrule\n" + "\n".join(rows)
+            + "\n\\bottomrule\n\\end{tabular}")
+    note = ("Change in test PR-AUC against training on the 5\\% real subset alone "
+            f"(LightGBM, absolute baseline {base:.3f}), when the synthetic rows appended are capped at one and four "
+            "times the number of real rows, and when the whole synthetic training split is appended "
+            "(about twenty times). The magnitude depends on the ratio, the sign and the ordering do not.")
+    (out / "tab_aug_ratio.tex").write_text(wrap(
+        body, "Augmentation gain is ratio-dependent in magnitude but not in sign.", "tab:augratio", note))
+
+
 def appendix_tables(out):
     """부록: 참조 리더보드 전체 지표 + 릴리스별 탐지기 상세."""
     r = json.loads((E / "leaderboard_real/results.json").read_text())
@@ -173,7 +248,7 @@ def appendix_tables(out):
         ci = n["pr_auc_ci95"][m]
         rows.append(f"{DET[m]} & {s['pr_auc'][0]:.3f} $\\pm$ {s['pr_auc'][1]:.3f} & [{ci[0]:.3f}, {ci[1]:.3f}] & "
                     f"{s['recall@0.1%fpr'][0]:.3f} & {s['recall@1%fpr'][0]:.3f} & {s['roc_auc'][0]:.3f} \\\\")
-    body = ("\\begin{tabular}{lccccc}\n\\toprule\nDetector & PR-AUC & 95\\% CI & R@0.1\\%FPR & R@1\\%FPR & ROC-AUC \\\\\n\\midrule\n"
+    body = ("\\small\n\\setlength{\\tabcolsep}{5pt}\n\\begin{tabular}{lccccc}\n\\toprule\nDetector & PR-AUC & 95\\% CI & R@0.1\\%FPR & R@1\\%FPR & ROC-AUC \\\\\n\\midrule\n"
             + "\n".join(rows) + "\n\\bottomrule\n\\end{tabular}")
     note = ("Seed mean $\\pm$ standard deviation over five runs; CI from 1{,}000 stratified bootstrap resamples of the test period. "
             "The columns omitted from Table~\\ref{tab:real} are included here.")
@@ -182,25 +257,30 @@ def appendix_tables(out):
     # 릴리스별 탐지기 PR-AUC (s2s / s2r)
     models = [m for m in GEN if (E / f"leaderboard_{m}_s2s").exists()]
     sm = json.loads((E / "standard_metrics.json").read_text())
-    models = sorted(models, key=lambda m: -sm[m]["lf_tau_s2s"])
+    lfa = json.loads((E / "lf_analysis.json").read_text())["releases"]
+    models = sorted(models, key=lambda m: -lfa[m]["s2s"]["tau_mean"])
     for tag, cap in [("s2s", "trained, tuned, and tested on the release ($S\\to S$)"),
                      ("s2r", "trained and tuned on the release, tested on the private test period ($S\\to R$)")]:
         lb = {m: json.loads((E / f"leaderboard_{m}_{tag}/results.json").read_text()) for m in models}
-        rows = []
-        for d in order:
-            cells = " & ".join(f"{lb[m][d]['summary']['pr_auc'][0]:.3f}" if d in lb[m] else "---" for m in models)
-            rows.append(f"{DET[d]} & {r[d]['summary']['pr_auc'][0]:.3f} & {cells} \\\\")
-        head = " & ".join(GEN.get(m, m) for m in models)
-        body = ("\\resizebox{\\textwidth}{!}{%\n\\begin{tabular}{l" + "c" * (len(models) + 1) + "}\n\\toprule\n"
-                "Detector & private & " + head + " \\\\\n\\midrule\n" + "\n".join(rows) + "\n\\bottomrule\n\\end{tabular}}")
-        note = ("Test PR-AUC, seed means. Rows are ordered by the private leaderboard; columns by $\\tau_{S\\to S}$. "
-                "A release preserves the leaderboard when its column orders the rows as the \\emph{private} column does.")
+        short = {"nb": "NB", "dt": "DT", "lr": "LR", "knn": "kNN", "mlp": "MLP", "rf": "RF", "et": "ET",
+                 "hgb": "HGB", "lgbm": "LGBM", "xgb": "XGB", "catboost": "CB"}
+        rows = ["private data & " + " & ".join(f"{r[d]['summary']['pr_auc'][0]:.2f}" for d in order) + " \\\\",
+                "\\midrule"]
+        for m in models:
+            cells = " & ".join(f"{lb[m][d]['summary']['pr_auc'][0]:.2f}" if d in lb[m] else "---" for d in order)
+            rows.append(f"{GEN.get(m, m)} & {cells} \\\\")
+        head = " & ".join(short[d] for d in order)
+        body = ("\\footnotesize\n\\setlength{\\tabcolsep}{4pt}\n\\begin{tabular}{l" + "c" * len(order) + "}\n"
+                "\\toprule\nRelease & " + head + " \\\\\n\\midrule\n" + "\n".join(rows)
+                + "\n\\bottomrule\n\\end{tabular}")
+        note = ("Test PR-AUC of the released run. Columns are ordered by the private leaderboard and rows by "
+                "$\\tau_{S\\to S}$; a release preserves the leaderboard when its row orders the columns as the first row does.")
         (out / f"tab_detectors_{tag}.tex").write_text(
             wrap(body, f"Per-detector results, {cap}.", f"tab:det{tag}", note))
 
 
 def tstr_vs_tau(out):
-    """부록: 같은 생성기의 실행본(시드)별 TSTR과 tau. TSTR은 거의 같은데 tau는 크게 다를 수 있음을 보인다."""
+    """부록: 같은 생성기의 실행본(시드)별 TSTR과 tau의 폭. 시드 수가 생성기마다 달라 열 수는 고정(범위로 요약)."""
     import sys
     sys.path.insert(0, str(ROOT / "scripts"))
     from tstr_vs_lf_v2 import MODELS, seeds_of, tau, tstr
@@ -208,21 +288,25 @@ def tstr_vs_tau(out):
     rows = []
     for m in MODELS:
         ss = seeds_of(m)
-        if len(ss) < 3:
+        if len(ss) < 2:
             continue
         ts, ta = [tstr(m, s, "catboost") for s in ss], [tau(m, s) for s in ss]
-        rows.append(f"{GEN.get(m, m)} & " + " & ".join(f"{x:.3f}" for x in ts) + f" & {max(ts)-min(ts):.3f} & "
-                    + " & ".join(f"{x:+.3f}" for x in ta) + f" & {max(ta)-min(ta):.3f} \\\\")
-    body = ("\\begin{tabular}{lcccccccc}\n\\toprule\n & \\multicolumn{4}{c}{TSTR (CatBoost PR-AUC)} & "
-            "\\multicolumn{4}{c}{$\\tau_{S\\to S}$} \\\\\n\\cmidrule(lr){2-5}\\cmidrule(lr){6-9}\n"
-            "Generator & seed 0 & seed 1 & seed 2 & range & seed 0 & seed 1 & seed 2 & range \\\\\n\\midrule\n"
+        best_by_tstr = ta[int(max(range(len(ss)), key=lambda i: ts[i]))]
+        rows.append(f"{GEN.get(m, m)} & {len(ss)} & {min(ts):.3f} to {max(ts):.3f} & "
+                    f"{min(ta):+.2f} to {max(ta):+.2f} & {best_by_tstr:+.2f} & {max(ta):+.2f} \\\\")
+    body = ("\\small\n\\begin{tabular}{lccccc}\n\\toprule\n & & \\multicolumn{2}{c}{Range over runs} & "
+            "\\multicolumn{2}{c}{$\\tau_{S\\to S}$ of the run picked by} \\\\\n"
+            "\\cmidrule(lr){3-4}\\cmidrule(lr){5-6}\n"
+            "Generator & runs & TSTR & $\\tau_{S\\to S}$ & TSTR & an oracle \\\\\n\\midrule\n"
             + "\n".join(rows) + "\n\\bottomrule\n\\end{tabular}")
     w = res["within_generator"]
-    note = (f"Across the {w['n_pairs']} pairs of runs of the same generator, the run with the higher TSTR also has the higher "
-            f"$\\tau_{{S\\to S}}$ in {w['agree_rate']*100:.0f}\\% of cases ({w['agree_rate_non_collapsed']*100:.0f}\\% of the "
-            f"{w['n_pairs_non_collapsed']} pairs among non-collapsed generators). GReaT was run once and is omitted.")
+    note = (f"Runs of one generator differ in $\\tau_{{S\\to S}}$ far more than in TSTR. Across the {w['n_pairs']} pairs of runs "
+            f"of the same generator, the run with the higher TSTR also has the higher $\\tau_{{S\\to S}}$ in "
+            f"{w['agree_rate']*100:.0f}\\% of cases ({w['agree_rate_non_collapsed']*100:.0f}\\% of the "
+            f"{w['n_pairs_non_collapsed']} pairs among non-collapsed generators). The last two columns compare the run TSTR would "
+            "select with the best run.")
     (out / "tab_tstr_vs_tau.tex").write_text(
-        wrap(body, "TSTR and leaderboard fidelity of individual runs of the same generator.", "tab:tstrtau", note))
+        wrap(body, "TSTR cannot tell a good run of a generator from a bad one.", "tab:tstrtau", note))
 
 
 def tabred(out):
@@ -255,7 +339,7 @@ def tabred(out):
             "\\midrule\n" + "\n".join(rows) + "\n\\bottomrule\n\\end{tabular}")
     note = (f"Public replication on TabReD homecredit-default (32{{,}}076 / 7{{,}}924 / 10{{,}}000 rows by time, "
             f"5.0 / 3.3 / 2.3\\% positive), same protocol at a reduced budget (one generator seed, 10 tuning trials, "
-            f"three detector seeds). The noise floor here is lower than on our benchmark: bootstrap $\\tau$ ceiling "
+            f"three detector seeds). The noise ceiling here is lower than on our benchmark: bootstrap $\\tau$ ceiling "
             f"{nf['tau_vs_full_mean']:.3f} (5th percentile {nf['tau_vs_full_q05']:.3f}) against 0.910 (0.818), and only "
             f"{sum(1 for v in nf['pairwise_win_prob'].values() if v >= 0.975 or v <= 0.025)} of "
             f"{len(nf['pairwise_win_prob'])} detector pairs are separable. "
@@ -275,6 +359,7 @@ if __name__ == "__main__":
     conditions(out)
     ablation(out)
     augmentation(out)
+    augmentation_ratio(out)
     appendix_tables(out)
     tstr_vs_tau(out)
     tabred(out)

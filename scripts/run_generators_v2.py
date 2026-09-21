@@ -34,6 +34,12 @@ TEMPLATE = ROOT / "exp/orig-micro-retry"  # 키 구조 참조용 (값은 아래 
 GEN_ROOT = ROOT / "exp/finsyn-v2/gen"
 SYN_ROOT = ROOT / "exp/finsyn-v2/synth"
 TIME_CAP_H = 3.0  # 모든 생성기 공통 학습시간 상한(시간, part당)
+# TabSyn/TabDiff는 상한을 에폭 수로 정했다(단독 실행 실측 기준). 공유 GPU에서는 같은 에폭이 더 오래 걸리므로
+# 벽시계 제한은 안전장치로만 둔다. 9/18 처음 설정(4.5시간)은 경합 탓에 TabDiff val 시드 0을 에폭 3,786/4,400에서 끊었다.
+EXT_TIMEOUT_H = 12.0
+# GReaT(distilgpt2 파인튜닝)는 같은 epoch 예산이라도 벽시계가 훨씬 길고 GPU 경합에 민감하다.
+# 시드 0-2도 6.6-25.6시간 걸렸으므로 공통 4.5시간 상한을 적용하면 무조건 죽는다(9/20 확인).
+GEN_TIMEOUT_H = {"great": 48.0}
 
 # 공식 구현/원 논문 기본값. 근거는 각 주석.
 DEFAULTS = {
@@ -56,9 +62,11 @@ DEFAULTS = {
         "model_type": "mlp", "rtdl_params": {"d_layers": [512, 1024, 1024, 512], "dropout": 0.0},
         "diffusion_params": {"num_timesteps": 1000, "gaussian_loss_type": "mse", "scheduler": "cosine"},
         "train_main": {"steps": 30000, "lr": 1e-3, "weight_decay": 1e-5, "batch_size": 4096}}},
-    # GReaT: be_great 기본 LLM(distilgpt2); epochs는 공통 학습시간 상한에 맞춰 9/17 실측 후 확정(기본 100은 상한 초과)
+    # GReaT: be_great 기본 LLM(distilgpt2); epochs는 학습시간 예산에 맞춰 9/17 실측 후 14로 확정(기본 100은 예산 초과).
+    # 주의: 시드 0-2 릴리스는 모두 14 epoch로 만들어졌다(great_run.json). 40으로 두면 시드 3-4만 2.9배 더 학습해
+    # "같은 설정, 다른 시드"라는 전제가 깨진다(9/20 발견).
     "great": {"template": "great", "pipeline": "be_great/pipeline_great.py", "train_params": {
-        "llm": "distilgpt2", "epochs": 40, "batch_size": 32, "save_strategy": "no", "save_steps": 1000000,
+        "llm": "distilgpt2", "epochs": 14, "batch_size": 32, "save_strategy": "no", "save_steps": 1000000,
         "save_total_limit": 0, "logging_steps": 50}},
     # TabPFGen: 코드 기본값 (n_sgld_steps=1000, step 0.01, noise 0.01); 구현이 학습 데이터를 10k로 서브샘플
     "tabpfgen": {"template": "tabpfgen", "pipeline": "TabPFGen/pipeline_tabpfgen.py", "train_params": {
@@ -67,6 +75,22 @@ DEFAULTS = {
     # balance_classes=False 경로는 SGLD 뒤 TabPFN argmax 재레이블링 때문에 소수 클래스가 전부 사라져(0%) 비교 대상이 되지 못한다.
     "tabpfgen-prior": {"template": "tabpfgen", "pipeline": "TabPFGen/pipeline_tabpfgen.py", "oversample": 2.0, "postprocess": "match_prior",
                        "train_params": {"n_sgld_steps": 1000, "sgld_step_size": 0.01, "sgld_noise_scale": 0.01}},
+    # TabSyn (ICLR'24), TabDiff (ICLR'25): 공식 저장소(저장소 루트에 클론, 수정 없음)를 scripts/tabgen/ 래퍼로 실행.
+    # 설정은 공식 기본값. 학습 길이만 공통 상한(기간당 3시간)에 맞춘다: 9/18 실측(64k행 train 기간, GPU 공유 상태)
+    #   TabSyn  VAE 4.0 s/epoch, 확산 2.1 s/epoch -> train 기간 VAE 1,300 + 확산 2,500 epoch(기본 4,000 + 최대 10,001, 조기종료 500)
+    #   TabDiff 9.4 s/epoch -> train 기간 1,100 epoch(기본 8,000). val/test 기간(15k행)은 약 1/4 시간이라
+    #   TabSyn은 기본값 그대로, TabDiff는 4,400 epoch.
+    "tabsyn": {"runner": "tabsyn", "repo": "tabsyn", "commit": "cb5ac0f",
+               "budget": {"train": {"vae_epochs": 1300, "diff_epochs": 2500},
+                          "val": {"vae_epochs": 4000, "diff_epochs": 10001},
+                          "test": {"vae_epochs": 4000, "diff_epochs": 10001}}},
+    "tabdiff": {"runner": "tabdiff", "repo": "TabDiff", "commit": "5ecdb33",
+                "budget": {"train": {"steps": 1100}, "val": {"steps": 4400}, "test": {"steps": 4400}}},
+    # FinDiff (ICAIF'23, 금융 표 데이터 전용 확산 모델): 클래스 기본값 그대로(MLP, 100 epoch, batch 128, lr 1e-4).
+    # 9/19 실측 20.5 s/epoch(train 기간, GPU 공유) -> 100 epoch = 34분으로 상한 안이라 모든 기간 기본값.
+    # 레이블 조건부 생성, 조건 레이블은 실제 레이블을 섞은 것(TabDDPM과 같은 방식).
+    "findiff": {"runner": "findiff", "repo": "FinDiff", "commit": "45e9563",
+                "budget": {"train": {"epochs": 100}, "val": {"epochs": 100}, "test": {"epochs": 100}}},
 }
 
 
@@ -98,6 +122,9 @@ def prepare(models, seed=0):
                if np.allclose(np.load(REAL / "X_num_train.npy")[:, j], np.round(np.load(REAL / "X_num_train.npy")[:, j]))]
     for model in models:
         spec = DEFAULTS[model]
+        if "runner" in spec:  # 외부 래퍼가 part 폴더를 직접 읽는다(설정 파일 불필요)
+            print(f"prepared {model} (seed {seed}): part folders only")
+            continue
         if "columns" in spec:
             p = ROOT / spec["columns"]
             cols = json.loads(p.read_text())
@@ -126,7 +153,7 @@ def prepare(models, seed=0):
         print(f"prepared {model} (seed {seed}): {', '.join(PARTS)}")
 
 
-def run(models, device, dry, seed=0):
+def run(models, device, dry, seed=0, parts=None, after_pid=None, start_stage=0):
     env = {**os.environ, "PYTHONPATH": f"{ROOT}:{ROOT}/scripts/_stubs", "PYTHONDONTWRITEBYTECODE": "1"}
     (ROOT / "scripts/_stubs").mkdir(exist_ok=True)
     stub = ROOT / "scripts/_stubs/eval_syntheval.py"  # scripts/pipeline.py가 import하지만 저장소에 없는 모듈
@@ -135,7 +162,11 @@ def run(models, device, dry, seed=0):
     log = SYN_ROOT.parent / "gen_runs.jsonl"
     for model in models:
         spec = DEFAULTS[model]
-        for part in PARTS:
+        if "runner" in spec:
+            for part in parts or PARTS:
+                run_external(model, part, seed, device, dry, env, log, after_pid, start_stage)
+            continue
+        for part in parts or PARTS:
             cfg_path = gen_dir(model, part, seed) / "config.toml"
             cfg = tomli.loads(cfg_path.read_text())
             cfg["device"] = device
@@ -149,7 +180,7 @@ def run(models, device, dry, seed=0):
             t0 = time.time()
             with open(gen_dir(model, part, seed) / "run.log", "w") as fh:
                 try:
-                    p = subprocess.run(cmd, cwd=ROOT, env=env, stdout=fh, stderr=subprocess.STDOUT, timeout=TIME_CAP_H * 3600 * 1.5)
+                    p = subprocess.run(cmd, cwd=ROOT, env=env, stdout=fh, stderr=subprocess.STDOUT, timeout=GEN_TIMEOUT_H.get(model, TIME_CAP_H * 1.5) * 3600)
                     rc = p.returncode
                 except subprocess.TimeoutExpired:
                     rc = "timeout"
@@ -157,6 +188,69 @@ def run(models, device, dry, seed=0):
             with log.open("a") as fh:
                 fh.write(json.dumps(rec) + "\n")
             print(rec, flush=True)
+
+
+def run_external(model, part, seed, device, dry, env, log, after_pid=None, start_stage=0):
+    """TabSyn/TabDiff: part 폴더를 저장소 형식으로 내보내고, 단계별로 학습·샘플링한 뒤 gen_dir 형식으로 가져온다.
+
+    after_pid/start_stage: 이미 돌고 있는 단계(부모가 종료된 학습 프로세스)가 끝나기를 기다렸다가 start_stage부터 잇는다.
+    """
+    sys.path.insert(0, str(ROOT / "scripts/tabgen"))
+    from adapter import export, import_samples
+    spec = DEFAULTS[model]
+    repo = ROOT / spec["repo"]
+    name = f"{REAL.name}-{part}-s{seed}"  # 기간·시드별 이름(체크포인트 폴더 충돌 방지)
+    out = gen_dir(model, part, seed)
+    out.mkdir(parents=True, exist_ok=True)
+    b = spec["budget"][part]
+    w = str(ROOT / f"scripts/tabgen/run_{model}.py")
+    if model == "findiff":  # 래퍼가 학습·샘플링·gen_dir 저장을 한 번에 한다
+        cmds = [[sys.executable, w, str(part_dir(part)), str(out), str(seed), "--epochs", str(b["epochs"])]]
+    elif model == "tabsyn":
+        csv = repo / f"synthetic/{name}/tabsyn_seed{seed}.csv"
+        cmds = [[sys.executable, w, str(repo), name, str(seed), "vae", "--vae_epochs", str(b["vae_epochs"])],
+                [sys.executable, w, str(repo), name, str(seed), "diff", "--diff_epochs", str(b["diff_epochs"])],
+                [sys.executable, w, str(repo), name, str(seed), "sample", "--save", str(csv)]]
+    else:
+        cmds = [[sys.executable, w, str(repo), name, str(seed), "train", "--steps", str(b["steps"])],
+                [sys.executable, w, str(repo), name, str(seed), "test", "--steps", str(b["steps"])]]
+    print(f"{model} {part} seed{seed}: " + " && ".join(" ".join(c[1:]) for c in cmds), flush=True)
+    if dry:
+        return
+    t0, rc = time.time(), 0
+    if after_pid:
+        while Path(f"/proc/{after_pid}").exists():
+            time.sleep(60)
+        done_marker = {"tabdiff": "Ending Trainnig Loop", "tabsyn": "Time:", "findiff": "Time:"}[model]  # 각 저장소가 단계 끝에 찍는 문구
+        if done_marker not in (out / "run.log").read_text(errors="ignore"):
+            rc = f"stage {start_stage - 1} did not finish (pid {after_pid})"
+    elif model != "findiff":
+        export(part_dir(part), repo, name)
+    genv = {**env, "CUDA_VISIBLE_DEVICES": device.split(":")[-1] if device.startswith("cuda") else ""}
+    with open(out / "run.log", "a" if start_stage else "w") as fh:
+        for c in (cmds[start_stage:] if rc == 0 else []):
+            try:
+                rc = subprocess.run(c, cwd=ROOT, env=genv, stdout=fh, stderr=subprocess.STDOUT,
+                                    timeout=EXT_TIMEOUT_H * 3600).returncode
+            except subprocess.TimeoutExpired:
+                rc = "timeout"
+            if rc != 0:
+                break
+    rec = {"model": model, "part": part, "seed": seed, "rc": rc, "minutes": round((time.time() - t0) / 60, 1),
+           "device": device, "budget": b}
+    if rc == 0 and model == "findiff":
+        run = json.loads((out / "findiff_run.json").read_text())
+        rec.update(rows=run["rows"], positive_rate=round(run["positive_rate"], 5),
+                   train_min=run["train_min"], sample_min=run["sample_min"])
+    elif rc == 0:
+        if model == "tabdiff":
+            cands = sorted((repo / f"tabdiff/result/{name}/seed{seed}").glob("*/samples.csv"), key=lambda q: q.stat().st_mtime)
+            csv = cands[-1]
+        n, rate = import_samples(csv, part_dir(part), out)
+        rec.update(rows=n, positive_rate=round(rate, 5), samples=str(csv.relative_to(ROOT)))
+    with log.open("a") as fh:
+        fh.write(json.dumps(rec) + "\n")
+    print(rec, flush=True)
 
 
 def match_prior(Xn, Xc, y, target_rate, rng):
@@ -208,6 +302,9 @@ def main():
     ap.add_argument("--models", default=",".join(DEFAULTS))
     ap.add_argument("--device", default="cuda:0")
     ap.add_argument("--seed", type=int, default=0)
+    ap.add_argument("--parts", default=None, help="쉼표로 구분한 기간(기본: train,val,test)")
+    ap.add_argument("--after-pid", type=int, default=None, help="이 PID(이미 도는 단계)가 끝난 뒤 잇는다")
+    ap.add_argument("--start-stage", type=int, default=0, help="외부 생성기 단계 번호(0부터)부터 실행")
     ap.add_argument("--dry", action="store_true")
     ap.add_argument("--real", default=None, help="데이터셋 디렉터리(기본 data/finsyn-v2)")
     ap.add_argument("--exp", default=None, help="실험 출력 디렉터리(기본 exp/finsyn-v2)")
@@ -219,7 +316,8 @@ def main():
         E = Path(args.exp) if Path(args.exp).is_absolute() else ROOT / args.exp
         GEN_ROOT, SYN_ROOT = E / "gen", E / "synth"
     models = args.models.split(",")
-    {"prepare": lambda: prepare(models, args.seed), "run": lambda: run(models, args.device, args.dry, args.seed),
+    {"prepare": lambda: prepare(models, args.seed), "run": lambda: run(models, args.device, args.dry, args.seed, args.parts.split(",") if args.parts else None,
+                       args.after_pid, args.start_stage),
      "assemble": lambda: assemble(models, args.seed)}[args.stage]()
 
 

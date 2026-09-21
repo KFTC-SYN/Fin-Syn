@@ -16,7 +16,16 @@ DCR(최근접 실제 레코드까지의 거리) 중앙값만으로는 "이 값�
   mia_auc      : 거리 기반 멤버십 추론. 각 실제 레코드에 대해 가장 가까운 합성 행까지의 거리를 점수로
                  회원(train) vs 비회원(holdout)을 구분했을 때의 AUC. 0.5 = 누출 없음.
 
+비회원 기준선 두 가지 (--holdout)
+  random  : 위 설명대로 학습기간의 무작위 비회원 이체. 벤치마크(사례-대조 표본)와 분포가 달라
+            일부 릴리스에서 MIA < 0.5가 나왔다(9/19 점검). 비교용으로 남겨 둔다.
+  matched : 벤치마크와 같은 표집 규칙으로 만든 비회원. 벤치마크 표집 틀(30만 건 부분표본)과 겹치지 않는
+            추출본 이체에서 30만 건을 무작위로 뽑고, _datasets/create_orig_micro.py와 같은 규칙
+            (플래그 이체 전부 + 플래그 계좌에서 3-hop 이내 계좌의 정상 이체)을 적용한 뒤 학습기간으로 제한한다.
+            결과는 privacy_matched.json.
+
 Usage:
+    python scripts/privacy_v2.py --holdout matched --models smote,...
     python scripts/privacy_v2.py --models smote,tabddpm,great,tabpfgen,tabpfgen-prior,ctgan,tvae,ctabgan,ctabgan-plus
 """
 import argparse
@@ -78,6 +87,55 @@ def build_holdout(orig_path, n, seed):
     return Xn.reset_index(drop=True), Xc.reset_index(drop=True)
 
 
+def _key(d, cols):
+    k = d[cols[0]].astype(str)
+    for c in cols[1:]:
+        k = k + "|" + d[c].astype(str)
+    return k
+
+
+def build_matched_holdout(orig_path, n, seed, frame_size=300_000, hops=3):
+    """벤치마크와 같은 표집 규칙(사례-대조, 계좌 3-hop 이웃)으로 만든 비회원 이체 n건."""
+    orig = load_raw(orig_path)
+    mini = load_raw(str(ROOT / "_datasets/orig_mini.parquet"))
+    in_frame = _key(orig, RAW_KEY + ["y"]).isin(set(_key(mini, RAW_KEY + ["y"])))
+    pool = orig[~in_frame].reset_index(drop=True)
+    frame = pool.sample(n=min(frame_size, len(pool)), random_state=seed).reset_index(drop=True)
+    flagged, normal = frame[frame.y == 1], frame[frame.y == 0]
+    acc = set(flagged.payer) | set(flagged.payee)
+    for _ in range(hops):
+        conn = normal[normal.payer.isin(acc) | normal.payee.isin(acc)]
+        acc |= set(conn.payer) | set(conn.payee)
+    sampled = pd.concat([flagged, normal[normal.payer.isin(acc) | normal.payee.isin(acc)]], ignore_index=True)
+    bench = pd.read_parquet(REAL / "full_with_ids_DO_NOT_RELEASE.parquet")
+    tr = bench[bench.split == "train"]
+    lo, hi = tr["거래일자"].min(), tr["거래일자"].max()
+    sampled = sampled[(sampled["거래일자"] >= lo) & (sampled["거래일자"] <= hi)]
+    sampled = sampled[~_key(sampled, RAW_KEY).isin(set(_key(tr, RAW_KEY)))].reset_index(drop=True)
+    print(f"matched holdout: frame {len(frame):,} of {len(pool):,} out-of-frame transfers -> case-control sample "
+          f"{len(sampled):,} train-period rows, flagged {sampled.y.mean():.2%} (benchmark train {tr.y.mean():.2%}); "
+          f"in-frame rows {in_frame.sum():,}", flush=True)
+    # 레이블 비율도 벤치마크 train과 맞춘다(층화 추출)
+    rng = np.random.default_rng(seed)
+    n = min(n, len(sampled))
+    n_pos = int(round(n * tr.y.mean()))
+    pos, neg = np.where(sampled.y.values == 1)[0], np.where(sampled.y.values == 0)[0]
+    idx = np.r_[rng.choice(pos, min(n_pos, len(pos)), replace=False), rng.choice(neg, n - min(n_pos, len(pos)), replace=False)]
+    rows = sampled.iloc[np.sort(idx)].reset_index(drop=True)
+    print(f"matched holdout rows {len(rows):,}, flagged {rows.y.mean():.2%}", flush=True)
+    feats = build_features(orig, rows)
+    Xc = pd.DataFrame({
+        "hour_band": rows["거래시간대"],
+        "dow": pd.to_datetime(rows["거래일자"], format="%Y%m%d").dt.dayofweek.astype(str),
+        "withdraw_bank": rows["출금금융회사일련번호"],
+        "deposit_bank": rows["입금금융회사일련번호"],
+        "media_type": rows["매체구분"],
+        "fund_type": rows["자금구분"],
+    }).astype(str)
+    Xn = pd.concat([rows[["거래금액"]].rename(columns={"거래금액": "amount"}), feats], axis=1).astype(float)[NUM]
+    return Xn.reset_index(drop=True), Xc.reset_index(drop=True)
+
+
 class Encoder:
     """standard_metrics_v2.privacy 와 같은 인코딩: 1~99% 분위 min-max + one-hot, 유클리드 거리."""
 
@@ -103,11 +161,17 @@ def main():
     ap.add_argument("--orig", default=str(ROOT / "_datasets/orig.parquet"))
     ap.add_argument("--n", type=int, default=20000, help="holdout/합성 표본 크기")
     ap.add_argument("--seed", type=int, default=0)
-    ap.add_argument("--out", default=str(E / "privacy.json"))
+    ap.add_argument("--holdout", choices=["random", "matched"], default="random")
+    ap.add_argument("--synth_seeds", default="0", help="릴리스 시드들(쉼표). 0 외의 시드가 있으면 키가 '<model>|<seed>'")
+    ap.add_argument("--out", default=None, help="기본: privacy.json (matched면 privacy_matched.json)")
     args = ap.parse_args()
 
     rn, rc = load_split(REAL, "train")
-    hn, hc = build_holdout(args.orig, args.n, args.seed)
+    seeds = [int(s) for s in args.synth_seeds.split(",")]
+    per_seed = seeds != [0]
+    if args.out is None:
+        args.out = str(E / ("privacy" + ("_matched" if args.holdout == "matched" else "") + ("_seeds" if per_seed else "") + ".json"))
+    hn, hc = (build_matched_holdout if args.holdout == "matched" else build_holdout)(args.orig, args.n, args.seed)
     enc = Encoder(rn, rc)
     R, H = enc(rn, rc), enc(hn, hc)
     rng = np.random.default_rng(args.seed)
@@ -127,8 +191,10 @@ def main():
     key = lambda a, b: pd.concat([a[NUM].round(6).astype(str), b[CAT]], axis=1).agg("|".join, axis=1)
     real_keys = set(key(rn, rc))
 
-    for m in args.models.split(","):
-        sn, sc = load_split(E / f"synth/{m}/seed0", "train")
+    jobs = [(m, k) for m in args.models.split(",") for k in seeds if (E / f"synth/{m}/seed{k}/info.json").exists()]
+    for m, k in jobs:
+        rk = f"{m}|{k}" if per_seed else m
+        sn, sc = load_split(E / f"synth/{m}/seed{k}", "train")
         copy_rate = float(key(sn, sc).isin(real_keys).mean())
         si = rng.choice(len(sn), min(args.n, len(sn)), replace=False)
         S = enc(sn.iloc[si], sc.iloc[si])
@@ -142,10 +208,10 @@ def main():
         s_mem, s_non = -nn_dist(S, members), -nn_dist(S, nonmembers)
         mia = float(roc_auc_score(np.r_[np.ones(len(s_mem)), np.zeros(len(s_non))], np.r_[s_mem, s_non]))
 
-        res[m] = {"copy_rate": copy_rate, "dcr_syn_to_train": dcr_syn, "dcr_holdout_to_train": dcr_holdout,
+        res[rk] = {"copy_rate": copy_rate, "dcr_syn_to_train": dcr_syn, "dcr_holdout_to_train": dcr_holdout,
                   "dcr_ratio": dcr_syn / dcr_holdout, "dcr_share": share, "mia_auc": mia}
         out.write_text(json.dumps(res, indent=1))
-        print(f"{m:16s} copy={copy_rate*100:5.2f}%  DCR={dcr_syn:.4f} (ratio {dcr_syn/dcr_holdout:.2f})  "
+        print(f"{rk:18s} copy={copy_rate*100:5.2f}%  DCR={dcr_syn:.4f} (ratio {dcr_syn/dcr_holdout:.2f})  "
               f"share={share:.3f}  MIA-AUC={mia:.3f}", flush=True)
 
     df = pd.DataFrame({k: v for k, v in res.items() if not k.startswith("_")}).T

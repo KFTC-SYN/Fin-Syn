@@ -7,6 +7,10 @@
   - 튜닝은 하지 않고 고정 설정(공정 비교), 평가는 비공개 test(시간 기준), 지표는 PR-AUC
 생성기별로 augmentation이 이득인지/해가 되는지, leaderboard fidelity와 어떤 관계인지 본다.
 
+--syn_ratio r (9/19 PAT 피드백): 합성 train 전체(약 6.4만 행)를 붙이면 5%(3,185행)에서 합성:실제가 약 20:1이 된다.
+  그 비율 자체가 결과를 좌우하는지 보려고, 합성 행을 실제 부분집합의 r배로 층화 서브샘플해 붙인다.
+  결과는 augmentation_ratio.json에 따로 쌓는다(키 끝에 |r<r>).
+
 Usage:
     OMP_NUM_THREADS=8 python scripts/augmentation_v2.py --models smote,tabddpm,great,tabpfgen,tabpfgen-prior,ctgan,tvae,ctabgan,ctabgan-plus
 """
@@ -66,13 +70,15 @@ def main():
     ap.add_argument("--fractions", default="0.05,0.10,0.25,0.50,1.00")
     ap.add_argument("--detectors", default="lgbm,xgb,catboost")
     ap.add_argument("--seeds", type=int, default=3)
-    ap.add_argument("--out", default=str(E / "augmentation.json"))
+    ap.add_argument("--out", default=None, help="기본: augmentation.json (--syn_ratio면 augmentation_ratio.json)")
+    ap.add_argument("--syn_ratio", type=float, default=None, help="합성 행 수 = r x 실제 부분집합 행 수")
     args = ap.parse_args()
 
     Xtr, ytr = load(REAL, "train")
     Xva, yva = load(REAL, "val")
     Xte, yte = load(REAL, "test")
-    out = Path(args.out)
+    out = Path(args.out or E / ("augmentation_ratio.json" if args.syn_ratio else "augmentation.json"))
+    suffix = f"|r{args.syn_ratio:g}" if args.syn_ratio else ""
     res = json.loads(out.read_text()) if out.exists() else {}
 
     for frac in [float(f) for f in args.fractions.split(",")]:
@@ -89,10 +95,16 @@ def main():
                     out.write_text(json.dumps(res, indent=1))
                     print(f"{key}: {res[key]:.3f}  (n={len(ys):,}, pos={ys.sum()})", flush=True)
                 for model in args.models.split(","):
-                    key = f"{model}|{frac}|{det}|{seed}"
+                    key = f"{model}|{frac}|{det}|{seed}{suffix}"
                     if key in res:
                         continue
                     Xg, yg = load(E / f"synth/{model}/seed0", "train")
+                    if args.syn_ratio:
+                        n = min(len(yg), int(round(args.syn_ratio * len(ys))))
+                        if n < len(yg):
+                            strat = yg if np.bincount(yg, minlength=2).min() >= 2 else None
+                            gi, _ = train_test_split(np.arange(len(yg)), train_size=n, stratify=strat, random_state=seed)
+                            Xg, yg = Xg.iloc[gi].reset_index(drop=True), yg[gi]
                     Xa = pd.concat([Xs, Xg], ignore_index=True)
                     ya = np.concatenate([ys, yg])
                     res[key] = fit_eval(det, Xa, ya, Xva, yva, Xte, yte, seed)
@@ -102,7 +114,7 @@ def main():
     # 요약: 생성기 × fraction 평균 (detector, seed 평균) 과 실제 전용 대비 증감
     rows = []
     for k, v in res.items():
-        src, frac, det, seed = k.split("|")
+        src, frac, det, seed = k.split("|")[:4]
         rows.append({"src": src, "frac": float(frac), "det": det, "seed": int(seed), "pr_auc": v})
     df = pd.DataFrame(rows).groupby(["src", "frac"]).pr_auc.mean().unstack()
     base = df.loc["real"]

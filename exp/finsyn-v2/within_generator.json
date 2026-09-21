@@ -1,0 +1,120 @@
+{
+ "ks": {
+  "all": {
+   "n_pairs": 141,
+   "agree_rate": 0.44680851063829785,
+   "n_generators": 12,
+   "tau_regret_mean": 0.22671394740308715
+  },
+  "non_collapsed": {
+   "n_pairs": 105,
+   "agree_rate": 0.42857142857142855,
+   "n_generators": 8,
+   "tau_regret_mean": 0.24090909090909093
+  }
+ },
+ "tvd": {
+  "all": {
+   "n_pairs": 141,
+   "agree_rate": 0.5319148936170213,
+   "n_generators": 12,
+   "tau_regret_mean": 0.21469597250896347
+  },
+  "non_collapsed": {
+   "n_pairs": 105,
+   "agree_rate": 0.5428571428571428,
+   "n_generators": 8,
+   "tau_regret_mean": 0.15909090909090912
+  }
+ },
+ "corr_rmse": {
+  "all": {
+   "n_pairs": 141,
+   "agree_rate": 0.574468085106383,
+   "n_generators": 12,
+   "tau_regret_mean": 0.2705208107505241
+  },
+  "non_collapsed": {
+   "n_pairs": 105,
+   "agree_rate": 0.5904761904761905,
+   "n_generators": 8,
+   "tau_regret_mean": 0.20454545454545459
+  }
+ },
+ "detection_auc": {
+  "all": {
+   "n_pairs": 122,
+   "agree_rate": 0.5163934426229508,
+   "n_generators": 12,
+   "tau_regret_mean": 0.196969696969697
+  },
+  "non_collapsed": {
+   "n_pairs": 89,
+   "agree_rate": 0.5168539325842697,
+   "n_generators": 8,
+   "tau_regret_mean": 0.2363636363636364
+  }
+ },
+ "pos_rate_abs_err_pp": {
+  "all": {
+   "n_pairs": 125,
+   "agree_rate": 0.576,
+   "n_generators": 12,
+   "tau_regret_mean": 0.15398667467581442
+  },
+  "non_collapsed": {
+   "n_pairs": 98,
+   "agree_rate": 0.5612244897959183,
+   "n_generators": 8,
+   "tau_regret_mean": 0.1772727272727273
+  }
+ },
+ "tstr_catboost_pr_auc": {
+  "all": {
+   "n_pairs": 141,
+   "agree_rate": 0.5673758865248227,
+   "n_generators": 12,
+   "tau_regret_mean": 0.20247152316066294
+  },
+  "non_collapsed": {
+   "n_pairs": 105,
+   "agree_rate": 0.6285714285714286,
+   "n_generators": 8,
+   "tau_regret_mean": 0.1772727272727273
+  }
+ },
+ "tstr_best_pr_auc": {
+  "all": {
+   "n_pairs": 141,
+   "agree_rate": 0.5319148936170213,
+   "n_generators": 12,
+   "tau_regret_mean": 0.24489576558490536
+  },
+  "non_collapsed": {
+   "n_pairs": 105,
+   "agree_rate": 0.5523809523809524,
+   "n_generators": 8,
+   "tau_regret_mean": 0.24090909090909093
+  }
+ },
+ "tau_oracle": {
+  "all": {
+   "agree_rate": 1.0,
+   "tau_regret_mean": 0.0
+  },
+  "non_collapsed": {
+   "agree_rate": 1.0,
+   "tau_regret_mean": 0.0
+  }
+ },
+ "random_pick": {
+  "all": {
+   "agree_rate": 0.5,
+   "tau_regret_mean": 0.2298501477343445
+  },
+  "non_collapsed": {
+   "agree_rate": 0.5,
+   "tau_regret_mean": 0.21681818181818185
+  }
+ }
+}

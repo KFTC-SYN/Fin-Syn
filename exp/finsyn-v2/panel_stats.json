@@ -1,0 +1,9 @@
+{
+ "transfers": 2419619,
+ "flag_rate": 0.004308942854226223,
+ "sending_accounts": 15533,
+ "receiving_accounts": 999923,
+ "share_senders_with_flag": 0.4644305671795532,
+ "share_receivers_in_panel": 0.0009260713074906768,
+ "share_rows_receiver_history_is_pair_history": 0.9323189428983889
+}

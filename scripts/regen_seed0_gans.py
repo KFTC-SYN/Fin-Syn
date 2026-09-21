@@ -109,7 +109,7 @@ def main():
     # 5) 표/그림 재생성
     sh([PY, "scripts/make_tables_v2.py"], log)
     sh([PY, "scripts/fig_leaderboard_fidelity.py", "--out",
-        str(ROOT.parent / "Fin-Syn-paper/202609_iclr/figures/leaderboard_fidelity.pdf")], log)
+        str(ROOT.parent / "Fin-Syn-paper/figures/leaderboard_fidelity.pdf")], log)
 
     # 6) 이전 값과 비교해서 무엇이 바뀌었는지 출력
     old = {}

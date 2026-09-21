@@ -82,32 +82,39 @@ def main():
     ap.add_argument("--models", required=True)
     ap.add_argument("--real", default="data/finsyn-v2")
     ap.add_argument("--exp", default="exp/finsyn-v2")
+    ap.add_argument("--synth_seeds", default="0", help="릴리스 시드들(쉼표). 0 외가 있으면 standard_metrics_seeds.json에 '<model>|<seed>' 키로")
     args = ap.parse_args()
     global E
     E = ROOT / args.exp
-    out_path = E / "standard_metrics.json"
+    seeds = [int(s) for s in args.synth_seeds.split(",")]
+    per_seed = seeds != [0]
+    out_path = E / ("standard_metrics_seeds.json" if per_seed else "standard_metrics.json")
     res = json.loads(out_path.read_text()) if out_path.exists() else {}
     rn, rc, ry = load(ROOT / args.real, "train")
-    for m in args.models.split(","):
-        syn = E / f"synth/{m}/seed0"
+    jobs = [(m, k) for m in args.models.split(",") for k in seeds if (E / f"synth/{m}/seed{k}/info.json").exists()]
+    for m, k in jobs:
+        rk, suf = (f"{m}|{k}" if per_seed else m), ("" if k == 0 else f"_seed{k}")
+        if per_seed and rk in res:
+            continue
+        syn = E / f"synth/{m}/seed{k}"
         sn, sc, sy = load(syn, "train")
         ks, tvd, corr = fidelity(rn, rc, sn, sc)
         det = detection_auc(rn, rc, sn, sc)
         copy, dcr = privacy(rn, rc, sn, sc)
-        lb = json.loads((E / f"leaderboard_{m}_s2r/results.json").read_text())
+        lb = json.loads((E / f"leaderboard_{m}_s2r{suf}/results.json").read_text())
         r = {"ks_mean": ks, "tvd_mean": tvd, "corr_rmse": corr, "detection_auc": det,
              "pos_rate_abs_err_pp": float(abs(sy.mean() - ry.mean()) * 100), "pos_rate": float(sy.mean()),
              "tstr_catboost_pr_auc": lb["catboost"]["summary"]["pr_auc"][0],
              "tstr_best_pr_auc": max(v["summary"]["pr_auc"][0] for v in lb.values()),
              "copy_rate": copy, "dcr_median": dcr}
         for tag in ["s2r", "s2s"]:
-            fp = E / f"leaderboard_{m}_{tag}/fidelity_vs_leaderboard_real.json"
+            fp = E / f"leaderboard_{m}_{tag}{suf}/fidelity_vs_leaderboard_real.json"
             if fp.exists():
                 f = json.loads(fp.read_text())
                 r[f"lf_tau_{tag}"], r[f"lf_pairs_{tag}"], r[f"lf_regret_{tag}"] = f["kendall_tau"], f["sig_pair_order_kept"], f["selection_regret_pr_auc"]
-        res[m] = r
+        res[rk] = r
         out_path.write_text(json.dumps(res, indent=1))
-        print(m, {k: round(v, 4) for k, v in r.items()}, flush=True)
+        print(rk, {kk: round(v, 4) for kk, v in r.items()}, flush=True)
 
     df = pd.DataFrame(res).T
     print("\n", df.round(3).to_string())
