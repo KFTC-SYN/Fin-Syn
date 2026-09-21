@@ -15,12 +15,16 @@ Usage:
 """
 import itertools
 import json
+import os
 from pathlib import Path
 
 import numpy as np
 
 ROOT = Path(__file__).resolve().parents[1]
 E = ROOT / "exp/finsyn-v2"
+# 생성기마다 같은 수의 공개본을 쓴다. SMOTE는 시드 10개가 남아 있어 상한이 없으면 이 분석에만
+# 쌍의 32%를 차지했다(9/22 발견). 논문이 말하는 "생성기당 다섯 공개본"과 어긋난다.
+MAX_SEEDS = int(os.environ.get("FINSYN_MAX_SEEDS", "5"))
 COLLAPSED = {"tvae", "ctgan", "ctabgan", "ctabgan-plus"}
 # 부호: 클수록 좋은 공개본이 되도록 맞춘다
 METRICS = {"ks": -1, "tvd": -1, "corr_rmse": -1, "detection_auc": -1, "pos_rate_abs_err_pp": -1,
@@ -42,6 +46,7 @@ def main():
         agree = {"all": [], "non_collapsed": []}
         regret = {"all": [], "non_collapsed": []}
         for m, rs in runs.items():
+            rs = {s_: rs[s_] for s_ in sorted(rs)[:MAX_SEEDS]}
             if len(rs) < 2:
                 continue
             grp = "non_collapsed" if m not in COLLAPSED else "collapsed"
@@ -77,7 +82,7 @@ def main():
     for k, v in res.items():
         a, n = v["all"], v["non_collapsed"]
         print(f"{k:22s} {a['agree_rate']:11.2f} {n['agree_rate']:15.2f} {a['tau_regret_mean']:16.3f} {n['tau_regret_mean']:10.3f}")
-    print(f"\nruns per generator: { {m: len(r) for m, r in runs.items()} }")
+    print(f"\nruns per generator (capped at {MAX_SEEDS}): { {m: min(len(r), MAX_SEEDS) for m, r in runs.items()} }")
 
 
 if __name__ == "__main__":
