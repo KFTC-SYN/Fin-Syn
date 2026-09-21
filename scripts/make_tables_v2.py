@@ -136,26 +136,54 @@ def generators(out):
         abody, "Remaining standard metrics for the seed-0 release of each generator.", "tab:genfull", anote))
 
 
+WORD = {3: "three", 4: "four", 5: "five", 6: "six", 7: "seven", 8: "eight"}
+
+
 def conditions(out):
-    rows = []
-    for tag, name in [("real", "Temporal split (reference)"), ("cond_random", "Random split"), ("cond_dup", "Duplicated rows + random split")]:
+    """구성 비교표. SynReal(ICML'23) Table 4처럼 조건을 행, 탐지기를 열로 두어
+    독자가 순위 뒤집힘을 직접 읽게 한다. 요약 통계(최고 점수, 포화 개수, 승자)는
+    표 안에서 바로 보이므로 별도 열을 두지 않는다(9/22 조사)."""
+    ref = json.loads((E / "leaderboard_real/results.json").read_text())
+    order = sorted(ref, key=lambda m: -ref[m]["summary"]["pr_auc"][0])
+    short = {"nb": "NB", "dt": "DT", "lr": "LR", "knn": "kNN", "mlp": "MLP", "rf": "RF", "et": "ET",
+             "hgb": "HGB", "lgbm": "LGBM", "xgb": "XGB", "catboost": "CB"}
+    PRIV = {k: v["summary"]["pr_auc"][0] for k, v in ref.items()}
+    rows, sep_counts, regrets, n_tied, reg_all = [], [], [], [], []
+    for tag, name in [("real", "Temporal split"), ("cond_random", "Random split"),
+                      ("cond_dup", "Duplicated + random split")]:
         d = E / ("leaderboard_real" if tag == "real" else f"leaderboard_{tag}")
         r = json.loads((d / "results.json").read_text())
         n = json.loads((d / "noise_floor.json").read_text())
-        sep = sum(1 for v in n["pairwise_win_prob"].values() if v >= 0.975 or v <= 0.025)
-        best = max(r, key=lambda m: r[m]["summary"]["pr_auc"][0])
-        sat = sum(1 for m in r if r[m]["summary"]["pr_auc"][0] >= 0.999)
+        sep_counts.append((sum(1 for v in n["pairwise_win_prob"].values() if v >= 0.975 or v <= 0.025),
+                           len(n["pairwise_win_prob"])))
         f = json.loads((d / "fidelity_vs_leaderboard_real.json").read_text()) if tag != "real" else None
-        rows.append(f"{name} & {r[best]['summary']['pr_auc'][0]:.3f} & {sat} & {sep}/{len(n['pairwise_win_prob'])} & "
-                    + (f"1.000 & {DET[best]} & 0.000" if f is None
-                       else f"{f['kendall_tau']:.3f} & {DET[f['cand_top1']]} & {f['selection_regret_pr_auc']:.3f}") + " \\\\")
-    body = ("\\small\n\\setlength{\\tabcolsep}{4pt}\n\\begin{tabular}{@{}lcccccc@{}}\n\\toprule\n"
-            "Construction & Best PR-AUC & Saturated & Separable pairs & $\\tau$ & Top-1 & Regret \\\\\n\\midrule\n"
-            + "\n".join(rows) + "\n\\bottomrule\n\\end{tabular}")
-    note = ("All three use the same transfers and features and differ only in the split; the last row also replicates 2{,}157 distinct rows to "
-            "91{,}005. Saturated counts detectors at a PR-AUC of $1.000$, and the last three columns read each construction against the first row.")
+        tau = "1.000" if f is None else f"{f['kendall_tau']:.3f}"
+        reg = "0.000" if f is None else f"{f['selection_regret_pr_auc']:.3f}"
+        hi = max(r[d_]["summary"]["pr_auc"][0] for d_ in order)
+        cells = " & ".join((f"\\textbf{{{r[d_]['summary']['pr_auc'][0]:.2f}}}"
+                            if abs(r[d_]["summary"]["pr_auc"][0] - hi) < 1e-9
+                            else f"{r[d_]['summary']['pr_auc'][0]:.2f}") for d_ in order)
+        n_tied.append(sum(1 for d_ in order if abs(r[d_]["summary"]["pr_auc"][0] - hi) < 1e-9))
+        reg_all.append([round(max(PRIV.values()) - PRIV[d_], 3)
+                        for d_ in order if abs(r[d_]["summary"]["pr_auc"][0] - hi) < 1e-9])
+        regrets.append(reg)
+        rows.append(f"{name} & {cells} & {tau} \\\\")
+    body = ("\\footnotesize\n\\setlength{\\tabcolsep}{3pt}\n"
+            "\\begin{tabular}{@{}l" + "c" * len(order) + "c@{}}\n\\toprule\n"
+            "Construction & " + " & ".join(short[d_] for d_ in order)
+            + " & $\\tau$ \\\\\n\\midrule\n" + "\n".join(rows)
+            + "\n\\bottomrule\n\\end{tabular}")
+    note = ("Test PR-AUC of every detector, with the columns ordered by the reference leaderboard of the first row, so a "
+            "construction preserves the ranking when its row orders the columns as the first row does. All three use the "
+            "same transfers and features and differ only in the split; the last row also replicates 2{,}157 distinct rows "
+            f"to 91{{,}}005. Bold marks the top score in each row. The first row is the reference leaderboard, "
+            f"and $\\tau$ is the rank agreement with it. "
+            f"Separable pairs fall from {sep_counts[0][0]} of {sep_counts[0][1]} to {sep_counts[1][0]} and then "
+            f"{sep_counts[2][0]}. In the last row {WORD.get(n_tied[2], n_tied[2])} detectors are exactly tied at a "
+            f"perfect score, so which one "
+            f"a user would deploy is arbitrary and the private PR-AUC it costs ranges from "
+            f"{min(reg_all[2]):.3f} to {max(reg_all[2]):.3f}.")
     (out / "tab_conditions.tex").write_text(wrap(body, "Effect of dataset construction on the private-data leaderboard.", "tab:cond", note))
-
 
 def ablation(out):
     a = json.loads((E / "ablation_feature_groups.json").read_text())
