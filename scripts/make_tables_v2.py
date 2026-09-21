@@ -106,9 +106,9 @@ def generators(out):
                     f"{removed[m]:.2f} & {p.get('dcr_share', float('nan')):.3f} \\\\")
 
     body = ("\\small\n\\setlength{\\tabcolsep}{4.5pt}\n\\begin{tabular}{lccccccc}\n\\toprule\n"
-            " & \\multicolumn{2}{c}{Standard metrics} & \\multicolumn{3}{c}{Leaderboard fidelity} & "
+            "\\multirow{2}{*}{Generator} & \\multicolumn{2}{c}{Standard metrics} & \\multicolumn{3}{c}{Leaderboard fidelity} & "
             "\\multicolumn{2}{c}{Privacy} \\\\\n\\cmidrule(lr){2-3}\\cmidrule(lr){4-6}\\cmidrule(lr){7-8}\n"
-            "Generator & KS $\\downarrow$ & TSTR $\\uparrow$ & $\\tau_{S\\to S}$ $\\uparrow$ & [min, max] & "
+            " & KS $\\downarrow$ & TSTR $\\uparrow$ & $\\tau_{S\\to S}$ $\\uparrow$ & [min, max] & "
             "$\\tau_{S\\to R}$ $\\uparrow$ & DCR $\\to 1$ & MIA $\\to .5$ \\\\\n\\midrule\n"
             + "\n".join(main) + "\n\\bottomrule\n\\end{tabular}")
     n_word = {3: "three", 4: "four", 5: "five", 10: "ten"}.get(n_rel, str(n_rel))
@@ -158,8 +158,8 @@ def conditions(out):
 
 def ablation(out):
     a = json.loads((E / "ablation_feature_groups.json").read_text())
-    names = {"T": "Transaction", "T+B": "+ bank codes, bank-pair volume", "T+R": "+ receiver cross-bank history",
-             "T+B+R": "+ bank, receiver cross-bank", "T+S": "+ sender history", "T+B+S": "+ bank, sender history",
+    names = {"T": "Transaction", "T+B": "+ Bank codes, bank-pair volume", "T+R": "+ Receiver cross-bank history",
+             "T+B+R": "+ Bank, receiver cross-bank", "T+S": "+ Sender history", "T+B+S": "+ Bank, sender history",
              "T+B+S+R": "All groups"}
     rows = [f"{names[k]} & {v['n_features']} & {v['pr_auc'][0]:.3f} $\\pm$ {v['pr_auc'][1]:.3f} & {v['recall@0.1%fpr'][0]:.3f} & {v['roc_auc'][0]:.3f} \\\\"
             for k, v in a.items()]
@@ -191,9 +191,9 @@ def augmentation(out):
     rows = [f"Real labels only & {' & '.join(f'{base[f]:.3f}' for f in fracs)} & none \\\\\n\\midrule"]
     rows += [f"+ {GEN.get(m, m)} & " + " & ".join(f"{delta[f][m]:+.3f}".replace("-", "$-$") for f in fracs)
              + f" & ${tau[m]:+.3f}$ \\\\".replace("$-", "$-") for m in order]
-    body = ("\\begin{tabular}{l" + "c" * len(fracs) + "c}\n\\toprule\n & \\multicolumn{" + str(len(fracs))
-            + "}{c}{Fraction of real training labels} & \\\\\n\\cmidrule(lr){2-" + str(len(fracs) + 1) + "}\n"
-            + "Training data & " + head + " & $\\tau_{S\\to S}$ \\\\\n\\midrule\n" + "\n".join(rows)
+    body = ("\\begin{tabular}{l" + "c" * len(fracs) + "c}\n\\toprule\n\\multirow{2}{*}{Training data} & \\multicolumn{" + str(len(fracs))
+            + "}{c}{Fraction of real training labels} & \\multirow{2}{*}{$\\tau_{S\\to S}$} \\\\\n\\cmidrule(lr){2-" + str(len(fracs) + 1) + "}\n"
+            + " & " + head + " & \\\\\n\\midrule\n" + "\n".join(rows)
             + "\n\\bottomrule\n\\end{tabular}")
     ac = lfa["aug_corr"]["tau_s2s"]
     note = ("Test PR-AUC on the private test period; first row absolute, the rest change against it. "
@@ -227,7 +227,7 @@ def augmentation_ratio(out):
         cells = " & ".join(f"{x:+.3f}".replace("-", "$-$") for x in (r1, r4, d))
         rows.append(f"{GEN.get(m, m)} & {cells} \\\\")
     body = ("\\small\n\\begin{tabular}{lccc}\n\\toprule\n"
-            "Release & 1:1 & 4:1 & unrestricted \\\\\n\\midrule\n" + "\n".join(rows)
+            "Release & 1:1 & 4:1 & Unrestricted \\\\\n\\midrule\n" + "\n".join(rows)
             + "\n\\bottomrule\n\\end{tabular}")
     note = ("Change in test PR-AUC against training on the 5\\% real subset alone "
             f"(LightGBM, absolute baseline {base:.3f}), when the synthetic rows appended are capped at one and four "
@@ -264,7 +264,7 @@ def appendix_tables(out):
         lb = {m: json.loads((E / f"leaderboard_{m}_{tag}/results.json").read_text()) for m in models}
         short = {"nb": "NB", "dt": "DT", "lr": "LR", "knn": "kNN", "mlp": "MLP", "rf": "RF", "et": "ET",
                  "hgb": "HGB", "lgbm": "LGBM", "xgb": "XGB", "catboost": "CB"}
-        rows = ["private data & " + " & ".join(f"{r[d]['summary']['pr_auc'][0]:.2f}" for d in order) + " \\\\",
+        rows = ["Private data & " + " & ".join(f"{r[d]['summary']['pr_auc'][0]:.2f}" for d in order) + " \\\\",
                 "\\midrule"]
         for m in models:
             cells = " & ".join(f"{lb[m][d]['summary']['pr_auc'][0]:.2f}" if d in lb[m] else "n/a" for d in order)
@@ -292,12 +292,13 @@ def tstr_vs_tau(out):
             continue
         ts, ta = [tstr(m, s, "catboost") for s in ss], [tau(m, s) for s in ss]
         best_by_tstr = ta[int(max(range(len(ss)), key=lambda i: ts[i]))]
-        rows.append(f"{GEN.get(m, m)} & {len(ss)} & {min(ts):.3f} to {max(ts):.3f} & "
-                    f"{min(ta):+.2f} to {max(ta):+.2f} & {best_by_tstr:+.2f} & {max(ta):+.2f} \\\\")
-    body = ("\\small\n\\begin{tabular}{lccccc}\n\\toprule\n & & \\multicolumn{2}{c}{Range over runs} & "
+        rows.append((f"{GEN.get(m, m)} & {len(ss)} & {min(ts):.3f} to {max(ts):.3f} & "
+                     f"{min(ta):+.2f} to {max(ta):+.2f} & {best_by_tstr:+.2f} & {max(ta):+.2f} \\\\")
+                    .replace("-", "$-$"))
+    body = ("\\small\n\\begin{tabular}{lccccc}\n\\toprule\n\\multirow{2}{*}{Generator} & \\multirow{2}{*}{Runs} & \\multicolumn{2}{c}{Range over runs} & "
             "\\multicolumn{2}{c}{$\\tau_{S\\to S}$ of the run picked by} \\\\\n"
             "\\cmidrule(lr){3-4}\\cmidrule(lr){5-6}\n"
-            "Generator & runs & TSTR & $\\tau_{S\\to S}$ & TSTR & an oracle \\\\\n\\midrule\n"
+            " & & TSTR & $\\tau_{S\\to S}$ & TSTR & Oracle \\\\\n\\midrule\n"
             + "\n".join(rows) + "\n\\bottomrule\n\\end{tabular}")
     w = res["within_generator"]
     note = (f"Runs of one generator differ in $\\tau_{{S\\to S}}$ far more than in TSTR. Across the {w['n_pairs']} pairs of runs "
@@ -330,12 +331,12 @@ def tabred(out):
         v, a, b = sm[m], tau(m, "s2s"), tau(m, "s2r")
         rows.append(f"{GEN.get(m, m)} & {v['ks_mean']:.3f} & {v['tvd_mean']:.3f} & {v['corr_rmse']:.3f} & "
                     f"{v['detection_auc']:.3f} & {100*v['pos_rate']:.2f} & {v['tstr_catboost_pr_auc']:.3f} & "
-                    + (f"{b:+.3f}" if b is not None else "n/a") + " & "
-                    + (f"{a:+.3f}" if a is not None else "undefined$^\\dagger$") + " \\\\")
-    body = ("\\begin{tabular}{lccccccc c}\n\\toprule\n & \\multicolumn{4}{c}{Standard metrics} & "
+                    + (f"{b:+.3f}".replace("-", "$-$") if b is not None else "n/a") + " & "
+                    + (f"{a:+.3f}".replace("-", "$-$") if a is not None else "undefined$^\\dagger$") + " \\\\")
+    body = ("\\begin{tabular}{lccccccc c}\n\\toprule\n\\multirow{2}{*}{Generator} & \\multicolumn{4}{c}{Standard metrics} & "
             "\\multicolumn{2}{c}{Label / utility} & \\multicolumn{2}{c}{Leaderboard fidelity} \\\\\n"
             "\\cmidrule(lr){2-5}\\cmidrule(lr){6-7}\\cmidrule(lr){8-9}\n"
-            "Generator & KS & TVD & corr & C2ST & pos.\\ \\% & TSTR & $\\tau_{S\\to R}$ & $\\tau_{S\\to S}$ \\\\\n"
+            " & KS & TVD & Corr & C2ST & Pos.\\ \\% & TSTR & $\\tau_{S\\to R}$ & $\\tau_{S\\to S}$ \\\\\n"
             "\\midrule\n" + "\n".join(rows) + "\n\\bottomrule\n\\end{tabular}")
     note = (f"Public replication on TabReD homecredit-default (32{{,}}076 / 7{{,}}924 / 10{{,}}000 rows by time, "
             f"5.0 / 3.3 / 2.3\\% positive), same protocol at a reduced budget (one generator seed, 10 tuning trials, "
