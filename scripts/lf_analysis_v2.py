@@ -132,6 +132,28 @@ def main():
     }
     corr = {k: assoc(v, tau) for k, v in metrics.items()}
 
+    # tau가 사용자에게 무엇을 뜻하는지: 공개본 60개에서 tau와 나머지 두 기준의 관계.
+    _ps = json.loads((E / "standard_metrics_seeds.json").read_text())
+    _t, _r, _p = [], [], []
+    for _k, _v in _ps.items():
+        if int(_k.split("|")[1]) >= MAX_SEEDS:
+            continue
+        if "lf_tau_s2s" in _v and "lf_regret_s2s" in _v and "lf_pairs_s2s" in _v:
+            _t.append(_v["lf_tau_s2s"]); _r.append(_v["lf_regret_s2s"]); _p.append(_v["lf_pairs_s2s"])
+    _t, _r = np.array(_t), np.array(_r)
+    _band = NFR["tau_vs_full_q05"] if "NFR" in dir() else json.loads(
+        (E / "leaderboard_real/noise_floor.json").read_text())["tau_vs_full_q05"]
+    tau_buys = {
+        "n_releases": len(_t),
+        "rho_tau_pairs": assoc(_t.tolist(), _p)["rho"],
+        "rho_tau_regret": assoc(_t.tolist(), _r.tolist())["rho"],
+        "band_regret_max": float(_r[_t >= _band].max()),
+        "band_n": int((_t >= _band).sum()),
+        "low_regret_mean": float(_r[_t < 0.5].mean()),
+        "low_regret_max": float(_r[_t < 0.5].max()),
+        "low_n": int((_t < 0.5).sum()),
+    }
+
     # 증강 이득(레이블 5%)과의 연관
     aug = json.loads((E / "augmentation.json").read_text())
     def gain(model, frac=0.05):
@@ -162,7 +184,8 @@ def main():
 
     out = {"definition": f"tau/pairs/regret = mean over generator seeds 0-{MAX_SEEDS - 1}",
            "variance_decomposition": variance,
-           "releases": rel, "corr_with_tau_s2s": corr, "aug_gain_5pct": dict(zip(MODELS, g5)),
+           "releases": rel, "corr_with_tau_s2s": corr, "what_tau_buys": tau_buys,
+           "aug_gain_5pct": dict(zip(MODELS, g5)),
            "aug_corr": aug_corr, "random_choice_regret": float(pr.max() - pr.mean()),
            "noise_floor": {"q05": nf["tau_vs_full_q05"], "mean": nf["tau_vs_full_mean"]}}
     (E / "lf_analysis.json").write_text(json.dumps(out, indent=1))
