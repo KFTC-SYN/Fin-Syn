@@ -22,7 +22,8 @@ E = ROOT / "exp/finsyn-v2"
 LABELS = {"smote": "SMOTE", "tabpfgen": "TabPFGen", "tabpfgen-prior": "TabPFGen-prior", "tabddpm": "TabDDPM",
           "great": "GReaT", "tvae": "TVAE", "ctabgan": "CTAB-GAN", "ctgan": "CTGAN", "ctabgan-plus": "CTAB-GAN+",
           "tabsyn": "TabSyn", "tabdiff": "TabDiff", "findiff": "FinDiff"}
-BLUE, ORANGE, GREY = "#1f4e79", "#c1662f", "#8c8c8c"
+# viridis 계열: 주색 viridis(0.25), 대비색 viridis(0.45) teal.
+BLUE, ORANGE, GREY = "#3b528b", "#25848e", "#8c8c8c"
 
 
 def spearman(x, y):
@@ -49,7 +50,10 @@ def main():
     lf = json.loads((E / "lf_analysis.json").read_text())["releases"]
     sm = json.loads((E / "standard_metrics.json").read_text())
     per_seed = json.loads((E / "standard_metrics_seeds.json").read_text())
-    fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(5.5, 2.4), gridspec_kw={"width_ratios": [1, 1.15]})
+    # 패널을 각각 독립 파일로 낸다. 본문에서 subfigure로 조립하므로 그림 안 제목은 두지 않는다(9/21).
+    fig1, ax1 = plt.subplots(figsize=(2.72, 2.35))
+    fig2, ax2 = plt.subplots(figsize=(2.72, 2.35))
+    fig = fig1   # 아래 canvas.draw()가 쓰는 이름
 
     # (a) 생성기 사이
     ms = [m for m in LABELS if m in lf and m in sm]
@@ -58,7 +62,7 @@ def main():
     y = [lf[m]["s2s"]["tau_mean"] for m in ms]
     rho_pub = float("nan")
     rho_ours = spearman([-v for v in x], y)
-    ax1.scatter(x, y, s=18, color=BLUE, zorder=3, label="Interbank (12 generators)")
+    ax1.scatter(x, y, s=18, color=BLUE, zorder=3, label="Interbank")
     others = list(zip(x, y))
     for m, xi, yi in zip(ms, x, y):
         placed.append((m, xi, yi))
@@ -73,13 +77,15 @@ def main():
             yt = [taus[m] for m in mt]
             rho_pub = spearman([-v for v in xt], yt)
             ax1.scatter(xt, yt, s=18, facecolor="white", edgecolor=ORANGE, lw=0.9, zorder=3,
-                        label=f"TabReD, public ({len(mt)})")
+                        label="TabReD")
             others += list(zip(xt, yt))
     # 이름표 배치: 실제 글자 상자를 재서 후보 위치를 시도하고, 전부 겹치면 겹침이 가장 적은 곳을 쓴다.
     # (9/21) 겹침이 남는 두 가지 원인을 고쳤다: 범례가 나중에 그려져 충돌 검사에서 빠졌고,
     #        모든 후보가 겹칠 때 검사 없이 기본 위치에 두었다.
     ax1.margins(x=0.20, y=0.18)
-    leg = ax1.legend(frameon=False, loc="lower left", handletextpad=0.3, borderaxespad=0.15)
+    leg = ax1.legend(frameon=True, loc="lower left", handletextpad=0.4, borderaxespad=0.2,
+                     borderpad=0.35)
+    leg.get_frame().set(edgecolor="#b0b0b0", facecolor="white", linewidth=0.6)
     fig.canvas.draw()
     rend = fig.canvas.get_renderer()
     pt_boxes = [ax1.transData.transform(pt) for pt in others]
@@ -102,9 +108,9 @@ def main():
         return c
 
     def annotate(m, xi, yi, dx, dy):
-        arrow = dict(arrowstyle="-", lw=0.4, color=GREY, shrinkA=0.5, shrinkB=2.5) if abs(dy) > 10 or abs(dx) > 10 else None
+        arrow = dict(arrowstyle="-", lw=0.4, color=BLUE, shrinkA=0.5, shrinkB=2.5) if abs(dy) > 10 or abs(dx) > 10 else None
         return ax1.annotate(LABELS[m], (xi, yi), textcoords="offset points", xytext=(dx, dy), fontsize=6.2,
-                            color=GREY, ha="left" if dx > 0 else ("right" if dx < 0 else "center"),
+                            color=BLUE, ha="left" if dx > 0 else ("right" if dx < 0 else "center"),
                             arrowprops=arrow)
 
     for m, xi, yi in placed:
@@ -123,33 +129,38 @@ def main():
 
     ax1.set_xlabel(r"Marginal fidelity error, KS ($\downarrow$)")
     ax1.set_ylabel(r"Leaderboard fidelity, Kendall $\tau$ ($\uparrow$)")
-    ax1.set_title("(a) Across generators", fontsize=8, color=GREY)
-    ax1.annotate(f"$\\rho$ = {rho_ours:.2f}", (0.97, 0.93), xycoords="axes fraction", ha="right", fontsize=7.5, color=BLUE)
+    print(f"  (a) Spearman rho = {rho_ours:.2f} (interbank), {rho_pub:.2f} (public)")
 
     # (b) 같은 생성기 안: 각 기준이 두 실행 중 더 좋은 쪽을 맞히는 비율
     wg = json.loads((E / "within_generator.json").read_text())
-    names = {"ks": "marginal fidelity (KS)", "tvd": "TVD", "corr_rmse": "dependence", "detection_auc": "C2ST",
-             "pos_rate_abs_err_pp": "label rate", "tstr_best_pr_auc": "TSTR (best detector)",
+    names = {"ks": "Marginal fidelity (KS)", "tvd": "TVD", "corr_rmse": "Dependence", "detection_auc": "C2ST",
+             "pos_rate_abs_err_pp": "Label rate", "tstr_best_pr_auc": "TSTR (best detector)",
              "tstr_catboost_pr_auc": "TSTR (CatBoost)"}
     items = [(names[k], wg[k]["all"]["agree_rate"], wg[k]["all"]["n_pairs"]) for k in names if k in wg]
     items.sort(key=lambda z: z[1])
-    ax2.axvline(0.5, color="black", ls="--", lw=0.8, zorder=1)
+    # 수치는 y축에 둔다(그림 1, 그림 3과 같은 방향). 막대 + 오차막대와 파선 기준선은
+    # TabArena(NeurIPS'25 D&B) Fig.1의 구성이다.
+    items.sort(key=lambda z: -z[1])
+    ax2.axhline(0.5, color="black", ls="--", lw=0.8, zorder=1)
     err = [1.96 * np.sqrt(max(v * (1 - v), 1e-9) / max(n, 1)) for _, v, n in items]
-    ax2.barh(range(len(items)), [v for _, v, _ in items], height=0.6, color=BLUE, alpha=0.85, zorder=2,
-             xerr=err, error_kw=dict(ecolor=GREY, elinewidth=0.8, capsize=2, capthick=0.8))
-    ax2.set_yticks(range(len(items)))
-    ax2.set_yticklabels([n for n, _, _ in items])
-    ax2.set_xlim(0, 1.0)
-    ax2.set_xlabel("Agreement on paired runs")
-    ax2.text(0.5, len(items) - 0.35, " chance", fontsize=6.8, va="center")
-    ax2.set_title("(b) Within a generator", fontsize=8, color=GREY)
-    ax2.grid(axis="x", color=GREY, alpha=0.25, lw=0.5)
+    ax2.bar(range(len(items)), [v for _, v, _ in items], width=0.6, color=BLUE, zorder=2,
+            yerr=err, error_kw=dict(ecolor=GREY, elinewidth=0.8, capsize=2, capthick=0.8))
+    ax2.set_xticks(range(len(items)))
+    ax2.set_xticklabels([n for n, _, _ in items], rotation=35, ha="right", rotation_mode="anchor")
+    ax2.set_ylim(0, 0.8)
+    ax2.set_ylabel("Agreement on paired runs")
+    ax2.set_xlim(-0.7, len(items) - 0.3)
+    ax2.text(len(items) - 0.35, 0.51, "Chance", fontsize=6.8, va="bottom", ha="right")
+    ax2.grid(axis="y", color=GREY, alpha=0.25, lw=0.5)
     ax2.set_axisbelow(True)
-    fig.tight_layout(pad=0.4, w_pad=1.2)
     out = Path(a.out)
     out.parent.mkdir(parents=True, exist_ok=True)
-    fig.savefig(out, bbox_inches="tight")
-    print(f"saved -> {out}  (a: {len(ms)} generators, b: {len(items)} criteria)")
+    for f, suffix in ((fig1, "_a"), (fig2, "_b")):
+        f.tight_layout(pad=0.3)
+        dst = out.with_name(out.stem + suffix + out.suffix)
+        f.savefig(dst, bbox_inches="tight")
+        print(f"saved -> {dst}")
+    print(f"  (a: {len(ms)} generators, b: {len(items)} criteria)")
 
 
 if __name__ == "__main__":

@@ -1,5 +1,5 @@
 """
-결과 파일에서 원고용 LaTeX 표를 생성한다(수치 전사 오류 방지). 표 내용은 파란색(\\color{blue})으로 출력.
+결과 파일에서 원고용 LaTeX 표를 생성한다(수치 전사 오류 방지).
 
 Usage:
     python scripts/make_tables_v2.py --out ../Fin-Syn-paper/202609_iclr/tables
@@ -26,12 +26,12 @@ GEN = {"smote": "SMOTE", "tvae": "TVAE", "ctgan": "CTGAN", "ctabgan": "CTAB-GAN"
 def wrap(body, caption, label, note="", wrapwidth=None):
     """wrapwidth를 주면 본문이 표 옆으로 흐르는 wraptable로 출력한다(지면 절약)."""
     if wrapwidth:
-        head = ("\\begin{wraptable}[15]{r}{" + wrapwidth + "}\n\\vspace{-\\intextsep}\n\\centering\\color{blue}\\small\n"
-                "\\caption{\\BLUE{" + caption + "}}\n\\label{" + label + "}\n")
+        head = ("\\begin{wraptable}{r}{" + wrapwidth + "}\n\\vspace{-\\intextsep}\n\\centering\\small\n"
+                "\\caption{" + caption + "}\n\\label{" + label + "}\n")
         tail = "\n\\end{wraptable}\n"  # 각주는 캡션에 포함시킨다
     else:
         cap = caption + ((" " + note) if note else "")  # 표 아래 각주를 쓰지 않고 캡션에 합친다(9/20 요청)
-        head = "\\begin{table}[t]\n\\centering\n\\color{blue}\n\\caption{\\BLUE{" + cap + "}}\n\\label{" + label + "}\n"
+        head = "\\begin{table}[t]\n\\centering\n\\caption{" + cap + "}\n\\label{" + label + "}\n"
         tail = "\n\\end{table}\n"
     return head + body + tail
 
@@ -45,17 +45,14 @@ def real_leaderboard(out):
         s = r[m]["summary"]
         ci = n["pr_auc_ci95"][m]
         rows.append(f"{DET[m]} & {s['pr_auc'][0]:.3f} & [{ci[0]:.3f}, {ci[1]:.3f}] \\\\")
-    # 본문 지면을 아끼려고 11행을 두 덩어리로 나란히 놓는다(9/21, 9쪽 제한).
-    half = (len(rows) + 1) // 2
-    left, right = rows[:half], rows[half:] + [" & & \\\\"] * (half - len(rows[half:]))
-    merged = [l.rstrip("\\ ").rstrip("\\") + " & " + r for l, r in zip(left, right)]
-    body = ("\\small\n\\setlength{\\tabcolsep}{4pt}\n\\begin{tabular}{lcc@{\\hspace{1.4em}}lcc}\n\\toprule\n"
-            "Detector & PR-AUC & 95\\% CI & Detector & PR-AUC & 95\\% CI \\\\\n\\midrule\n"
-            + "\n".join(merged) + "\n\\bottomrule\n\\end{tabular}")
-    cap = ("Reference leaderboard on the private test period. Test PR-AUC, mean over five detector seeds; 95\\% CI from "
-           "1{,}000 stratified bootstrap resamples of the test period. Resampling moves this ranking by $\\tau=0.910$, the "
-           "highest agreement a release can be expected to reach. Recall and ROC-AUC are in Appendix~\\ref{app:extra}.")
-    (out / "tab_real_leaderboard.tex").write_text(wrap(body, cap, "tab:real"))
+    # 11행 한 덩어리. 6+5로 나누면 홀수라 마지막 칸이 비어 표가 어색해진다(9/21 되돌림).
+    body = ("\\begin{tabular}{@{}lcc@{}}\n\\toprule\nDetector & PR-AUC & 95\\% CI \\\\\n\\midrule\n"
+            + "\n".join(rows) + "\n\\bottomrule\n\\end{tabular}")
+    # 본문이 표 옆으로 흐르도록 wraptable로 낸다(9/21 요청). 폭이 좁아 캡션도 세 문장으로 줄였고,
+    # 재표집 일치도 0.910은 5.1절 본문이 그대로 싣는다.
+    cap = ("Reference leaderboard on the private test period. Test PR-AUC, mean over five detector seeds, with a 95\\% CI "
+           "from 1{,}000 stratified bootstrap resamples. Recall and ROC-AUC are in Appendix~\\ref{app:extra}.")
+    (out / "tab_real_leaderboard.tex").write_text(wrap(body, cap, "tab:real", wrapwidth="0.46\\textwidth"))
 
 
 
@@ -131,15 +128,16 @@ def generators(out):
              "Pos. \\% & TSTR $\\uparrow$ & Copies \\% & DCR sh. $\\to .5$ \\\\\n\\midrule\n"
              + "\n".join(appx) + "\n\\bottomrule\n\\end{tabular}")
     anote = ("Separable-pair preservation and selection regret are means over that generator's runs; the remaining columns use "
-             "the released run. \\emph{Copies removed} is the share of rows identical to a private record, deleted before "
-             "publication; only SMOTE produced such rows. The private prevalence is 1.28\\%.")
+             "the released run. The Copies removed column gives the share of rows identical to a private record, deleted before "
+             "publication. Across all sixty releases this affected thirty SMOTE splits, three TabDDPM runs and "
+             "two GReaT runs; at seed 0, which this table reports, only SMOTE produced them. The private prevalence is 1.28\\%.")
     (out / "tab_generators_full.tex").write_text(wrap(
         abody, "Remaining standard metrics for the seed-0 release of each generator.", "tab:genfull", anote))
 
 
 def conditions(out):
     rows = []
-    for tag, name in [("real", "Temporal split (ours)"), ("cond_random", "Random split"), ("cond_dup", "Duplicated rows + random split")]:
+    for tag, name in [("real", "Temporal split (reference)"), ("cond_random", "Random split"), ("cond_dup", "Duplicated rows + random split")]:
         d = E / ("leaderboard_real" if tag == "real" else f"leaderboard_{tag}")
         r = json.loads((d / "results.json").read_text())
         n = json.loads((d / "noise_floor.json").read_text())
@@ -148,11 +146,13 @@ def conditions(out):
         sat = sum(1 for m in r if r[m]["summary"]["pr_auc"][0] >= 0.999)
         f = json.loads((d / "fidelity_vs_leaderboard_real.json").read_text()) if tag != "real" else None
         rows.append(f"{name} & {r[best]['summary']['pr_auc'][0]:.3f} & {sat} & {sep}/{len(n['pairwise_win_prob'])} & "
-                    + ("--- & --- & ---" if f is None else f"{f['kendall_tau']:.3f} & {DET[f['cand_top1']]} & {f['selection_regret_pr_auc']:.3f}") + " \\\\")
-    body = ("\\small\n\\begin{tabular}{lcccccc}\n\\toprule\nConstruction & best PR-AUC & saturated & sep.\\ pairs & $\\tau$ & top-1 & regret \\\\\n\\midrule\n"
+                    + (f"1.000 & {DET[best]} & 0.000" if f is None
+                       else f"{f['kendall_tau']:.3f} & {DET[f['cand_top1']]} & {f['selection_regret_pr_auc']:.3f}") + " \\\\")
+    body = ("\\small\n\\setlength{\\tabcolsep}{4pt}\n\\begin{tabular}{@{}lcccccc@{}}\n\\toprule\n"
+            "Construction & Best PR-AUC & Saturated & Separable pairs & $\\tau$ & Top-1 & Regret \\\\\n\\midrule\n"
             + "\n".join(rows) + "\n\\bottomrule\n\\end{tabular}")
-    note = ("All three use the same transfers and features; only the split (and, in the last row, replication of 2{,}157 distinct rows to "
-            "91{,}005 as in a naive construction) differ.")
+    note = ("All three use the same transfers and features and differ only in the split; the last row also replicates 2{,}157 distinct rows to "
+            "91{,}005. Saturated counts detectors at a PR-AUC of $1.000$, and the last three columns read each construction against the first row.")
     (out / "tab_conditions.tex").write_text(wrap(body, "Effect of dataset construction on the private-data leaderboard.", "tab:cond", note))
 
 
@@ -189,8 +189,8 @@ def augmentation(out):
     tau = {m: lfa["releases"][m]["s2s"]["tau_mean"] for m in delta.index}
     head = " & ".join(f"{int(f * 100)}\\%" for f in fracs)
     rows = [f"Real labels only & {' & '.join(f'{base[f]:.3f}' for f in fracs)} & --- \\\\\n\\midrule"]
-    rows += [f"+ {GEN.get(m, m)} & " + " & ".join(f"{delta[f][m]:+.3f}" for f in fracs) + f" & ${tau[m]:+.3f}$ \\\\"
-             for m in order]
+    rows += [f"+ {GEN.get(m, m)} & " + " & ".join(f"{delta[f][m]:+.3f}".replace("-", "$-$") for f in fracs)
+             + f" & ${tau[m]:+.3f}$ \\\\".replace("$-", "$-") for m in order]
     body = ("\\begin{tabular}{l" + "c" * len(fracs) + "c}\n\\toprule\n & \\multicolumn{" + str(len(fracs))
             + "}{c}{Fraction of real training labels} & \\\\\n\\cmidrule(lr){2-" + str(len(fracs) + 1) + "}\n"
             + "Training data & " + head + " & $\\tau_{S\\to S}$ \\\\\n\\midrule\n" + "\n".join(rows)
@@ -200,7 +200,7 @@ def augmentation(out):
             "LightGBM and XGBoost at fixed configurations, three stratified subsamples each; "
             "$\\tau_{S\\to S}$ is the seed-mean value of Table~\\ref{tab:gen}. "
             f"At 5\\% of labels, Spearman $\\rho$ between gain and $\\tau_{{S\\to S}}$ is {ac['rho']:.2f} "
-            f"(exact permutation $p={ac['p']:.3f}$, $n=9$).")
+            f"(exact permutation $p={ac['p']:.3f}$, $n={len(delta)}$).")
     (out / "tab_augmentation.tex").write_text(
         wrap(body, "Augmenting scarce real labels with a synthetic release.", "tab:aug", note))
 

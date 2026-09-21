@@ -15,7 +15,8 @@ matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 from matplotlib.patches import FancyArrowPatch, FancyBboxPatch
 
-BLUE, FILL, GREY = "#1f4e79", "#eef2f8", "#8c8c8c"
+# viridis 계열: 테두리 viridis(0.25), 채움은 그 옅은 톤.
+BLUE, FILL, GREY = "#3b528b", "#eceef6", "#8c8c8c"
 BOXES = ["Customer", "Access\nchannel", "Sending\nbank", "Clearing\nnetwork", "Receiving\nbank"]
 
 
