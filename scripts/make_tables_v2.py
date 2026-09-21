@@ -97,7 +97,7 @@ def generators(out):
         tau_s2s = num(a["tau_mean"], signed=True)
         if abs(a["tau_mean"] - best_tau) < 1e-9:
             tau_s2s = "\\textbf{" + tau_s2s + "}"
-        priv = (f"{num(p['dcr_ratio'])} & {p['mia_auc']:.2f}" if p else "--- & ---")
+        priv = (f"{num(p['dcr_ratio'])} & {p['mia_auc']:.2f}" if p else "n/a & n/a")
         name = GEN.get(m, m) + ("" if uniform else f" ({a['n_seeds']})")
         main.append(f"{name} & {v['ks_mean']:.2f} & {v['tstr_catboost_pr_auc']:.2f} & "
                     f"{tau_s2s} & {rng} & {num(b['tau_mean'], signed=True)} & {priv} \\\\")
@@ -188,7 +188,7 @@ def augmentation(out):
     lfa = json.loads((E / "lf_analysis.json").read_text())
     tau = {m: lfa["releases"][m]["s2s"]["tau_mean"] for m in delta.index}
     head = " & ".join(f"{int(f * 100)}\\%" for f in fracs)
-    rows = [f"Real labels only & {' & '.join(f'{base[f]:.3f}' for f in fracs)} & --- \\\\\n\\midrule"]
+    rows = [f"Real labels only & {' & '.join(f'{base[f]:.3f}' for f in fracs)} & none \\\\\n\\midrule"]
     rows += [f"+ {GEN.get(m, m)} & " + " & ".join(f"{delta[f][m]:+.3f}".replace("-", "$-$") for f in fracs)
              + f" & ${tau[m]:+.3f}$ \\\\".replace("$-", "$-") for m in order]
     body = ("\\begin{tabular}{l" + "c" * len(fracs) + "c}\n\\toprule\n & \\multicolumn{" + str(len(fracs))
@@ -267,7 +267,7 @@ def appendix_tables(out):
         rows = ["private data & " + " & ".join(f"{r[d]['summary']['pr_auc'][0]:.2f}" for d in order) + " \\\\",
                 "\\midrule"]
         for m in models:
-            cells = " & ".join(f"{lb[m][d]['summary']['pr_auc'][0]:.2f}" if d in lb[m] else "---" for d in order)
+            cells = " & ".join(f"{lb[m][d]['summary']['pr_auc'][0]:.2f}" if d in lb[m] else "n/a" for d in order)
             rows.append(f"{GEN.get(m, m)} & {cells} \\\\")
         head = " & ".join(short[d] for d in order)
         body = ("\\footnotesize\n\\setlength{\\tabcolsep}{4pt}\n\\begin{tabular}{l" + "c" * len(order) + "}\n"
@@ -330,7 +330,7 @@ def tabred(out):
         v, a, b = sm[m], tau(m, "s2s"), tau(m, "s2r")
         rows.append(f"{GEN.get(m, m)} & {v['ks_mean']:.3f} & {v['tvd_mean']:.3f} & {v['corr_rmse']:.3f} & "
                     f"{v['detection_auc']:.3f} & {100*v['pos_rate']:.2f} & {v['tstr_catboost_pr_auc']:.3f} & "
-                    + (f"{b:+.3f}" if b is not None else "---") + " & "
+                    + (f"{b:+.3f}" if b is not None else "n/a") + " & "
                     + (f"{a:+.3f}" if a is not None else "undefined$^\\dagger$") + " \\\\")
     body = ("\\begin{tabular}{lccccccc c}\n\\toprule\n & \\multicolumn{4}{c}{Standard metrics} & "
             "\\multicolumn{2}{c}{Label / utility} & \\multicolumn{2}{c}{Leaderboard fidelity} \\\\\n"
