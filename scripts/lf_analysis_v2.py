@@ -3,7 +3,7 @@
 
 정의
   릴리스의 tau / 유의쌍 보존율 / regret = 생성기 시드 0,1,2 결과의 평균(GReaT는 시드 0 하나).
-  표준지표는 시드 0 릴리스에서 계산된 값(standard_metrics.json, privacy.json)을 쓴다.
+  표준지표는 생성기당 다섯 공개본의 평균을 쓴다(상관 분석). 프라이버시는 시드 0 값이다.
 
 상관 분석 (릴리스 9개, n=9)
   Spearman rho, 각 지표는 "클수록 좋은 릴리스"가 되도록 부호를 맞춘다(오차·구분가능성은 음수화).
@@ -106,6 +106,16 @@ def assoc(x, y):
 
 def main():
     sm = json.loads((E / "standard_metrics.json").read_text())
+    # 생성기 수준 상관은 생성기당 다섯 공개본의 평균으로 잰다. 시드 0 한 개로 재면
+    # y축(다섯 공개본 평균 tau)과 x축의 기준이 어긋난다(9/22 점검).
+    per = {}
+    for k, v in json.loads((E / "standard_metrics_seeds.json").read_text()).items():
+        m, sd = k.split("|")
+        if int(sd) < MAX_SEEDS:
+            per.setdefault(m, []).append(v)
+    smm = {m: {k: float(np.mean([r[k] for r in rs])) for k in rs[0] if isinstance(rs[0][k], (int, float))}
+           for m, rs in per.items()}
+    sm = {m: {**sm.get(m, {}), **smm.get(m, {})} for m in set(sm) | set(smm)}
     pv = json.loads((E / "privacy.json").read_text())
     rel = {m: {"s2s": summarize(m, "s2s"), "s2r": summarize(m, "s2r")} for m in MODELS}
     tau = np.array([rel[m]["s2s"]["tau_mean"] for m in MODELS])

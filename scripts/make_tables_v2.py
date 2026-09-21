@@ -130,7 +130,7 @@ def generators(out):
              + "\n".join(appx) + "\n\\bottomrule\n\\end{tabular}")
     anote = ("Separable-pair preservation and selection regret are means over that generator's runs; the remaining columns use "
              "the released run. The Copies removed column gives the share of rows identical to a private record, deleted before "
-             "publication. Across all sixty releases this affected thirty SMOTE splits, three TabDDPM runs and "
+             "publication. Across the sixty releases this affected all fifteen SMOTE splits, three TabDDPM runs and "
              "two GReaT runs; at seed 0, which this table reports, only SMOTE produced them. The private prevalence is 1.28\\%.")
     (out / "tab_generators_full.tex").write_text(wrap(
         abody, "Remaining standard metrics for the seed-0 release of each generator.", "tab:genfull", anote))

@@ -65,7 +65,7 @@ Eleven detectors, each tuned with 20 trials of TPE search maximizing PR-AUC on t
 
 ## Privacy
 
-Every synthetic row identical to a private training record is deleted before publication. This affected all thirty SMOTE splits, about 1% of each and none of them flagged, three TabDDPM runs, and two GReaT runs. All results in the paper are computed on the filtered releases.
+Every synthetic row identical to a private training record is deleted before publication. This affected all fifteen SMOTE splits, about 1% of each and none of them flagged, three TabDDPM runs, and two GReaT runs. All results in the paper are computed on the filtered releases.
 
 The SMOTE releases sit closer to the private data than a fresh real sample does, with a distance ratio of 0.42 and a nearest-neighbour membership-inference AUC of 0.584. We disclose this rather than presenting the releases as risk-free; Section 5.5 and the Ethics Statement of the paper give the measurements.
 

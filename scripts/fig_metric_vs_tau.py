@@ -17,6 +17,9 @@ import matplotlib.pyplot as plt
 import numpy as np
 from scipy.stats import rankdata
 
+import os
+MAX_SEEDS = int(os.environ.get("FINSYN_MAX_SEEDS", "5"))
+
 ROOT = Path(__file__).resolve().parents[1]
 E = ROOT / "exp/finsyn-v2"
 LABELS = {"smote": "SMOTE", "tabpfgen": "TabPFGen", "tabpfgen-prior": "TabPFGen-prior", "tabddpm": "TabDDPM",
@@ -56,9 +59,15 @@ def main():
     fig = fig1   # 아래 canvas.draw()가 쓰는 이름
 
     # (a) 생성기 사이
-    ms = [m for m in LABELS if m in lf and m in sm]
+    # x축도 y축과 같이 생성기당 다섯 공개본의 평균으로 잰다(9/22 점검: 시드 0 하나였다).
+    per = {}
+    for k, v in per_seed.items():
+        mm, sd = k.split("|")
+        if int(sd) < MAX_SEEDS:
+            per.setdefault(mm, []).append(v["ks_mean"])
+    ms = [m for m in LABELS if m in lf and m in per]
     placed = []
-    x = [sm[m]["ks_mean"] for m in ms]
+    x = [float(np.mean(per[m])) for m in ms]
     y = [lf[m]["s2s"]["tau_mean"] for m in ms]
     rho_pub = float("nan")
     rho_ours = spearman([-v for v in x], y)
@@ -92,7 +101,8 @@ def main():
     taken = [leg.get_window_extent(renderer=rend).expanded(1.02, 1.05)]
     axbb = ax1.get_window_extent()
     cands = [(5, 2), (5, -8), (-5, 2), (-5, -8), (5, 8), (-5, 8), (0, 8), (0, -12),
-             (13, 2), (-13, 2), (13, -8), (-13, -8), (0, 17), (0, -21)]
+             (13, 2), (-13, 2), (13, -8), (-13, -8), (0, 17), (0, -21),
+             (5, 14), (-5, 14), (5, -16), (-5, -16), (20, 2), (-20, 2), (0, 24), (0, -28)]
 
     def cost(bb):
         """다른 상자·점과 겹치는 넓이. 축 밖으로 나가면 큰 벌점."""
@@ -118,14 +128,14 @@ def main():
         scored = []
         for dx, dy in cands:
             t = annotate(m, xi, yi, dx, dy)
-            bb = t.get_window_extent(renderer=rend).expanded(1.12, 1.45)
+            bb = t.get_window_extent(renderer=rend).expanded(1.15, 1.7)
             scored.append((cost(bb), dx, dy))
             t.remove()
             if scored[-1][0] == 0:
                 break
         _, dx, dy = min(scored)
         t = annotate(m, xi, yi, dx, dy)
-        taken.append(t.get_window_extent(renderer=rend).expanded(1.12, 1.45))
+        taken.append(t.get_window_extent(renderer=rend).expanded(1.15, 1.7))
 
     ax1.set_xlabel(r"Marginal fidelity error, KS ($\downarrow$)")
     ax1.set_ylabel(r"Leaderboard fidelity, Kendall $\tau$ ($\uparrow$)")
