@@ -50,8 +50,9 @@ def real_leaderboard(out):
             + "\n".join(rows) + "\n\\bottomrule\n\\end{tabular}")
     # 본문이 표 옆으로 흐르도록 wraptable로 낸다(9/21 요청). 폭이 좁아 캡션도 세 문장으로 줄였고,
     # 재표집 일치도 0.910은 5.1절 본문이 그대로 싣는다.
-    cap = ("Reference leaderboard on the private test period. Test PR-AUC, mean over five detector seeds, with a 95\\% CI "
-           "from 1{,}000 stratified bootstrap resamples. Recall and ROC-AUC are in Appendix~\\ref{app:extra}.")
+    # wraptable이라 캡션이 길면 표가 쪽 아래 끝에 닿는다. 자세한 조건은 4.3절과 부록이 싣는다.
+    cap = ("Reference leaderboard on the private test period. Test PR-AUC, seed mean, with a 95\\% bootstrap CI. "
+           "Recall and ROC-AUC are in Appendix~\\ref{app:extra}.")
     (out / "tab_real_leaderboard.tex").write_text(wrap(body, cap, "tab:real", wrapwidth="0.46\\textwidth"))
 
 
