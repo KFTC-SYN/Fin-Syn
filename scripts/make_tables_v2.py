@@ -173,16 +173,12 @@ def conditions(out):
             "Construction & " + " & ".join(short[d_] for d_ in order)
             + " & $\\tau$ \\\\\n\\midrule\n" + "\n".join(rows)
             + "\n\\bottomrule\n\\end{tabular}")
-    note = ("Test PR-AUC of every detector, with the columns ordered by the reference leaderboard of the first row, so a "
-            "construction preserves the ranking when its row orders the columns as the first row does. All three use the "
-            "same transfers and features and differ only in the split; the last row also replicates 2{,}157 distinct rows "
-            f"to 91{{,}}005. Bold marks the top score in each row. The first row is the reference leaderboard, "
-            f"and $\\tau$ is the rank agreement with it. "
-            f"Separable pairs fall from {sep_counts[0][0]} of {sep_counts[0][1]} to {sep_counts[1][0]} and then "
-            f"{sep_counts[2][0]}. In the last row {WORD.get(n_tied[2], n_tied[2])} detectors are exactly tied at a "
-            f"perfect score, so which one "
-            f"a user would deploy is arbitrary and the private PR-AUC it costs ranges from "
-            f"{min(reg_all[2]):.3f} to {max(reg_all[2]):.3f}.")
+    note = ("Test PR-AUC of every detector, columns ordered by the first row, the reference leaderboard, so a row that "
+            "orders them the same way preserves the ranking; $\\tau$ is its agreement with that row. All three use the "
+            "same transfers and features; the last also replicates 2{,}157 distinct rows to 91{,}005. Bold marks each "
+            f"row's top score; the {WORD.get(n_tied[2], n_tied[2])} tied at a perfect score in the last row cost from "
+            f"{min(reg_all[2]):.3f} to {max(reg_all[2]):.3f} of private PR-AUC when deployed. Separable pairs fall from "
+            f"{sep_counts[0][0]} to {sep_counts[1][0]} to {sep_counts[2][0]} of {sep_counts[0][1]}.")
     (out / "tab_conditions.tex").write_text(wrap(body, "Effect of dataset construction on the private-data leaderboard.", "tab:cond", note))
 
 def ablation(out):

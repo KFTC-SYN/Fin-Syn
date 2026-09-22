@@ -1,6 +1,6 @@
 # Fin-Syn: sixty synthetic releases of a private interbank fraud benchmark
 
-Anonymous supplement to the submission *Do Synthetic Releases Preserve the Leaderboard? Evidence from Private Interbank Transfers*.
+Anonymous supplement to the submission *Leaderboard Fidelity: What a Synthetic Release Preserves, and How to Measure It*.
 
 This repository contains the sixty synthetic releases the paper evaluates, the evaluation protocol as code, and the stored results from which every table and figure in the paper is generated.
 

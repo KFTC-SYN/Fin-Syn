@@ -1,6 +1,6 @@
 # Fin-Syn
 
-Anonymous supplement to the submission *Do Synthetic Releases Preserve the Leaderboard? Evidence from Private Interbank Transfers*.
+Anonymous supplement to the submission *Leaderboard Fidelity: What a Synthetic Release Preserves, and How to Measure It*.
 
 ## Start here
 
