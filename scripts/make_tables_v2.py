@@ -359,7 +359,7 @@ def tabred(out):
         rows.append(f"{GEN.get(m, m)} & {v['ks_mean']:.3f} & {v['tvd_mean']:.3f} & {v['corr_rmse']:.3f} & "
                     f"{v['detection_auc']:.3f} & {100*v['pos_rate']:.2f} & {v['tstr_catboost_pr_auc']:.3f} & "
                     + (f"{b:+.3f}".replace("-", "$-$") if b is not None else "n/a") + " & "
-                    + (f"{a:+.3f}".replace("-", "$-$") if a is not None else "undefined$^\\dagger$") + " \\\\")
+                    + (f"{a:+.3f}".replace("-", "$-$") if a is not None else "undefined") + " \\\\")
     body = ("\\begin{tabular}{lccccccc c}\n\\toprule\n\\multirow{2}{*}{Generator} & \\multicolumn{4}{c}{Standard metrics} & "
             "\\multicolumn{2}{c}{Label / utility} & \\multicolumn{2}{c}{Leaderboard fidelity} \\\\\n"
             "\\cmidrule(lr){2-5}\\cmidrule(lr){6-7}\\cmidrule(lr){8-9}\n"
@@ -371,7 +371,7 @@ def tabred(out):
             f"{nf['tau_vs_full_mean']:.3f} (5th percentile {nf['tau_vs_full_q05']:.3f}) against 0.910 (0.818), and only "
             f"{sum(1 for v in nf['pairwise_win_prob'].values() if v >= 0.975 or v <= 0.025)} of "
             f"{len(nf['pairwise_win_prob'])} detector pairs are separable. "
-            "$^\\dagger$The synthetic test split contains no positive row, so no metric, and hence no ranking, is defined.")
+            "A release marked undefined has no positive row in its synthetic test split, so no metric, and hence no ranking, is defined for it.")
     (out / "tab_tabred.tex").write_text(
         wrap(body, "External replication of the protocol on public data.", "tab:tabred", note))
 
