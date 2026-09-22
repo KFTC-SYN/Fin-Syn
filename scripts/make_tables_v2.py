@@ -159,13 +159,14 @@ def conditions(out):
         f = json.loads((d / "fidelity_vs_leaderboard_real.json").read_text()) if tag != "real" else None
         tau = "1.000" if f is None else f"{f['kendall_tau']:.3f}"
         reg = "0.000" if f is None else f"{f['selection_regret_pr_auc']:.3f}"
-        hi = max(r[d_]["summary"]["pr_auc"][0] for d_ in order)
-        cells = " & ".join((f"\\textbf{{{r[d_]['summary']['pr_auc'][0]:.2f}}}"
-                            if abs(r[d_]["summary"]["pr_auc"][0] - hi) < 1e-9
+        # 표는 소수 둘째 자리까지 보이므로 동점 판정도 그 자리에서 한다. 전체 정밀도로
+        # 판정하면 "1.00"으로 보이는 칸이 굵지 않아 오식으로 읽힌다(9/22).
+        hi = round(max(r[d_]["summary"]["pr_auc"][0] for d_ in order), 2)
+        tied = [d_ for d_ in order if round(r[d_]["summary"]["pr_auc"][0], 2) == hi]
+        cells = " & ".join((f"\\textbf{{{r[d_]['summary']['pr_auc'][0]:.2f}}}" if d_ in tied
                             else f"{r[d_]['summary']['pr_auc'][0]:.2f}") for d_ in order)
-        n_tied.append(sum(1 for d_ in order if abs(r[d_]["summary"]["pr_auc"][0] - hi) < 1e-9))
-        reg_all.append([round(max(PRIV.values()) - PRIV[d_], 3)
-                        for d_ in order if abs(r[d_]["summary"]["pr_auc"][0] - hi) < 1e-9])
+        n_tied.append(len(tied))
+        reg_all.append([round(max(PRIV.values()) - PRIV[d_], 3) for d_ in tied])
         regrets.append(reg)
         rows.append(f"{name} & {cells} & {tau} \\\\")
     body = ("\\footnotesize\n\\setlength{\\tabcolsep}{3pt}\n"
@@ -175,8 +176,9 @@ def conditions(out):
             + "\n\\bottomrule\n\\end{tabular}")
     note = ("Test PR-AUC of every detector, columns ordered by the first row, the reference leaderboard, so a row that "
             "orders them the same way preserves the ranking; $\\tau$ is its agreement with that row. All three use the "
-            "same transfers and features; the last also replicates 2{,}157 distinct rows to 91{,}005. Bold marks each "
-            f"row's top score; the {WORD.get(n_tied[2], n_tied[2])} tied at a perfect score in the last row cost from "
+            "same transfers and features; the last also replicates 2{,}157 distinct rows to 91{,}005. Bold marks the "
+            "highest score in each row and any tied with it at this precision; the "
+            f"{WORD.get(n_tied[2], n_tied[2])} tied at the top of the last row cost from "
             f"{min(reg_all[2]):.3f} to {max(reg_all[2]):.3f} of private PR-AUC when deployed. Separable pairs fall from "
             f"{sep_counts[0][0]} to {sep_counts[1][0]} to {sep_counts[2][0]} of {sep_counts[0][1]}.")
     (out / "tab_conditions.tex").write_text(wrap(body, "Effect of dataset construction on the private-data leaderboard.", "tab:cond", note))
