@@ -1,0 +1,20 @@
+{
+ "n_splits": 462,
+ "n_select_detectors": 6,
+ "n_select_pairs": 15,
+ "n_eval_pairs": 40,
+ "all_releases": {
+  "selected": 0.7692640692640725,
+  "random": 0.4569696969696968,
+  "oracle": 0.9391774891774815,
+  "share_of_gap_recovered": 0.6476344375617373,
+  "selected_beats_random_share_of_splits": 0.9653679653679653
+ },
+ "within_generator": {
+  "selected": 0.5658008658008655,
+  "random": 0.4569696969696968,
+  "oracle": 0.6871031746031748,
+  "share_of_gap_recovered": 0.4729045506560268,
+  "selected_beats_random_share_of_splits": 0.974025974025974
+ }
+}
