@@ -18,9 +18,12 @@
    ],
    "n_runs": 60,
    "total_var": 0.09760003108306724,
+   "ss_within": 2.0091434320542754,
+   "ss_between": 3.749258401846693,
+   "within_share": 0.34890643098680774,
    "within_var": 0.04185715483446406,
    "between_var_of_means": 0.06816833457903078,
-   "within_share": 0.38043143509371385,
+   "within_share_var_ratio": 0.38043143509371385,
    "within_sd": 0.20459021197130633,
    "range_per_generator": {
     "smote": [
@@ -86,9 +89,12 @@
    ],
    "n_runs": 40,
    "total_var": 0.05529222292858656,
+   "ss_within": 1.135603305785124,
+   "ss_between": 1.020793388429752,
+   "within_share": 0.5266207784642272,
    "within_var": 0.03548760330578512,
    "between_var_of_means": 0.029165525383707196,
-   "within_share": 0.5488922813963171,
+   "within_share_var_ratio": 0.5488922813963171,
    "within_sd": 0.1883815365310123,
    "range_per_generator": {
     "smote": [
@@ -978,6 +984,6 @@
  "random_choice_regret": 0.10179895142950612,
  "noise_floor": {
   "q05": 0.8181818181818182,
-  "mean": 0.9098545454545454
+  "mean": 0.9232727272727272
  }
 }

@@ -15,8 +15,8 @@
    "nb": 0.459
   },
   "tabm_rank": 4,
-  "noise_ceiling_mean": 0.8808484848484847,
-  "noise_band_q05": 0.7575757575757575,
+  "noise_ceiling_mean": 0.8942727272727271,
+  "noise_band_q05": 0.7878787878787877,
   "separable_pairs": 50,
   "n_pairs": 66
  },

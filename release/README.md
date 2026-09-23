@@ -45,19 +45,29 @@ One row per release, with its row counts, its positive rate, and the two rank ag
 - `tau_s2s`: Kendall tau between the leaderboard obtained by training, tuning, and testing on the release, and the private reference leaderboard. This is what an outside user's leaderboard is worth. It ranges from -0.309 to 0.927 across the sixty releases.
 - `tau_s2r`: the same for the TSTR leaderboard, which trains and tunes on the release but tests on the private test period.
 
-Read `tau_s2s` against the noise scale of the private data: resampling the private test period alone moves the ranking by 0.910 on average, with a 5th percentile of 0.818.
+Read `tau_s2s` against the noise scale of the private data: a leaderboard computed on a bootstrap resample of the private test period agrees with the full one at tau = 0.923 on average, with a 5th percentile of 0.818.
 
 ## Reproducing the public-user leaderboard
 
+From the repository root:
+
 ```bash
-python ../scripts/leaderboard.py \
+python scripts/leaderboard.py \
   --train release/data/tabsyn/seed0 \
   --tune  release/data/tabsyn/seed0:val \
   --test  release/data/tabsyn/seed0:test \
   --out   /tmp/lb_tabsyn_seed0 --models all --trials 20 --seeds 5
 ```
 
-Eleven detectors, each tuned with 20 trials of TPE search maximizing PR-AUC on the validation split, then retrained with five seeds; the reported score is the seed mean. Comparing the resulting ordering with `../exp/finsyn-v2/leaderboard_real/results.json` reproduces `tau_s2s` for that release.
+`leaderboard.py` reads a release folder of Parquet files directly. Eleven detectors, each tuned with 20 trials of TPE search maximizing PR-AUC on the validation split, then retrained with five seeds; the reported score is the seed mean. Comparing the resulting ordering with `../exp/finsyn-v2/leaderboard_real/results.json` reproduces `tau_s2s` for that release:
+
+```bash
+python scripts/fidelity.py --real exp/finsyn-v2/leaderboard_real --cand /tmp/lb_tabsyn_seed0
+```
+
+The Parquet files hold exactly the values the paper evaluated: integer columns are stored as integers only where every value is a whole number, and all other numeric columns as 64-bit floats. `../scripts/verify_release.py` checks all 180 splits against the arrays the leaderboards were computed from.
+
+The standard distributional metrics of the paper (KS, TVD, dependence error, C2ST) compare a release with the private training period, so they cannot be recomputed from the public data; their measured values are in `../exp/finsyn-v2/standard_metrics_seeds.json`.
 
 ## Results
 
@@ -71,4 +81,4 @@ The SMOTE releases sit closer to the private data than a fresh real sample does,
 
 ## Third-party code
 
-The generators are run from their official implementations at the commits and configurations documented in Appendix C of the paper. This repository ships our evaluation code under `../scripts/`, not those implementations; `THIRD_PARTY.md` lists each upstream repository, the commit we used, its license, and the deviations we applied.
+The generators are run from their official implementations at the commits and configurations documented in Appendix C of the paper. Our evaluation code is under `../scripts/`; four of the implementations (TabSyn, TabDiff, FinDiff, TabM) are included unmodified at the commits we ran, and the others are vendored copies. `THIRD_PARTY.md` lists each upstream repository, the commit or copy we used, its license, and the deviations we applied. `../requirements.txt` pins the library versions of the environment every result was produced with.

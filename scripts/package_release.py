@@ -31,14 +31,16 @@ def load_split(d: Path, split: str, cols: dict) -> pd.DataFrame:
     cat = np.load(d / f"X_cat_{split}.npy", allow_pickle=True)
     y = np.load(d / f"y_{split}.npy", allow_pickle=True)
     df = pd.DataFrame(num, columns=cols["num_cols"])
-    # 18개 수치 열 가운데 17개는 개수·금액이라 정수다. float64로 두면 파일이 두 배가 된다.
+    # 값이 전부 정확히 정수인 열만 정수형으로 줄이고, 나머지는 float64 그대로 둔다. 공개본은 평가에 쓴
+    # 배열과 값 하나까지 같아야 한다. 예전에는 np.allclose(상대 허용오차)로 판정해 큰 금액 열의 소수가
+    # 잘렸고, float32로 저장해 억 단위 금액이 반올림됐다(9/23 외부 검토, verify_release.py로 확인).
     for c in df.columns:
-        v = df[c].to_numpy()
-        if np.allclose(v, np.round(v)):
+        v = df[c].to_numpy(dtype=float)
+        if np.all(np.isfinite(v)) and np.all(v == np.round(v)):
             lo, hi = v.min(), v.max()
             df[c] = v.astype("int32" if -2**31 < lo and hi < 2**31 else "int64")
         else:
-            df[c] = v.astype("float32")
+            df[c] = v
     for i, c in enumerate(cols["cat_cols"]):
         df[c] = pd.Series(cat[:, i]).astype("category")
     df["label"] = pd.Series(y).astype("int8")

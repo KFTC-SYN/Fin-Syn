@@ -113,16 +113,16 @@ def generators(out):
             "$\\tau_{S\\to R}$ $\\uparrow$ & DCR $\\to 1$ & MIA $\\to .5$ \\\\\n\\midrule\n"
             + "\n".join(main) + "\n\\bottomrule\n\\end{tabular}")
     n_word = {3: "three", 4: "four", 5: "five", 10: "ten"}.get(n_rel, str(n_rel))
-    lead = (f"Every generator produced {n_word} releases, one per seed. " if uniform
-            else "The number of releases per generator is given in parentheses. ")
-    note = (lead + "$\\tau_{S\\to S}$ is the mean over them and "
+    lead = (f"$\\tau_{{S\\to S}}$ is the mean over each generator's {n_word} releases, one per seed, and " if uniform
+            else "The number of releases per generator is given in parentheses. $\\tau_{S\\to S}$ is the mean over them and ")
+    note = (lead + ""
             "[min, max] their range; the other columns use the "
             "released seed-0 run. Arrows give the better direction; DCR near 1.0 means as far from the private data as a fresh real "
             "sample, and bold marks the highest $\\tau_{S\\to S}$. TVAE keeps one positive row per split, so its $\\tau$ is "
             "not interpretable. Definitions are in Appendix~\\ref{app:metrics}; separable pairs, regret and the remaining "
             "metrics are in Table~\\ref{tab:genfull}.")
     (out / "tab_generators.tex").write_text(wrap(
-        body, "Leaderboard fidelity varies more between runs of one generator than between generators.", "tab:gen", note))
+        body, "Among generators that do not collapse, leaderboard fidelity varies more between runs of one generator than between generators.", "tab:gen", note))
 
     abody = ("\\small\n\\setlength{\\tabcolsep}{4pt}\n\\begin{tabular}{lcccccccc}\n\\toprule\n"
              "Generator & Pairs \\% $\\uparrow$ & Regret $\\downarrow$ & TVD $\\downarrow$ & Dep. $\\downarrow$ & "
@@ -353,25 +353,40 @@ def tabred(out):
         v = json.loads(f.read_text())["kendall_tau"]
         return v if v == v else None
 
+    # 시드 1~4 확장(9/23): tau_S->S는 다섯 공개본의 평균과 범위, 나머지 열은 시드 0 공개본(표 2와 같은 구성).
+    wg = json.loads((T / "within_generator.json").read_text())["tau_per_release"]
+    main_nf = json.loads((E / "leaderboard_real/noise_floor.json").read_text())
+
+    def fmt(v):
+        return f"{v:+.2f}".replace("-", "$-$")
+
+    def key(m):
+        t = list(wg.get(m, {}).values())
+        return -np.mean(t) if t else 9
     rows = []
-    for m in sorted(sm, key=lambda m: -(tau(m, "s2s") if tau(m, "s2s") is not None else -9)):
-        v, a, b = sm[m], tau(m, "s2s"), tau(m, "s2r")
+    for m in sorted(sm, key=key):
+        v, b = sm[m], tau(m, "s2r")
+        t = list(wg.get(m, {}).values())
+        s2s = (f"{fmt(np.mean(t))} & [{fmt(min(t))}, {fmt(max(t))}]" if t else "undefined & ")
         rows.append(f"{GEN.get(m, m)} & {v['ks_mean']:.3f} & {v['tvd_mean']:.3f} & {v['corr_rmse']:.3f} & "
                     f"{v['detection_auc']:.3f} & {100*v['pos_rate']:.2f} & {v['tstr_catboost_pr_auc']:.3f} & "
-                    + (f"{b:+.3f}".replace("-", "$-$") if b is not None else "n/a") + " & "
-                    + (f"{a:+.3f}".replace("-", "$-$") if a is not None else "undefined") + " \\\\")
-    body = ("\\begin{tabular}{lccccccc c}\n\\toprule\n\\multirow{2}{*}{Generator} & \\multicolumn{4}{c}{Standard metrics} & "
-            "\\multicolumn{2}{c}{Label / utility} & \\multicolumn{2}{c}{Leaderboard fidelity} \\\\\n"
-            "\\cmidrule(lr){2-5}\\cmidrule(lr){6-7}\\cmidrule(lr){8-9}\n"
-            " & KS & TVD & Corr & C2ST & Pos.\\ \\% & TSTR & $\\tau_{S\\to R}$ & $\\tau_{S\\to S}$ \\\\\n"
+                    + (fmt(b) if b is not None else "n/a") + " & " + s2s + " \\\\")
+    body = ("\\small\n\\setlength{\\tabcolsep}{4pt}\n"
+            "\\begin{tabular}{lccccccccc}\n\\toprule\n\\multirow{2}{*}{Generator} & \\multicolumn{4}{c}{Standard metrics} & "
+            "\\multicolumn{2}{c}{Label / utility} & \\multicolumn{3}{c}{Leaderboard fidelity} \\\\\n"
+            "\\cmidrule(lr){2-5}\\cmidrule(lr){6-7}\\cmidrule(lr){8-10}\n"
+            " & KS & TVD & Corr & C2ST & Pos.\\ \\% & TSTR & $\\tau_{S\\to R}$ & $\\tau_{S\\to S}$ & [min, max] \\\\\n"
             "\\midrule\n" + "\n".join(rows) + "\n\\bottomrule\n\\end{tabular}")
     note = (f"Public replication on TabReD homecredit-default (32{{,}}076 / 7{{,}}924 / 10{{,}}000 rows by time, "
-            f"5.0 / 3.3 / 2.3\\% positive), same protocol at a reduced budget (one generator seed, 10 tuning trials, "
-            f"three detector seeds). The noise ceiling here is lower than on our benchmark: bootstrap $\\tau$ ceiling "
-            f"{nf['tau_vs_full_mean']:.3f} (5th percentile {nf['tau_vs_full_q05']:.3f}) against 0.910 (0.818), and only "
+            f"5.0 / 3.3 / 2.3\\% positive), same protocol at a reduced budget (10 tuning trials, three detector seeds). "
+            f"Every generator produced five releases; $\\tau_{{S\\to S}}$ is the mean over them and [min, max] their range, "
+            f"and the other columns use the seed-0 release. The noise ceiling here is lower than on our benchmark: "
+            f"bootstrap $\\tau$ ceiling {nf['tau_vs_full_mean']:.3f} (5th percentile {nf['tau_vs_full_q05']:.3f}) against "
+            f"{main_nf['tau_vs_full_mean']:.3f} ({main_nf['tau_vs_full_q05']:.3f}), and only "
             f"{sum(1 for v in nf['pairwise_win_prob'].values() if v >= 0.975 or v <= 0.025)} of "
             f"{len(nf['pairwise_win_prob'])} detector pairs are separable. "
-            "A release marked undefined has no positive row in its synthetic test split, so no metric, and hence no ranking, is defined for it.")
+            "A generator marked undefined has no positive row in the synthetic test split of any of its five releases, "
+            "so no metric, and hence no ranking, is defined for it.")
     (out / "tab_tabred.tex").write_text(
         wrap(body, "External replication of the protocol on public data.", "tab:tabred", note))
 

@@ -176,8 +176,15 @@ def main():
         allv = np.concatenate([np.asarray(v) for v in runs.values()])
         within = float(np.mean([np.var(v, ddof=1) for v in runs.values()]))
         between = float(np.var([np.mean(v) for v in runs.values()], ddof=1))
+        # 비중은 일원 분산분석의 제곱합으로 낸다: 생성기 안 제곱합 / 전체 제곱합(9/23 외부 검토).
+        # 예전 정의(생성기 안 표본분산의 평균 / (그것 + 생성기 평균의 분산))는 within_share_var_ratio로 남긴다.
+        grand = float(np.mean(allv))
+        ss_w = float(sum(((np.asarray(v) - np.mean(v)) ** 2).sum() for v in runs.values()))
+        ss_b = float(sum(len(v) * (np.mean(v) - grand) ** 2 for v in runs.values()))
         return {"generators": list(runs), "n_runs": int(len(allv)), "total_var": float(np.var(allv, ddof=1)),
-                "within_var": within, "between_var_of_means": between, "within_share": within / (within + between),
+                "ss_within": ss_w, "ss_between": ss_b, "within_share": ss_w / (ss_w + ss_b),
+                "within_var": within, "between_var_of_means": between,
+                "within_share_var_ratio": within / (within + between),
                 "within_sd": float(np.sqrt(within)),
                 "range_per_generator": {m: [float(min(v)), float(max(v))] for m, v in runs.items()}}
     variance = {"all": decompose(MODELS), "non_collapsed": decompose([m for m in MODELS if m not in COLLAPSED])}

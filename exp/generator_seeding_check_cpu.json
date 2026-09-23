@@ -1,0 +1,22 @@
+{
+ "ctgan": {
+  "same_seed_identical": true,
+  "same_seed_max_abs_diff": 0.0,
+  "different_seed_identical": false
+ },
+ "tvae": {
+  "same_seed_identical": true,
+  "same_seed_max_abs_diff": 0.0,
+  "different_seed_identical": false
+ },
+ "ctabgan": {
+  "same_seed_identical": true,
+  "same_seed_max_abs_diff": 0.0,
+  "different_seed_identical": false
+ },
+ "ctabgan-plus": {
+  "same_seed_identical": true,
+  "same_seed_max_abs_diff": 0.0,
+  "different_seed_identical": false
+ }
+}

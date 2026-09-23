@@ -75,15 +75,18 @@ def main():
     others = list(zip(x, y))
     for m, xi, yi in zip(ms, x, y):
         placed.append((m, xi, yi))
-    tr = E.parent / "tabred-hc/lf_analysis.json"
+    # 공개 데이터(TabReD)도 우리 데이터와 같이 생성기당 다섯 공개본의 평균으로 찍는다(9/23 시드 확장).
+    tr = E.parent / "tabred-hc/standard_metrics_seeds.json"
     if tr.exists():
-        t = json.loads(tr.read_text())
-        tsm = json.loads((E.parent / "tabred-hc/standard_metrics.json").read_text())
-        taus = t["tau_s2s"]
-        mt = [m for m in taus if m in tsm and not np.isnan(taus[m])]
+        tper = {}
+        for k, v in json.loads(tr.read_text()).items():
+            mm, sd = k.split("|")
+            if int(sd) < MAX_SEEDS and v.get("lf_tau_s2s") is not None and v["lf_tau_s2s"] == v["lf_tau_s2s"]:
+                tper.setdefault(mm, []).append(v)
+        mt = sorted(tper)
         if mt:
-            xt = [tsm[m]["ks_mean"] for m in mt]
-            yt = [taus[m] for m in mt]
+            xt = [float(np.mean([v["ks_mean"] for v in tper[m]])) for m in mt]
+            yt = [float(np.mean([v["lf_tau_s2s"] for v in tper[m]])) for m in mt]
             rho_pub = spearman([-v for v in xt], yt)
             ax1.scatter(xt, yt, s=18, facecolor="white", edgecolor=ORANGE, lw=0.9, zorder=3,
                         label="TabReD")
@@ -146,13 +149,15 @@ def main():
     names = {"ks": "Marginal fidelity (KS)", "tvd": "TVD", "corr_rmse": "Dependence", "detection_auc": "C2ST",
              "pos_rate_abs_err_pp": "Label rate", "tstr_best_pr_auc": "TSTR (best detector)",
              "tstr_catboost_pr_auc": "TSTR (CatBoost)"}
-    items = [(names[k], wg[k]["all"]["agree_rate"], wg[k]["all"]["n_pairs"]) for k in names if k in wg]
+    # 오차막대는 생성기를 단위로 재표집한 95% 구간이다. 한 공개본이 쌍 네 개에 들어가 쌍끼리 독립이
+    # 아니므로 이항 구간은 너무 좁다(9/23 외부 검토).
+    items = [(names[k], wg[k]["all"]["agree_rate"], wg[k]["all"]["ci95_generator_bootstrap"]) for k in names if k in wg]
     items.sort(key=lambda z: z[1])
     # 수치는 y축에 둔다(그림 1, 그림 3과 같은 방향). 막대 + 오차막대와 파선 기준선은
     # TabArena(NeurIPS'25 D&B) Fig.1의 구성이다.
     items.sort(key=lambda z: -z[1])
     ax2.axhline(0.5, color="black", ls="--", lw=0.8, zorder=1)
-    err = [1.96 * np.sqrt(max(v * (1 - v), 1e-9) / max(n, 1)) for _, v, n in items]
+    err = np.array([[v - ci[0] for _, v, ci in items], [ci[1] - v for _, v, ci in items]])
     ax2.bar(range(len(items)), [v for _, v, _ in items], width=0.6, color=BLUE, zorder=2,
             yerr=err, error_kw=dict(ecolor=GREY, elinewidth=0.8, capsize=2, capthick=0.8))
     ax2.set_xticks(range(len(items)))

@@ -12,17 +12,19 @@ Usage:
 """
 import json
 import os
+import sys
 from pathlib import Path
 
 import numpy as np
 from scipy.stats import kendalltau
-from sklearn.metrics import average_precision_score
 from sklearn.model_selection import StratifiedShuffleSplit
 
 ROOT = Path(__file__).resolve().parents[1]
 E = ROOT / "exp/finsyn-v2"
 MAX_SEEDS = int(os.environ.get("FINSYN_MAX_SEEDS", "5"))
 N_SPLITS = 200
+sys.path.insert(0, str(ROOT / "scripts"))
+from leaderboard import board_score, seed_preds  # noqa: E402
 GEN = ["smote", "tabsyn", "tabdiff", "findiff", "tabddpm", "tabpfgen", "tabpfgen-prior",
        "great", "tvae", "ctgan", "ctabgan", "ctabgan-plus"]
 
@@ -30,7 +32,8 @@ GEN = ["smote", "tabsyn", "tabdiff", "findiff", "tabddpm", "tabpfgen", "tabpfgen
 def main():
     dets = sorted(json.loads((E / "leaderboard_real/results.json").read_text()))
     y = np.load(ROOT / "data/finsyn-v2/y_test.npy").astype(int)
-    real = {d: np.load(E / f"leaderboard_real/pred_test_{d}.npy") for d in dets}
+    real = {d: seed_preds(E / "leaderboard_real", d) for d in dets}
+    assert all(v.ndim == 2 for v in real.values()), "시드별 예측이 없다: scripts/refit_seed_preds.py 먼저"
     runs = {}
     for m in GEN:
         v = []
@@ -43,8 +46,8 @@ def main():
 
     acc = {k: {m: [] for m in GEN} for k in ("random", "ensemble", "selected", "oracle")}
     for a, b in StratifiedShuffleSplit(n_splits=N_SPLITS, test_size=0.5, random_state=0).split(np.zeros(len(y)), y):
-        refA = [average_precision_score(y[a], real[d][a]) for d in dets]
-        refB = [average_precision_score(y[b], real[d][b]) for d in dets]
+        refA = [board_score(y[a], real[d][:, a]) for d in dets]
+        refB = [board_score(y[b], real[d][:, b]) for d in dets]
         for m, vs in runs.items():
             tA = [kendalltau(refA, v).statistic for v in vs]
             tB = [kendalltau(refB, v).statistic for v in vs]

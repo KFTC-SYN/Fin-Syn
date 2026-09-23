@@ -1,9 +1,9 @@
 {
  "n_models": 11,
  "kendall_tau": -0.018181818181818184,
- "tau_ceiling_real_bootstrap": 0.7707999999999999,
- "sig_pair_order_kept": 0.47619047619047616,
- "n_sig_pairs": 21,
+ "tau_ceiling_real_bootstrap": 0.7397454545454546,
+ "sig_pair_order_kept": 0.4444444444444444,
+ "n_sig_pairs": 18,
  "cand_top1": "et",
  "cand_top1_in_real_top_tier": false,
  "real_top_tier": [

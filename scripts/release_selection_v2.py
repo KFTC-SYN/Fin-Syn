@@ -4,9 +4,11 @@
 문제: 데이터 보유자가 같은 테스트 기간으로 여러 공개본의 tau를 재고 최고를 고르면, 그 선택은 테스트 기간의
       우연한 흔들림에 맞춰질 수 있다(winner's curse). 그러면 고른 공개본이 실제로는 다른 것보다 낫지 않을 수 있다.
 방법: 비공개 test를 층화 반분(A/B)을 200번 반복한다.
-      - 기준 리더보드: 각 탐지기의 시드 평균 예측(leaderboard_real/pred_test_*.npy)으로 A, B에서 각각 PR-AUC.
+      - 기준 리더보드: 각 탐지기의 시드별 예측(leaderboard_real/pred_test_*_seed*.npy)으로 A, B에서 각각
+        시드별 PR-AUC를 재서 평균한다. 요약 리더보드와 같은 점수 정의다(9/23 통일).
       - S->S 후보: 합성 test에서 잰 점수라 A/B와 무관(results.json의 시드 평균 PR-AUC).
-      - S->R 후보: 후보 리더보드의 pred_test를 같은 A/B로 잘라 잰다.
+      - S->R 후보: 후보 리더보드의 pred_test를 같은 A/B로 잘라 잰다. 공개본 리더보드는 시드 평균 예측만
+        저장돼 있어 이쪽은 평균 예측의 PR-AUC다. 원고는 S->S만 보고한다.
       - A에서 tau가 가장 큰 공개본을 고르고, B에서 그 공개본의 tau를 무작위 선택(평균)·사후 최선(oracle)과 비교한다.
       생성기별(같은 생성기의 시드 중 선택)과 전체(모든 공개본 중 선택) 두 가지로 본다.
 
@@ -22,6 +24,7 @@ from sklearn.metrics import average_precision_score
 from sklearn.model_selection import StratifiedShuffleSplit
 
 import os
+import sys
 # 논문 메인 표/그림은 생성기마다 같은 수의 공개본을 쓴다(사용자 지시 9/20). 기본 5시드.
 MAX_SEEDS = int(os.environ.get("FINSYN_MAX_SEEDS", "5"))
 
@@ -31,6 +34,8 @@ DETS = ["nb", "dt", "lr", "knn", "mlp", "rf", "et", "hgb", "lgbm", "xgb", "catbo
 MODELS = ["smote", "tabpfgen", "tabpfgen-prior", "tabddpm", "great", "tvae", "ctabgan", "ctgan", "ctabgan-plus",
           "tabsyn", "tabdiff", "findiff"]
 N_SPLITS = 200
+sys.path.insert(0, str(ROOT / "scripts"))
+from leaderboard import board_score, seed_preds  # noqa: E402
 
 
 def run_dir(m, tag, s):
@@ -49,7 +54,8 @@ def runs():
 
 def main():
     y = np.load(ROOT / "data/finsyn-v2/y_test.npy").astype(int)
-    real = {d: np.load(E / f"leaderboard_real/pred_test_{d}.npy") for d in DETS}
+    real = {d: seed_preds(E / "leaderboard_real", d) for d in DETS}
+    assert all(v.ndim == 2 for v in real.values()), "시드별 예측이 없다: scripts/refit_seed_preds.py 먼저"
     R = runs()
     s2s = {r: [json.loads((run_dir(*r[:1], "s2s", r[1]) / "results.json").read_text())[d]["summary"]["pr_auc"][0]
                for d in DETS] for r in R}
@@ -57,7 +63,7 @@ def main():
     sss = StratifiedShuffleSplit(n_splits=N_SPLITS, test_size=0.5, random_state=0)
     rec = {"s2s": [], "s2r": []}
     for a, b in sss.split(np.zeros(len(y)), y):
-        ref = {h: [average_precision_score(y[idx], real[d][idx]) for d in DETS] for h, idx in (("A", a), ("B", b))}
+        ref = {h: [board_score(y[idx], real[d][:, idx]) for d in DETS] for h, idx in (("A", a), ("B", b))}
         for tag in ("s2s", "s2r"):
             tau = {}
             for r in R:

@@ -1,0 +1,218 @@
+{
+ "ks": {
+  "all": {
+   "n_pairs": 47,
+   "agree_rate": 0.5106382978723404,
+   "n_generators": 5,
+   "tau_regret_mean": 0.050909090909090904,
+   "ci95_generator_bootstrap": [
+    0.30434782608695654,
+    0.7608695652173914
+   ],
+   "p_perm_two_sided": 1.0,
+   "null_q025_q975": [
+    0.3191489361702128,
+    0.6808510638297872
+   ]
+  },
+  "non_collapsed": {
+   "n_pairs": 47,
+   "agree_rate": 0.5106382978723404,
+   "n_generators": 5,
+   "tau_regret_mean": 0.050909090909090904,
+   "p_perm_two_sided": 1.0,
+   "null_q025_q975": [
+    0.3191489361702128,
+    0.6808510638297872
+   ]
+  }
+ },
+ "tvd": {
+  "all": {
+   "n_pairs": 47,
+   "agree_rate": 0.48936170212765956,
+   "n_generators": 5,
+   "tau_regret_mean": 0.15092599339673307,
+   "ci95_generator_bootstrap": [
+    0.2127659574468085,
+    0.7659574468085106
+   ],
+   "p_perm_two_sided": 1.0,
+   "null_q025_q975": [
+    0.3191489361702128,
+    0.6808510638297872
+   ]
+  },
+  "non_collapsed": {
+   "n_pairs": 47,
+   "agree_rate": 0.48936170212765956,
+   "n_generators": 5,
+   "tau_regret_mean": 0.15092599339673307,
+   "p_perm_two_sided": 1.0,
+   "null_q025_q975": [
+    0.3191489361702128,
+    0.6808510638297872
+   ]
+  }
+ },
+ "corr_rmse": {
+  "all": {
+   "n_pairs": 47,
+   "agree_rate": 0.5531914893617021,
+   "n_generators": 5,
+   "tau_regret_mean": 0.12956801922195466,
+   "ci95_generator_bootstrap": [
+    0.40816326530612246,
+    0.782608695652174
+   ],
+   "p_perm_two_sided": 0.6535,
+   "null_q025_q975": [
+    0.3191489361702128,
+    0.6808510638297872
+   ]
+  },
+  "non_collapsed": {
+   "n_pairs": 47,
+   "agree_rate": 0.5531914893617021,
+   "n_generators": 5,
+   "tau_regret_mean": 0.12956801922195466,
+   "p_perm_two_sided": 0.6562,
+   "null_q025_q975": [
+    0.3191489361702128,
+    0.6808510638297872
+   ]
+  }
+ },
+ "detection_auc": {
+  "all": {
+   "n_pairs": 47,
+   "agree_rate": 0.425531914893617,
+   "n_generators": 5,
+   "tau_regret_mean": 0.11170427446083349,
+   "ci95_generator_bootstrap": [
+    0.2978723404255319,
+    0.5714285714285714
+   ],
+   "p_perm_two_sided": 0.5051,
+   "null_q025_q975": [
+    0.3191489361702128,
+    0.6808510638297872
+   ]
+  },
+  "non_collapsed": {
+   "n_pairs": 47,
+   "agree_rate": 0.425531914893617,
+   "n_generators": 5,
+   "tau_regret_mean": 0.11170427446083349,
+   "p_perm_two_sided": 0.5019,
+   "null_q025_q975": [
+    0.3191489361702128,
+    0.6808510638297872
+   ]
+  }
+ },
+ "pos_rate_abs_err_pp": {
+  "all": {
+   "n_pairs": 28,
+   "agree_rate": 0.7142857142857143,
+   "n_generators": 5,
+   "tau_regret_mean": 0.06609069229593953,
+   "ci95_generator_bootstrap": [
+    0.5555555555555556,
+    0.8
+   ],
+   "p_perm_two_sided": 0.11,
+   "null_q025_q975": [
+    0.25,
+    0.75
+   ]
+  },
+  "non_collapsed": {
+   "n_pairs": 28,
+   "agree_rate": 0.7142857142857143,
+   "n_generators": 5,
+   "tau_regret_mean": 0.06609069229593953,
+   "p_perm_two_sided": 0.115,
+   "null_q025_q975": [
+    0.25,
+    0.75
+   ]
+  }
+ },
+ "tstr_catboost_pr_auc": {
+  "all": {
+   "n_pairs": 5,
+   "agree_rate": 0.4,
+   "n_generators": 1,
+   "tau_regret_mean": 0.036363636363636376,
+   "ci95_generator_bootstrap": [
+    0.4,
+    0.4
+   ],
+   "p_perm_two_sided": 1.0,
+   "null_q025_q975": [
+    0.0,
+    1.0
+   ]
+  },
+  "non_collapsed": {
+   "n_pairs": 5,
+   "agree_rate": 0.4,
+   "n_generators": 1,
+   "tau_regret_mean": 0.036363636363636376,
+   "p_perm_two_sided": 1.0,
+   "null_q025_q975": [
+    0.0,
+    1.0
+   ]
+  }
+ },
+ "tstr_best_pr_auc": {
+  "all": {
+   "n_pairs": 5,
+   "agree_rate": 0.6,
+   "n_generators": 1,
+   "tau_regret_mean": 0.0,
+   "ci95_generator_bootstrap": [
+    0.6,
+    0.6
+   ],
+   "p_perm_two_sided": 1.0,
+   "null_q025_q975": [
+    0.0,
+    1.0
+   ]
+  },
+  "non_collapsed": {
+   "n_pairs": 5,
+   "agree_rate": 0.6,
+   "n_generators": 1,
+   "tau_regret_mean": 0.0,
+   "p_perm_two_sided": 1.0,
+   "null_q025_q975": [
+    0.0,
+    1.0
+   ]
+  }
+ },
+ "tau_oracle": {
+  "all": {
+   "agree_rate": 1.0,
+   "tau_regret_mean": 0.0
+  },
+  "non_collapsed": {
+   "agree_rate": 1.0,
+   "tau_regret_mean": 0.0
+  }
+ },
+ "random_pick": {
+  "all": {
+   "agree_rate": 0.5,
+   "tau_regret_mean": 0.113475977693274
+  },
+  "non_collapsed": {
+   "agree_rate": 0.5,
+   "tau_regret_mean": 0.113475977693274
+  }
+ }
+}

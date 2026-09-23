@@ -24,7 +24,7 @@ from scipy.stats import kendalltau, spearmanr
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "scripts"))
 from fidelity import fidelity  # noqa: E402
-from leaderboard import bootstrap_noise, load_split  # noqa: E402
+from leaderboard import bootstrap_noise, load_split, seed_preds  # noqa: E402
 
 E = ROOT / "exp/finsyn-v2"
 T, M = E / "tabm", E / "tabm12"
@@ -52,7 +52,8 @@ def main():
     assert real is not None, "TabM real leaderboard missing"
     _, yte, _ = load_split(str(ROOT / "data/finsyn-v2"), "test")
     res = json.loads((real / "results.json").read_text())
-    preds = {m: np.load(real / f"pred_test_{m}.npy") for m in res}
+    preds = {m: seed_preds(real, m) for m in res}  # 시드별 PR-AUC의 평균(요약 리더보드와 같은 정의, 9/23)
+    assert all(p.ndim == 2 for p in preds.values()), "시드별 예측이 없다: refit_seed_preds.py 먼저"
     noise = bootstrap_noise(yte, preds)
     (real / "noise_floor.json").write_text(json.dumps(noise, indent=1))
     ref = {m: v["summary"]["pr_auc"][0] for m, v in res.items()}

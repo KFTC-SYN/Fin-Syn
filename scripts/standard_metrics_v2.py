@@ -101,11 +101,13 @@ def main():
         ks, tvd, corr = fidelity(rn, rc, sn, sc)
         det = detection_auc(rn, rc, sn, sc)
         copy, dcr = privacy(rn, rc, sn, sc)
-        lb = json.loads((E / f"leaderboard_{m}_s2r{suf}/results.json").read_text())
+        # TSTR은 S->R 리더보드가 있어야 한다. TabReD 시드 1~4는 S->S만 만들었으므로 비워 둔다(9/23).
+        lbf = E / f"leaderboard_{m}_s2r{suf}/results.json"
+        lb = json.loads(lbf.read_text()) if lbf.exists() else None
         r = {"ks_mean": ks, "tvd_mean": tvd, "corr_rmse": corr, "detection_auc": det,
              "pos_rate_abs_err_pp": float(abs(sy.mean() - ry.mean()) * 100), "pos_rate": float(sy.mean()),
-             "tstr_catboost_pr_auc": lb["catboost"]["summary"]["pr_auc"][0],
-             "tstr_best_pr_auc": max(v["summary"]["pr_auc"][0] for v in lb.values()),
+             "tstr_catboost_pr_auc": lb["catboost"]["summary"]["pr_auc"][0] if lb else None,
+             "tstr_best_pr_auc": max(v["summary"]["pr_auc"][0] for v in lb.values()) if lb else None,
              "copy_rate": copy, "dcr_median": dcr}
         for tag in ["s2r", "s2s"]:
             fp = E / f"leaderboard_{m}_{tag}{suf}/fidelity_vs_leaderboard_real.json"
@@ -114,7 +116,7 @@ def main():
                 r[f"lf_tau_{tag}"], r[f"lf_pairs_{tag}"], r[f"lf_regret_{tag}"] = f["kendall_tau"], f["sig_pair_order_kept"], f["selection_regret_pr_auc"]
         res[rk] = r
         out_path.write_text(json.dumps(res, indent=1))
-        print(rk, {kk: round(v, 4) for kk, v in r.items()}, flush=True)
+        print(rk, {kk: (round(v, 4) if v is not None else None) for kk, v in r.items()}, flush=True)
 
     df = pd.DataFrame(res).T
     print("\n", df.round(3).to_string())

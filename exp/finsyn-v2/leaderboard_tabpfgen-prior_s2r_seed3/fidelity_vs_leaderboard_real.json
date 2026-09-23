@@ -1,7 +1,7 @@
 {
  "n_models": 11,
  "kendall_tau": 0.7090909090909091,
- "tau_ceiling_real_bootstrap": 0.9098545454545454,
+ "tau_ceiling_real_bootstrap": 0.9232727272727272,
  "sig_pair_order_kept": 0.9545454545454546,
  "n_sig_pairs": 44,
  "cand_top1": "catboost",

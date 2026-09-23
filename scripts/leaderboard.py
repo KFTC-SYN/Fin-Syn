@@ -35,6 +35,8 @@ N_JOBS = int(os.environ.get("LB_N_JOBS", "4"))
 # ---------------------------------------------------------------- data
 def load_split(spec: str, default_split: str):
     d, s = (spec.split(":") + [default_split])[:2]
+    if (Path(d) / f"{s}.parquet").exists() and not (Path(d) / "info.json").exists():
+        return load_parquet(Path(d) / f"{s}.parquet")
     info = json.loads((Path(d) / "info.json").read_text())
     X = pd.concat([
         pd.DataFrame(np.load(Path(d) / f"X_num_{s}.npy", allow_pickle=True).astype(float), columns=info["num_cols"]),
@@ -42,6 +44,17 @@ def load_split(spec: str, default_split: str):
     ], axis=1)
     y = np.load(Path(d) / f"y_{s}.npy", allow_pickle=True).astype(int)
     return X, y, info
+
+
+def load_parquet(f: Path):
+    """공개본 형식(release/data/<generator>/seed<k>/<split>.parquet)을 읽는다. 열 순서와 형식은
+    package_release.py가 쓴 그대로이고, 범주 열은 category, 정답은 label이다(9/23: README 예시가 이 경로를 쓴다)."""
+    df = pd.read_parquet(f)
+    y = df.pop("label").to_numpy().astype(int)
+    cat = [c for c in df.columns if isinstance(df[c].dtype, pd.CategoricalDtype) or df[c].dtype == object]
+    num = [c for c in df.columns if c not in cat]
+    X = pd.concat([df[num].astype(float), df[cat].astype(str)], axis=1)
+    return X, y, {"num_cols": num, "cat_cols": cat}
 
 
 class Prep:
@@ -175,23 +188,40 @@ def metrics(y, p):
             "recall@0.1%fpr": recall_at_fpr(y, p, 0.001), "recall@1%fpr": recall_at_fpr(y, p, 0.01)}
 
 
+def board_score(y, p):
+    """리더보드 점수 = 시드별 PR-AUC의 평균. p는 (시드, 행) 배열. 요약·부트스트랩·감사가 모두 이 정의를 쓴다(9/23).
+    1차원이면(시드별 예측이 없는 옛 결과) 그 예측 하나의 PR-AUC."""
+    p = np.atleast_2d(p)
+    return float(np.mean([average_precision_score(y, q) for q in p]))
+
+
+def seed_preds(out, name):
+    """저장된 시드별 평가 예측을 (시드, 행)으로 쌓는다. 없으면 평균 예측 하나를 돌려준다."""
+    fs = sorted(Path(out).glob(f"pred_test_{name}_seed*.npy"), key=lambda f: int(f.stem.rsplit("seed", 1)[1]))
+    return np.stack([np.load(f) for f in fs]) if fs else np.load(Path(out) / f"pred_test_{name}.npy")
+
+
 def bootstrap_noise(y, preds: dict, n_boot=1000, seed=0):
-    """평가 행 bootstrap으로 순위 불확실성: 전체 대비 bootstrap 순위의 Kendall τ 분포와 쌍별 유의 차이."""
+    """평가 행 bootstrap으로 순위 불확실성: 전체 대비 bootstrap 순위의 Kendall τ 분포와 쌍별 유의 차이.
+    preds의 값이 (시드, 행)이면 각 bootstrap 표본에서도 시드별 PR-AUC의 평균으로 점수를 낸다."""
     rng = np.random.default_rng(seed)
     names = list(preds)
-    full = np.array([average_precision_score(y, preds[n]) for n in names])
+    P = {n: np.atleast_2d(preds[n]) for n in names}
+    full = np.array([board_score(y, P[n]) for n in names])
     pos, neg = np.where(y == 1)[0], np.where(y == 0)[0]
     boots = np.empty((n_boot, len(names)))
     for b in range(n_boot):
         idx = np.concatenate([rng.choice(pos, len(pos)), rng.choice(neg, len(neg))])  # 층화 bootstrap
-        boots[b] = [average_precision_score(y[idx], preds[n][idx]) for n in names]
+        boots[b] = [board_score(y[idx], P[n][:, idx]) for n in names]
     taus = np.array([kendalltau(full, boots[b]).statistic for b in range(n_boot)])
     sig = {}
     for i, a in enumerate(names):
         for j, c in enumerate(names):
             if i < j:
                 d = boots[:, i] - boots[:, j]
-                sig[f"{a}>{c}"] = float((d > 0).mean())
+                # 동점은 반씩 나눈다. 두 탐지기가 매 표본 같은 점수(예: 둘 다 1.000)면 0.5가 되어
+                # 분리 가능한 쌍으로 세지 않는다. 예전에는 동점을 뒤쪽의 승리로 세었다(9/23 발견).
+                sig[f"{a}>{c}"] = float((d > 0).mean() + 0.5 * (d == 0).mean())
     ci = {n: [float(np.quantile(boots[:, k], 0.025)), float(np.quantile(boots[:, k], 0.975))] for k, n in enumerate(names)}
     return {"tau_vs_full_mean": float(np.nanmean(taus)), "tau_vs_full_q05": float(np.nanquantile(taus, 0.05)),
             "pr_auc_ci95": ci, "pairwise_win_prob": sig}
@@ -252,6 +282,7 @@ def main():
                 pv, pt = np.full(len(yva), ytr.mean()), np.full(len(yte), ytr.mean())
             runs.append({"seed": s, "tune_pr_auc": float(average_precision_score(yva, pv)), **metrics(yte, pt)})
             test_preds.append(pt)
+            np.save(out / f"pred_test_{name}_seed{s}.npy", pt)
         np.save(out / f"pred_test_{name}.npy", np.mean(test_preds, axis=0))
         summ = {k: [float(np.mean([r[k] for r in runs])), float(np.std([r[k] for r in runs]))]
                 for k in ["tune_pr_auc", "pr_auc", "roc_auc", "recall@0.1%fpr", "recall@1%fpr"]}
@@ -265,7 +296,7 @@ def main():
     done = [m for m in models if m in res]
     if len(done) < 2:  # 단일 모델(예: --models tabm 부가 실행)은 순위 노이즈를 정의할 수 없다
         return
-    preds = {m: np.load(out / f"pred_test_{m}.npy") for m in done}
+    preds = {m: seed_preds(out, m) for m in done}
     noise = bootstrap_noise(yte, preds)
     # seed 노이즈: seed별 리더보드끼리의 τ
     seed_boards = np.array([[res[m]["runs"][s]["pr_auc"] for m in done] for s in range(args.seeds)])
@@ -273,7 +304,7 @@ def main():
     noise["seed_tau_mean"] = float(np.nanmean(seed_taus))
     (out / "noise_floor.json").write_text(json.dumps(noise, indent=1))
     board = sorted(done, key=lambda m: -res[m]["summary"]["pr_auc"][0])
-    print("\nleaderboard (PR-AUC, seed-mean prediction CI95):")
+    print("\nleaderboard (PR-AUC averaged over seeds, bootstrap CI95):")
     for m in board:
         print(f"  {m:9s} {res[m]['summary']['pr_auc'][0]:.3f}  CI95 {noise['pr_auc_ci95'][m][0]:.3f}-{noise['pr_auc_ci95'][m][1]:.3f}")
     print(f"bootstrap τ(full, boot) mean {noise['tau_vs_full_mean']:.3f} (5% {noise['tau_vs_full_q05']:.3f}) | seed τ mean {noise['seed_tau_mean']:.3f}")
