@@ -44,7 +44,17 @@ def main():
                 v.append([r[d]["summary"]["pr_auc"][0] for d in dets])
         runs[m] = v
 
-    acc = {k: {m: [] for m in GEN} for k in ("random", "ensemble", "selected", "oracle")}
+    # DGE(van Breugel et al. 권고 (3)): 공개본 k로 학습해 같은 생성기의 다른 공개본 j의 test로 잰 점수를
+    # k != j 20개 조합에 대해 평균한 리더보드. scripts/dge_cross_eval_v2.py 결과가 있어야 한다.
+    dge = {}
+    for m in GEN:
+        fs = [E / f"dge/{m}_seed{k}.json" for k in range(MAX_SEEDS)]
+        if all(f.exists() for f in fs):
+            sc = [json.loads(f.read_text())["scores"] for f in fs]
+            dge[m] = [float(np.nanmean([sc[k][str(j)][d] for k in range(MAX_SEEDS) for j in range(MAX_SEEDS) if j != k]))
+                      for d in dets]
+    kinds = ("random", "ensemble", "dge", "selected", "oracle") if len(dge) == len(GEN) else ("random", "ensemble", "selected", "oracle")
+    acc = {k: {m: [] for m in GEN} for k in kinds}
     for a, b in StratifiedShuffleSplit(n_splits=N_SPLITS, test_size=0.5, random_state=0).split(np.zeros(len(y)), y):
         refA = [board_score(y[a], real[d][:, a]) for d in dets]
         refB = [board_score(y[b], real[d][:, b]) for d in dets]
@@ -53,22 +63,22 @@ def main():
             tB = [kendalltau(refB, v).statistic for v in vs]
             acc["random"][m].append(float(np.mean(tB)))
             acc["ensemble"][m].append(float(kendalltau(refB, np.mean(vs, axis=0)).statistic))
+            if "dge" in acc:
+                acc["dge"][m].append(float(kendalltau(refB, dge[m]).statistic))
             acc["selected"][m].append(float(tB[int(np.argmax(tA))]))
             acc["oracle"][m].append(float(max(tB)))
 
     out = {"n_splits": N_SPLITS, "n_generators": len(GEN), "seeds_per_generator": MAX_SEEDS}
-    for k in ("random", "ensemble", "selected", "oracle"):
+    for k in kinds:
         out[k] = {"overall": float(np.mean([np.mean(acc[k][m]) for m in GEN])),
                   "per_generator": {m: float(np.mean(acc[k][m])) for m in GEN}}
     gap = out["oracle"]["overall"] - out["random"]["overall"]
-    out["share_of_gap_recovered"] = {
-        "ensemble": (out["ensemble"]["overall"] - out["random"]["overall"]) / gap,
-        "selected": (out["selected"]["overall"] - out["random"]["overall"]) / gap}
+    out["share_of_gap_recovered"] = {k: (out[k]["overall"] - out["random"]["overall"]) / gap
+                                     for k in kinds if k not in ("random", "oracle")}
     (E / "ensemble_vs_audit.json").write_text(json.dumps(out, indent=1))
-    for k in ("random", "ensemble", "selected", "oracle"):
+    for k in kinds:
         print(f"  {k:10s} {out[k]['overall']:+.3f}")
-    print(f"  회수 비율: 앙상블 {out['share_of_gap_recovered']['ensemble']:.0%}, "
-          f"감사 {out['share_of_gap_recovered']['selected']:.0%}")
+    print("  회수 비율:", {k: f"{v:.0%}" for k, v in out["share_of_gap_recovered"].items()})
 
 
 if __name__ == "__main__":

@@ -174,13 +174,10 @@ def conditions(out):
             "Construction & " + " & ".join(short[d_] for d_ in order)
             + " & $\\tau$ \\\\\n\\midrule\n" + "\n".join(rows)
             + "\n\\bottomrule\n\\end{tabular}")
-    note = ("Test PR-AUC of every detector, columns ordered by the first row, the reference leaderboard, so a row that "
-            "orders them the same way preserves the ranking; $\\tau$ is its agreement with that row. All three use the "
-            "same transfers and features; the last also replicates 2{,}157 distinct rows to 91{,}005. Bold marks the "
-            "highest score in each row and any tied with it at this precision; the "
-            f"{WORD.get(n_tied[2], n_tied[2])} tied at the top of the last row cost from "
-            f"{min(reg_all[2]):.3f} to {max(reg_all[2]):.3f} of private PR-AUC when deployed. Separable pairs fall from "
-            f"{sep_counts[0][0]} to {sep_counts[1][0]} to {sep_counts[2][0]} of {sep_counts[0][1]}.")
+    note = ("Test PR-AUC of every detector, columns ordered by the reference leaderboard (first row); $\\tau$ is each "
+            "row's agreement with it. The last row also replicates 2{,}157 distinct rows to 91{,}005 before splitting. Bold "
+            "marks each row's highest score and ties at this precision. Separable pairs: "
+            f"{sep_counts[0][0]}, {sep_counts[1][0]}, and {sep_counts[2][0]} of {sep_counts[0][1]}.")
     (out / "tab_conditions.tex").write_text(wrap(body, "Effect of dataset construction on the private-data leaderboard.", "tab:cond", note))
 
 def ablation(out):
