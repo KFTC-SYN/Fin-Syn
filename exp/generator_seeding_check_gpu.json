@@ -1,5 +1,5 @@
 {
- "device": "cpu",
+ "device": "cuda:0",
  "cudnn_deterministic": false,
  "rows": 2000,
  "epochs": 2,
@@ -37,7 +37,7 @@
   "ctabgan": {
    "class_file": "CTAB-GAN/model/ctabgan.py",
    "same_seed_identical": {
-    "X_num": true,
+    "X_num": false,
     "X_cat": true,
     "y": true
    },
@@ -46,13 +46,13 @@
     "X_cat": false,
     "y": false
    },
-   "same_seed_X_num_share_differing": 0.0,
-   "same_seed_X_num_max_diff_in_sd": 0.0
+   "same_seed_X_num_share_differing": 0.7247777777777777,
+   "same_seed_X_num_max_diff_in_sd": 0.0007522316634967285
   },
   "ctabgan-plus": {
    "class_file": "CTAB-GAN-Plus/model/ctabgan.py",
    "same_seed_identical": {
-    "X_num": true,
+    "X_num": false,
     "X_cat": true,
     "y": true
    },
@@ -61,8 +61,8 @@
     "X_cat": false,
     "y": false
    },
-   "same_seed_X_num_share_differing": 0.0,
-   "same_seed_X_num_max_diff_in_sd": 0.0
+   "same_seed_X_num_share_differing": 0.7723333333333333,
+   "same_seed_X_num_max_diff_in_sd": 0.002390017352469981
   }
  },
  "distinct_implementations": [

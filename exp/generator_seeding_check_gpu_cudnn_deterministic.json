@@ -1,0 +1,42 @@
+{
+ "device": "cuda:0",
+ "cudnn_deterministic": true,
+ "rows": 2000,
+ "epochs": 2,
+ "generators": {
+  "ctabgan": {
+   "class_file": "CTAB-GAN/model/ctabgan.py",
+   "same_seed_identical": {
+    "X_num": true,
+    "X_cat": true,
+    "y": true
+   },
+   "different_seed_identical": {
+    "X_num": false,
+    "X_cat": false,
+    "y": false
+   },
+   "same_seed_X_num_share_differing": 0.0,
+   "same_seed_X_num_max_diff_in_sd": 0.0
+  },
+  "ctabgan-plus": {
+   "class_file": "CTAB-GAN-Plus/model/ctabgan.py",
+   "same_seed_identical": {
+    "X_num": true,
+    "X_cat": true,
+    "y": true
+   },
+   "different_seed_identical": {
+    "X_num": false,
+    "X_cat": false,
+    "y": false
+   },
+   "same_seed_X_num_share_differing": 0.0,
+   "same_seed_X_num_max_diff_in_sd": 0.0
+  }
+ },
+ "distinct_implementations": [
+  "CTAB-GAN-Plus/model/ctabgan.py",
+  "CTAB-GAN/model/ctabgan.py"
+ ]
+}
