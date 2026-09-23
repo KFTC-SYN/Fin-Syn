@@ -22,7 +22,7 @@ exp/orig-micro-retry/
 # 상류 생성기 저장소(tabsyn/TabDiff/FinDiff/tabm)는 소스만 공개한다.
 # 학습 산출물과 상류가 배포한 실험 자료가 4.4GB 중 99.9%를 차지한다.
 tabsyn/tabsyn/ckpt/
-tabsyn/tabsyn/vae/
+tabsyn/tabsyn/vae/ckpt/
 tabsyn/data/
 tabsyn/synthetic/
 TabDiff/tabdiff/ckpt/
