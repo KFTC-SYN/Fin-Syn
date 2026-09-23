@@ -1,0 +1,14 @@
+DEPS_OK
+Traceback (most recent call last):
+  File "<string>", line 1, in <module>
+  File "/home/user/Gwangui/workspace/syn/.venv/lib/python3.11/site-packages/tabpfn/__init__.py", line 3, in <module>
+    from tabpfn.classifier import TabPFNClassifier
+  File "/home/user/Gwangui/workspace/syn/.venv/lib/python3.11/site-packages/tabpfn/classifier.py", line 34, in <module>
+    from tabpfn_common_utils.telemetry import track_model_call
+  File "/home/user/Gwangui/workspace/syn/.venv/lib/python3.11/site-packages/tabpfn_common_utils/telemetry/__init__.py", line 3, in <module>
+    from .core.events import DatasetEvent, FitEvent, ModelLoadEvent, PingEvent, PredictEvent
+  File "/home/user/Gwangui/workspace/syn/.venv/lib/python3.11/site-packages/tabpfn_common_utils/telemetry/core/__init__.py", line 5, in <module>
+    from .events import (
+  File "/home/user/Gwangui/workspace/syn/.venv/lib/python3.11/site-packages/tabpfn_common_utils/telemetry/core/events.py", line 11, in <module>
+    from pynvml import (
+ModuleNotFoundError: No module named 'pynvml'

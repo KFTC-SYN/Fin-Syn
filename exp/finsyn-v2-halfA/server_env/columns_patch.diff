@@ -1,0 +1,90 @@
+diff --git a/CTAB-GAN-Plus/columns.json b/CTAB-GAN-Plus/columns.json
+index 8cfe0be..aa6cf7e 100644
+--- a/CTAB-GAN-Plus/columns.json
++++ b/CTAB-GAN-Plus/columns.json
+@@ -664,5 +664,39 @@
+         "problem_type": {
+             "Classification": "y"
+         }
++    },
++    "finsyn-v2-halfA-part-test": {
++        "categorical_columns": [
++            "18",
++            "19",
++            "20",
++            "21",
++            "22",
++            "23",
++            "y"
++        ],
++        "mixed_columns": {},
++        "integer_columns": [
++            "0",
++            "1",
++            "2",
++            "3",
++            "4",
++            "6",
++            "7",
++            "8",
++            "9",
++            "10",
++            "11",
++            "12",
++            "13",
++            "14",
++            "15",
++            "16",
++            "17"
++        ],
++        "problem_type": {
++            "Classification": "y"
++        }
+     }
+ }
+\ No newline at end of file
+diff --git a/CTAB-GAN/columns.json b/CTAB-GAN/columns.json
+index 69c8e31..a60653b 100644
+--- a/CTAB-GAN/columns.json
++++ b/CTAB-GAN/columns.json
+@@ -583,5 +583,39 @@
+         "problem_type": {
+             "Classification": "y"
+         }
++    },
++    "finsyn-v2-halfA-part-test": {
++        "categorical_columns": [
++            "18",
++            "19",
++            "20",
++            "21",
++            "22",
++            "23",
++            "y"
++        ],
++        "mixed_columns": {},
++        "integer_columns": [
++            "0",
++            "1",
++            "2",
++            "3",
++            "4",
++            "6",
++            "7",
++            "8",
++            "9",
++            "10",
++            "11",
++            "12",
++            "13",
++            "14",
++            "15",
++            "16",
++            "17"
++        ],
++        "problem_type": {
++            "Classification": "y"
++        }
+     }
+ }
+\ No newline at end of file

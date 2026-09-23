@@ -1,0 +1,302 @@
+{
+ "smote|0": {
+  "rows": 7860,
+  "removed": 23,
+  "positive_rate": 0.011068702290076336
+ },
+ "smote|1": {
+  "rows": 7863,
+  "removed": 20,
+  "positive_rate": 0.011064479206409768
+ },
+ "smote|2": {
+  "rows": 7853,
+  "removed": 30,
+  "positive_rate": 0.011078568699859926
+ },
+ "smote|3": {
+  "rows": 7858,
+  "removed": 25,
+  "positive_rate": 0.011071519470603208
+ },
+ "smote|4": {
+  "rows": 7856,
+  "removed": 27,
+  "positive_rate": 0.011074338085539715
+ },
+ "tabpfgen|0": {
+  "rows": 7882,
+  "removed": 0,
+  "positive_rate": 0.43580309566099973
+ },
+ "tabpfgen|1": {
+  "rows": 7882,
+  "removed": 0,
+  "positive_rate": 0.442019791930982
+ },
+ "tabpfgen|2": {
+  "rows": 7882,
+  "removed": 0,
+  "positive_rate": 0.437706165947729
+ },
+ "tabpfgen|3": {
+  "rows": 7882,
+  "removed": 0,
+  "positive_rate": 0.44341537680791676
+ },
+ "tabpfgen|4": {
+  "rows": 7882,
+  "removed": 0,
+  "positive_rate": 0.44024359299670135
+ },
+ "tabpfgen-prior|0": {
+  "rows": 8977,
+  "removed": 0,
+  "positive_rate": 0.01102818313467751
+ },
+ "tabpfgen-prior|1": {
+  "rows": 8934,
+  "removed": 0,
+  "positive_rate": 0.011081262592343854
+ },
+ "tabpfgen-prior|2": {
+  "rows": 8915,
+  "removed": 0,
+  "positive_rate": 0.010992708917554684
+ },
+ "tabpfgen-prior|3": {
+  "rows": 8960,
+  "removed": 0,
+  "positive_rate": 0.011049107142857144
+ },
+ "tabpfgen-prior|4": {
+  "rows": 8968,
+  "removed": 0,
+  "positive_rate": 0.011039250669045495
+ },
+ "tabddpm|0": {
+  "rows": 7883,
+  "removed": 0,
+  "positive_rate": 0.013192946847646835
+ },
+ "tabddpm|1": {
+  "rows": 7883,
+  "removed": 0,
+  "positive_rate": 0.012558670556894583
+ },
+ "tabddpm|2": {
+  "rows": 7883,
+  "removed": 0,
+  "positive_rate": 0.009767854877584676
+ },
+ "tabddpm|3": {
+  "rows": 7883,
+  "removed": 0,
+  "positive_rate": 0.012304960040593683
+ },
+ "tabddpm|4": {
+  "rows": 7883,
+  "removed": 0,
+  "positive_rate": 0.01129011797539008
+ },
+ "great|0": {
+  "rows": 7883,
+  "removed": 0,
+  "positive_rate": 0.0013954078396549536
+ },
+ "great|1": {
+  "rows": 7883,
+  "removed": 0,
+  "positive_rate": 0.0024102499048585563
+ },
+ "great|2": {
+  "rows": 7883,
+  "removed": 0,
+  "positive_rate": 0.0012685525815045035
+ },
+ "great|3": {
+  "rows": 7883,
+  "removed": 0,
+  "positive_rate": 0.0020296841304072053
+ },
+ "great|4": {
+  "rows": 7883,
+  "removed": 0,
+  "positive_rate": 0.001902828872256755
+ },
+ "tvae|0": {
+  "rows": 7883,
+  "removed": 0,
+  "positive_rate": 0.00012685525815045033
+ },
+ "tvae|1": {
+  "rows": 7883,
+  "removed": 0,
+  "positive_rate": 0.00012685525815045033
+ },
+ "tvae|2": {
+  "rows": 7883,
+  "removed": 0,
+  "positive_rate": 0.00012685525815045033
+ },
+ "tvae|3": {
+  "rows": 7883,
+  "removed": 0,
+  "positive_rate": 0.00012685525815045033
+ },
+ "tvae|4": {
+  "rows": 7883,
+  "removed": 0,
+  "positive_rate": 0.00012685525815045033
+ },
+ "ctabgan|0": {
+  "rows": 7883,
+  "removed": 0,
+  "positive_rate": 0.038690853735887355
+ },
+ "ctabgan|1": {
+  "rows": 7883,
+  "removed": 0,
+  "positive_rate": 0.041862235189648614
+ },
+ "ctabgan|2": {
+  "rows": 7883,
+  "removed": 0,
+  "positive_rate": 0.029176709374603576
+ },
+ "ctabgan|3": {
+  "rows": 7883,
+  "removed": 0,
+  "positive_rate": 0.027020169986045922
+ },
+ "ctabgan|4": {
+  "rows": 7883,
+  "removed": 0,
+  "positive_rate": 0.02663960421159457
+ },
+ "ctgan|0": {
+  "rows": 7883,
+  "removed": 0,
+  "positive_rate": 0.0942534568057846
+ },
+ "ctgan|1": {
+  "rows": 7883,
+  "removed": 0,
+  "positive_rate": 0.09412660154763415
+ },
+ "ctgan|2": {
+  "rows": 7883,
+  "removed": 0,
+  "positive_rate": 0.08740327286566028
+ },
+ "ctgan|3": {
+  "rows": 7883,
+  "removed": 0,
+  "positive_rate": 0.08296333883039451
+ },
+ "ctgan|4": {
+  "rows": 7883,
+  "removed": 0,
+  "positive_rate": 0.07941139160218191
+ },
+ "ctabgan-plus|0": {
+  "rows": 7883,
+  "removed": 0,
+  "positive_rate": 0.03133324876316123
+ },
+ "ctabgan-plus|1": {
+  "rows": 7883,
+  "removed": 0,
+  "positive_rate": 0.028796143600152226
+ },
+ "ctabgan-plus|2": {
+  "rows": 7883,
+  "removed": 0,
+  "positive_rate": 0.02993784092350628
+ },
+ "ctabgan-plus|3": {
+  "rows": 7883,
+  "removed": 0,
+  "positive_rate": 0.02663960421159457
+ },
+ "ctabgan-plus|4": {
+  "rows": 7883,
+  "removed": 0,
+  "positive_rate": 0.019028288722567552
+ },
+ "tabsyn|0": {
+  "rows": 7883,
+  "removed": 0,
+  "positive_rate": 0.009767854877584676
+ },
+ "tabsyn|1": {
+  "rows": 7883,
+  "removed": 0,
+  "positive_rate": 0.007865026005327921
+ },
+ "tabsyn|2": {
+  "rows": 7883,
+  "removed": 0,
+  "positive_rate": 0.010528986426487377
+ },
+ "tabsyn|3": {
+  "rows": 7883,
+  "removed": 0,
+  "positive_rate": 0.005962197133071166
+ },
+ "tabsyn|4": {
+  "rows": 7883,
+  "removed": 0,
+  "positive_rate": 0.010402131168336928
+ },
+ "tabdiff|0": {
+  "rows": 7883,
+  "removed": 0,
+  "positive_rate": 0.006850183940124318
+ },
+ "tabdiff|1": {
+  "rows": 7883,
+  "removed": 0,
+  "positive_rate": 0.006596473423823418
+ },
+ "tabdiff|2": {
+  "rows": 7883,
+  "removed": 0,
+  "positive_rate": 0.006089052391221616
+ },
+ "tabdiff|3": {
+  "rows": 7883,
+  "removed": 0,
+  "positive_rate": 0.008245591779779272
+ },
+ "tabdiff|4": {
+  "rows": 7883,
+  "removed": 0,
+  "positive_rate": 0.008245591779779272
+ },
+ "findiff|0": {
+  "rows": 7883,
+  "removed": 0,
+  "positive_rate": 0.01103640745908918
+ },
+ "findiff|1": {
+  "rows": 7883,
+  "removed": 0,
+  "positive_rate": 0.01103640745908918
+ },
+ "findiff|2": {
+  "rows": 7883,
+  "removed": 0,
+  "positive_rate": 0.01103640745908918
+ },
+ "findiff|3": {
+  "rows": 7883,
+  "removed": 0,
+  "positive_rate": 0.01103640745908918
+ },
+ "findiff|4": {
+  "rows": 7883,
+  "removed": 0,
+  "positive_rate": 0.01103640745908918
+ }
+}

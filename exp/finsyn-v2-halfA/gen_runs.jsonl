@@ -1,0 +1,72 @@
+{"model": "tabsyn", "part": "test", "seed": 0, "rc": 1, "minutes": 0.0, "device": "cuda:2", "budget": {"vae_epochs": 4000, "diff_epochs": 10001}}
+{"model": "tabsyn", "part": "test", "seed": 1, "rc": 1, "minutes": 0.0, "device": "cuda:2", "budget": {"vae_epochs": 4000, "diff_epochs": 10001}}
+{"model": "tabsyn", "part": "test", "seed": 2, "rc": 1, "minutes": 0.0, "device": "cuda:2", "budget": {"vae_epochs": 4000, "diff_epochs": 10001}}
+{"model": "tabsyn", "part": "test", "seed": 3, "rc": 1, "minutes": 0.0, "device": "cuda:2", "budget": {"vae_epochs": 4000, "diff_epochs": 10001}}
+{"model": "tabsyn", "part": "test", "seed": 4, "rc": 1, "minutes": 0.0, "device": "cuda:2", "budget": {"vae_epochs": 4000, "diff_epochs": 10001}}
+{"model": "tabsyn", "part": "test", "seed": 1, "rc": -15, "minutes": 2.9, "device": "cuda:1", "budget": {"vae_epochs": 4000, "diff_epochs": 10001}}
+{"model": "tabdiff", "part": "test", "seed": 4, "rc": -15, "minutes": 6.1, "device": "cuda:2", "budget": {"steps": 4400}}
+{"model": "tabsyn", "part": "test", "seed": 0, "rc": -15, "minutes": 3.0, "device": "cuda:0", "budget": {"vae_epochs": 4000, "diff_epochs": 10001}}
+{"model": "tabdiff", "part": "test", "seed": 0, "rc": -15, "minutes": 6.1, "device": "cuda:0", "budget": {"steps": 4400}}
+{"model": "tabdiff", "part": "test", "seed": 1, "rc": -15, "minutes": 6.1, "device": "cuda:0", "budget": {"steps": 4400}}
+{"model": "tabdiff", "part": "test", "seed": 2, "rc": -15, "minutes": 6.1, "device": "cuda:1", "budget": {"steps": 4400}}
+{"model": "tabdiff", "part": "test", "seed": 3, "rc": -15, "minutes": 6.1, "device": "cuda:1", "budget": {"steps": 4400}}
+{"model": "tabsyn", "part": "test", "seed": 2, "rc": -15, "minutes": 3.0, "device": "cuda:2", "budget": {"vae_epochs": 4000, "diff_epochs": 10001}}
+{"model": "great", "part": "test", "seed": 0, "rc": -15, "minutes": 3.6, "device": "cuda:2"}
+{"model": "tabdiff", "part": "test", "seed": 0, "rc": 0, "minutes": 49.7, "device": "cuda:0", "budget": {"steps": 4400}, "rows": 7883, "positive_rate": 0.00685, "samples": "TabDiff/tabdiff/result/finsyn-v2-halfA-test-s0/seed0/4243/samples.csv"}
+{"model": "tabdiff", "part": "test", "seed": 1, "rc": 0, "minutes": 49.7, "device": "cuda:0", "budget": {"steps": 4400}, "rows": 7883, "positive_rate": 0.0066, "samples": "TabDiff/tabdiff/result/finsyn-v2-halfA-test-s1/seed1/3638/samples.csv"}
+{"model": "tabdiff", "part": "test", "seed": 2, "rc": 0, "minutes": 49.8, "device": "cuda:1", "budget": {"steps": 4400}, "rows": 7883, "positive_rate": 0.00609, "samples": "TabDiff/tabdiff/result/finsyn-v2-halfA-test-s2/seed2/4209/samples.csv"}
+{"model": "tabdiff", "part": "test", "seed": 4, "rc": 0, "minutes": 49.8, "device": "cuda:2", "budget": {"steps": 4400}, "rows": 7883, "positive_rate": 0.00825, "samples": "TabDiff/tabdiff/result/finsyn-v2-halfA-test-s4/seed4/4308/samples.csv"}
+{"model": "tabdiff", "part": "test", "seed": 3, "rc": 0, "minutes": 50.1, "device": "cuda:1", "budget": {"steps": 4400}, "rows": 7883, "positive_rate": 0.00825, "samples": "TabDiff/tabdiff/result/finsyn-v2-halfA-test-s3/seed3/3301/samples.csv"}
+{"model": "tabsyn", "part": "test", "seed": 0, "rc": 0, "minutes": 72.4, "device": "cuda:2", "budget": {"vae_epochs": 4000, "diff_epochs": 10001}, "rows": 7883, "positive_rate": 0.00977, "samples": "tabsyn/synthetic/finsyn-v2-halfA-test-s0/tabsyn_seed0.csv"}
+{"model": "tabsyn", "part": "test", "seed": 1, "rc": 0, "minutes": 62.9, "device": "cuda:0", "budget": {"vae_epochs": 4000, "diff_epochs": 10001}, "rows": 7883, "positive_rate": 0.00787, "samples": "tabsyn/synthetic/finsyn-v2-halfA-test-s1/tabsyn_seed1.csv"}
+{"model": "great", "part": "test", "seed": 2, "rc": -15, "minutes": 2.4, "device": "cuda:0"}
+{"model": "great", "part": "test", "seed": 0, "rc": -15, "minutes": 64.9, "device": "cuda:1"}
+{"model": "great", "part": "test", "seed": 1, "rc": -15, "minutes": 42.9, "device": "cuda:2"}
+{"model": "tabsyn", "part": "test", "seed": 2, "rc": 0, "minutes": 68.8, "device": "cuda:0", "budget": {"vae_epochs": 4000, "diff_epochs": 10001}, "rows": 7883, "positive_rate": 0.01053, "samples": "tabsyn/synthetic/finsyn-v2-halfA-test-s2/tabsyn_seed2.csv"}
+{"model": "tabsyn", "part": "test", "seed": 4, "rc": 0, "minutes": 68.9, "device": "cuda:2", "budget": {"vae_epochs": 4000, "diff_epochs": 10001}, "rows": 7883, "positive_rate": 0.0104, "samples": "tabsyn/synthetic/finsyn-v2-halfA-test-s4/tabsyn_seed4.csv"}
+{"model": "tabsyn", "part": "test", "seed": 3, "rc": 0, "minutes": 73.2, "device": "cuda:1", "budget": {"vae_epochs": 4000, "diff_epochs": 10001}, "rows": 7883, "positive_rate": 0.00596, "samples": "tabsyn/synthetic/finsyn-v2-halfA-test-s3/tabsyn_seed3.csv"}
+{"model": "great", "part": "test", "seed": 4, "rc": 0, "minutes": 18.6, "device": "cuda:0"}
+{"model": "tabddpm", "part": "test", "seed": 0, "rc": 0, "minutes": 19.5, "device": "cuda:0"}
+{"model": "great", "part": "test", "seed": 0, "rc": 0, "minutes": 27.1, "device": "cuda:0"}
+{"model": "great", "part": "test", "seed": 1, "rc": 0, "minutes": 27.1, "device": "cuda:0"}
+{"model": "great", "part": "test", "seed": 3, "rc": 0, "minutes": 27.4, "device": "cuda:0"}
+{"model": "great", "part": "test", "seed": 2, "rc": 0, "minutes": 27.4, "device": "cuda:0"}
+{"model": "tabddpm", "part": "test", "seed": 1, "rc": 0, "minutes": 9.8, "device": "cuda:0"}
+{"model": "tabpfgen-prior", "part": "test", "seed": 0, "rc": 0, "minutes": 1.3, "device": "cuda:0"}
+{"model": "tabpfgen-prior", "part": "test", "seed": 1, "rc": 0, "minutes": 1.3, "device": "cuda:0"}
+{"model": "tabpfgen-prior", "part": "test", "seed": 4, "rc": 0, "minutes": 0.8, "device": "cuda:0"}
+{"model": "tabddpm", "part": "test", "seed": 2, "rc": 0, "minutes": 10.1, "device": "cuda:0"}
+{"model": "tabpfgen-prior", "part": "test", "seed": 2, "rc": 0, "minutes": 1.2, "device": "cuda:0"}
+{"model": "tabpfgen-prior", "part": "test", "seed": 3, "rc": 0, "minutes": 1.2, "device": "cuda:0"}
+{"model": "tvae", "part": "test", "seed": 0, "rc": 0, "minutes": 0.4, "device": "cuda:0"}
+{"model": "tvae", "part": "test", "seed": 1, "rc": 0, "minutes": 0.4, "device": "cuda:0"}
+{"model": "tvae", "part": "test", "seed": 4, "rc": 0, "minutes": 0.4, "device": "cuda:0"}
+{"model": "tvae", "part": "test", "seed": 3, "rc": 0, "minutes": 0.4, "device": "cuda:0"}
+{"model": "tvae", "part": "test", "seed": 2, "rc": 0, "minutes": 0.4, "device": "cuda:0"}
+{"model": "ctabgan", "part": "test", "seed": 2, "rc": 0, "minutes": 0.7, "device": "cuda:0"}
+{"model": "ctabgan", "part": "test", "seed": 1, "rc": 0, "minutes": 0.7, "device": "cuda:0"}
+{"model": "ctabgan", "part": "test", "seed": 0, "rc": 0, "minutes": 0.7, "device": "cuda:0"}
+{"model": "ctabgan", "part": "test", "seed": 3, "rc": 0, "minutes": 0.7, "device": "cuda:0"}
+{"model": "ctgan", "part": "test", "seed": 1, "rc": 0, "minutes": 0.5, "device": "cuda:0"}
+{"model": "ctgan", "part": "test", "seed": 2, "rc": 0, "minutes": 0.5, "device": "cuda:0"}
+{"model": "ctgan", "part": "test", "seed": 0, "rc": 0, "minutes": 0.5, "device": "cuda:0"}
+{"model": "ctabgan", "part": "test", "seed": 4, "rc": 0, "minutes": 0.6, "device": "cuda:0"}
+{"model": "ctgan", "part": "test", "seed": 3, "rc": 0, "minutes": 0.5, "device": "cuda:0"}
+{"model": "ctgan", "part": "test", "seed": 4, "rc": 0, "minutes": 0.5, "device": "cuda:0"}
+{"model": "findiff", "part": "test", "seed": 1, "rc": 0, "minutes": 0.6, "device": "cuda:2", "budget": {"epochs": 100}, "rows": 7883, "positive_rate": 0.01104, "train_min": 0.5, "sample_min": 0.0}
+{"model": "findiff", "part": "test", "seed": 0, "rc": 0, "minutes": 0.6, "device": "cuda:2", "budget": {"epochs": 100}, "rows": 7883, "positive_rate": 0.01104, "train_min": 0.5, "sample_min": 0.0}
+{"model": "findiff", "part": "test", "seed": 2, "rc": 0, "minutes": 0.5, "device": "cuda:1", "budget": {"epochs": 100}, "rows": 7883, "positive_rate": 0.01104, "train_min": 0.4, "sample_min": 0.0}
+{"model": "ctabgan-plus", "part": "test", "seed": 0, "rc": 0, "minutes": 0.5, "device": "cuda:0"}
+{"model": "findiff", "part": "test", "seed": 3, "rc": 0, "minutes": 0.6, "device": "cuda:1", "budget": {"epochs": 100}, "rows": 7883, "positive_rate": 0.01104, "train_min": 0.4, "sample_min": 0.0}
+{"model": "findiff", "part": "test", "seed": 4, "rc": 0, "minutes": 0.6, "device": "cuda:2", "budget": {"epochs": 100}, "rows": 7883, "positive_rate": 0.01104, "train_min": 0.5, "sample_min": 0.0}
+{"model": "ctabgan-plus", "part": "test", "seed": 1, "rc": 0, "minutes": 0.5, "device": "cuda:0"}
+{"model": "ctabgan-plus", "part": "test", "seed": 3, "rc": 0, "minutes": 0.6, "device": "cuda:0"}
+{"model": "ctabgan-plus", "part": "test", "seed": 2, "rc": 0, "minutes": 0.6, "device": "cuda:0"}
+{"model": "ctabgan-plus", "part": "test", "seed": 4, "rc": 0, "minutes": 0.6, "device": "cuda:0"}
+{"model": "tabpfgen", "part": "test", "seed": 0, "rc": 0, "minutes": 0.4, "device": "cuda:0"}
+{"model": "tabpfgen", "part": "test", "seed": 3, "rc": 0, "minutes": 0.7, "device": "cuda:0"}
+{"model": "tabpfgen", "part": "test", "seed": 4, "rc": 0, "minutes": 0.7, "device": "cuda:0"}
+{"model": "tabpfgen", "part": "test", "seed": 1, "rc": 0, "minutes": 0.7, "device": "cuda:0"}
+{"model": "tabpfgen", "part": "test", "seed": 2, "rc": 0, "minutes": 0.7, "device": "cuda:0"}
+{"model": "tabddpm", "part": "test", "seed": 3, "rc": 0, "minutes": 10.0, "device": "cuda:0"}
+{"model": "tabddpm", "part": "test", "seed": 4, "rc": 0, "minutes": 10.1, "device": "cuda:0"}

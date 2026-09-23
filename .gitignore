@@ -37,3 +37,4 @@ FinDiff/images/
 # 시드별 기준 예측(scripts/refit_seed_preds.py가 저장된 튜닝값으로 다시 만든다, 9/23)
 exp/*/*/leaderboard_*/pred_test_*_seed*.npy
 exp/*/*/logs/
+exp/*/synth_test/

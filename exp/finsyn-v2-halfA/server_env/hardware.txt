@@ -1,0 +1,8 @@
+devbox
+Linux devbox 6.8.0-134-generic #134-Ubuntu SMP PREEMPT_DYNAMIC Fri Jun 26 18:43:11 UTC 2026 x86_64 x86_64 x86_64 GNU/Linux
+16
+Model name:                              AMD EPYC 7302 16-Core Processor
+name, driver_version, memory.total [MiB]
+NVIDIA RTX A6000, 535.309.01, 49140 MiB
+NVIDIA RTX A6000, 535.309.01, 49140 MiB
+NVIDIA RTX A6000, 535.309.01, 49140 MiB
