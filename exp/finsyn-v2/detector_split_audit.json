@@ -3,6 +3,7 @@
  "n_select_detectors": 6,
  "n_select_pairs": 15,
  "n_eval_pairs": 40,
+ "n_unused_only_pairs": 10,
  "all_releases": {
   "selected": 0.7692640692640725,
   "random": 0.4569696969696968,
@@ -16,5 +17,12 @@
   "oracle": 0.6871031746031748,
   "share_of_gap_recovered": 0.4729045506560268,
   "selected_beats_random_share_of_splits": 0.974025974025974
+ },
+ "within_generator_unused_only": {
+  "selected": 0.541341991341992,
+  "random": 0.45696969696969636,
+  "oracle": 0.7603896103896101,
+  "share_of_gap_recovered": 0.27807105150521155,
+  "selected_beats_random_share_of_splits": 0.8593073593073594
  }
 }

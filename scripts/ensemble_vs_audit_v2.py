@@ -53,7 +53,16 @@ def main():
             sc = [json.loads(f.read_text())["scores"] for f in fs]
             dge[m] = [float(np.nanmean([sc[k][str(j)][d] for k in range(MAX_SEEDS) for j in range(MAX_SEEDS) if j != k]))
                       for d in dets]
+    # 같은 교차 평가를, 다른 네 공개본의 test를 이어 붙인 하나의 평가 집합에서 잰 변형(dge_pooled/, 9/24 리뷰 W5)
+    dge_pooled = {}
+    for m in GEN:
+        fs = [E / f"dge_pooled/{m}_seed{k}.json" for k in range(MAX_SEEDS)]
+        if all(f.exists() for f in fs):
+            sc = [json.loads(f.read_text())["pooled"] for f in fs]
+            dge_pooled[m] = [float(np.nanmean([sc[k][d] for k in range(MAX_SEEDS)])) for d in dets]
     kinds = ("random", "ensemble", "dge", "selected", "oracle") if len(dge) == len(GEN) else ("random", "ensemble", "selected", "oracle")
+    if len(dge_pooled) == len(GEN):
+        kinds = kinds[:3] + ("dge_pooled",) + kinds[3:]
     acc = {k: {m: [] for m in GEN} for k in kinds}
     for a, b in StratifiedShuffleSplit(n_splits=N_SPLITS, test_size=0.5, random_state=0).split(np.zeros(len(y)), y):
         refA = [board_score(y[a], real[d][:, a]) for d in dets]
@@ -65,6 +74,8 @@ def main():
             acc["ensemble"][m].append(float(kendalltau(refB, np.mean(vs, axis=0)).statistic))
             if "dge" in acc:
                 acc["dge"][m].append(float(kendalltau(refB, dge[m]).statistic))
+            if "dge_pooled" in acc:
+                acc["dge_pooled"][m].append(float(kendalltau(refB, dge_pooled[m]).statistic))
             acc["selected"][m].append(float(tB[int(np.argmax(tA))]))
             acc["oracle"][m].append(float(max(tB)))
 

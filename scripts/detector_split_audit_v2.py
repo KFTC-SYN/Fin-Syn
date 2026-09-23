@@ -43,10 +43,13 @@ def main():
             r = json.loads(f.read_text())
             runs[(m, s)] = np.array([r[d]["summary"]["pr_auc"][0] for d in dets])
     all_pairs = list(itertools.combinations(range(len(dets)), 2))
-    rec = {"all": [], "gen": []}
+    rec = {"all": [], "gen": [], "gen_unused_only": []}
     for S in itertools.combinations(range(len(dets)), N_SELECT):
         sel_pairs = [p for p in all_pairs if p[0] in S and p[1] in S]
         ev_pairs = [p for p in all_pairs if not (p[0] in S and p[1] in S)]
+        # 9/24 리뷰 Q1: 평가 40쌍 중 30쌍은 선택용 탐지기와 섞인 쌍이다. 미사용 탐지기끼리의 10쌍만으로도 본다.
+        un_pairs = [p for p in all_pairs if p[0] not in S and p[1] not in S]
+        c = {k: agreement(ref, v, un_pairs) for k, v in runs.items()}
         a = {k: agreement(ref, v, sel_pairs) for k, v in runs.items()}
         b = {k: agreement(ref, v, ev_pairs) for k, v in runs.items()}
         pick = max(runs, key=a.get)
@@ -56,12 +59,17 @@ def main():
             ks = [k for k in runs if k[0] == m]
             g.append((b[max(ks, key=a.get)], np.mean([b[k] for k in ks]), max(b[k] for k in ks)))
         rec["gen"].append(np.mean(g, axis=0))
+        gu = []
+        for m in MODELS:
+            ks = [k for k in runs if k[0] == m]
+            gu.append((c[max(ks, key=a.get)], np.mean([c[k] for k in ks]), max(c[k] for k in ks)))
+        rec["gen_unused_only"].append(np.mean(gu, axis=0))
     out = {"n_splits": len(rec["all"]), "n_select_detectors": N_SELECT,
-           "n_select_pairs": len(sel_pairs), "n_eval_pairs": len(ev_pairs)}
-    for k in ("all", "gen"):
+           "n_select_pairs": len(sel_pairs), "n_eval_pairs": len(ev_pairs), "n_unused_only_pairs": len(un_pairs)}
+    for k in ("all", "gen", "gen_unused_only"):
         v = np.array(rec[k])
         sel, rnd, orc = v.mean(axis=0)
-        out["all_releases" if k == "all" else "within_generator"] = {
+        out[{"all": "all_releases", "gen": "within_generator", "gen_unused_only": "within_generator_unused_only"}[k]] = {
             "selected": float(sel), "random": float(rnd), "oracle": float(orc),
             "share_of_gap_recovered": float((sel - rnd) / (orc - rnd)),
             "selected_beats_random_share_of_splits": float(np.mean(v[:, 0] > v[:, 1]))}
