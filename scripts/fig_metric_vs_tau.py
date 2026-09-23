@@ -95,6 +95,9 @@ def main():
     # (9/21) 겹침이 남는 두 가지 원인을 고쳤다: 범례가 나중에 그려져 충돌 검사에서 빠졌고,
     #        모든 후보가 겹칠 때 검사 없이 기본 위치에 두었다.
     ax1.margins(x=0.20, y=0.18)
+    # 왼쪽 위(SMOTE·TabSyn·TabDiff와 TabReD 점 두 개)가 붐벼 왼쪽에 이름표 자리를 둔다(9/23)
+    ax1.set_xlim(left=-0.10)
+    ax1.set_xticks(np.arange(0, 0.41, 0.1))  # KS는 음수가 없으므로 눈금은 0부터
     leg = ax1.legend(frameon=True, loc="lower left", handletextpad=0.4, borderaxespad=0.2,
                      borderpad=0.35)
     leg.get_frame().set(edgecolor="#b0b0b0", facecolor="white", linewidth=0.6)
@@ -105,7 +108,10 @@ def main():
     axbb = ax1.get_window_extent()
     cands = [(5, 2), (5, -8), (-5, 2), (-5, -8), (5, 8), (-5, 8), (0, 8), (0, -12),
              (13, 2), (-13, 2), (13, -8), (-13, -8), (0, 17), (0, -21),
-             (5, 14), (-5, 14), (5, -16), (-5, -16), (20, 2), (-20, 2), (0, 24), (0, -28)]
+             (5, 14), (-5, 14), (5, -16), (-5, -16), (20, 2), (-20, 2), (0, 24), (0, -28),
+             # 9/23: TabReD 점을 다섯 시드 평균으로 옮기자 왼쪽 위가 붐벼 더 먼 후보를 둔다
+             (-24, 10), (-24, -10), (24, 10), (24, -10), (-30, 0), (30, 0), (10, 26), (-10, 26),
+             (10, -30), (-10, -30), (-32, 16), (32, 16), (-32, -18), (32, -18)]
 
     def cost(bb):
         """다른 상자·점과 겹치는 넓이. 축 밖으로 나가면 큰 벌점."""
@@ -126,7 +132,12 @@ def main():
                             color=BLUE, ha="left" if dx > 0 else ("right" if dx < 0 else "center"),
                             arrowprops=arrow)
 
+    FIXED = {"tabsyn": (-6, -3), "tabdiff": (7, 5)}
     for m, xi, yi in placed:
+        if m in FIXED:
+            t = annotate(m, xi, yi, *FIXED[m])
+            taken.append(t.get_window_extent(renderer=rend).expanded(1.15, 1.7))
+            continue
         # 후보마다 임시로 그려 비용만 재고 바로 지운다. 확정된 위치에 한 번만 다시 그린다.
         scored = []
         for dx, dy in cands:

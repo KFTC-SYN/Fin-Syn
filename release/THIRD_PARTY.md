@@ -32,7 +32,7 @@ Each of these is a judgement call another author might make differently, so we r
 
 ## Our code
 
-Everything under `code/` is ours and is released under the MIT License, except where a file states otherwise.
+Everything under `scripts/` is ours and is released under the MIT License, except where a file states otherwise.
 
 ## The releases
 

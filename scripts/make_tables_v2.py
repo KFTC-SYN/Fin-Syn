@@ -113,23 +113,23 @@ def generators(out):
             "$\\tau_{S\\to R}$ $\\uparrow$ & DCR $\\to 1$ & MIA $\\to .5$ \\\\\n\\midrule\n"
             + "\n".join(main) + "\n\\bottomrule\n\\end{tabular}")
     n_word = {3: "three", 4: "four", 5: "five", 10: "ten"}.get(n_rel, str(n_rel))
-    lead = (f"$\\tau_{{S\\to S}}$ is the mean over each generator's {n_word} releases, one per seed, and " if uniform
+    lead = (f"$\\tau_{{S\\to S}}$ and $\\tau_{{S\\to R}}$ are means over each generator's {n_word} releases, one per seed, and " if uniform
             else "The number of releases per generator is given in parentheses. $\\tau_{S\\to S}$ is the mean over them and ")
     note = (lead + ""
-            "[min, max] their range; the other columns use the "
-            "released seed-0 run. Arrows give the better direction; DCR near 1.0 means as far from the private data as a fresh real "
+            "[min, max] is the range of $\\tau_{S\\to S}$; the other columns use the "
+            "seed-0 release. Arrows give the better direction; DCR near 1.0 means as far from the private data as a fresh real "
             "sample, and bold marks the highest $\\tau_{S\\to S}$. TVAE keeps one positive row per split, so its $\\tau$ is "
             "not interpretable. Definitions are in Appendix~\\ref{app:metrics}; separable pairs, regret and the remaining "
             "metrics are in Table~\\ref{tab:genfull}.")
     (out / "tab_generators.tex").write_text(wrap(
         body, "Among generators that do not collapse, leaderboard fidelity varies more between runs of one generator than between generators.", "tab:gen", note))
 
-    abody = ("\\small\n\\setlength{\\tabcolsep}{4pt}\n\\begin{tabular}{lcccccccc}\n\\toprule\n"
+    abody = ("\\small\n\\setlength{\\tabcolsep}{3.2pt}\n\\begin{tabular}{lcccccccc}\n\\toprule\n"
              "Generator & Pairs \\% $\\uparrow$ & Regret $\\downarrow$ & TVD $\\downarrow$ & Dep. $\\downarrow$ & "
-             "Pos. \\% & TSTR $\\uparrow$ & Copies \\% & DCR sh. $\\to .5$ \\\\\n\\midrule\n"
+             "Pos. \\% & TSTR (best) $\\uparrow$ & Copies \\% & DCR sh. $\\to .5$ \\\\\n\\midrule\n"
              + "\n".join(appx) + "\n\\bottomrule\n\\end{tabular}")
-    anote = ("Separable-pair preservation and selection regret are means over that generator's runs; the remaining columns use "
-             "the released run. The Copies removed column gives the share of rows identical to a private record, deleted before "
+    anote = ("Separable-pair preservation and selection regret are means over that generator's releases; the remaining columns use "
+             "the seed-0 release, and TSTR here is the best of the eleven detectors, where Table~\\ref{tab:gen} reports CatBoost. The Copies removed column gives the share of rows identical to a private record, deleted before "
              "publication. Across the sixty releases this affected all fifteen SMOTE splits, three TabDDPM runs and "
              "two GReaT runs; at seed 0, which this table reports, only SMOTE produced them. The private prevalence is 1.28\\%.")
     (out / "tab_generators_full.tex").write_text(wrap(
@@ -259,9 +259,10 @@ def augmentation_ratio(out):
     note = ("Change in test PR-AUC against training on the 5\\% real subset alone "
             f"(LightGBM, absolute baseline {base:.3f}), when the synthetic rows appended are capped at one and four "
             "times the number of real rows, and when the whole synthetic training split is appended "
-            "(about twenty times). The magnitude depends on the ratio, the sign and the ordering do not.")
+            "(about twenty times). The four releases that help unrestricted help at every ratio, and TVAE, GReaT, CTGAN, "
+            "CTAB-GAN+, and TabDiff hurt at every ratio; the three that change sign are within 0.004 of zero at 1:1.")
     (out / "tab_aug_ratio.tex").write_text(wrap(
-        body, "Augmentation gain is ratio-dependent in magnitude but not in sign.", "tab:augratio", note))
+        body, "The releases that help do so at every mixing ratio.", "tab:augratio", note))
 
 
 def appendix_tables(out):
@@ -300,7 +301,7 @@ def appendix_tables(out):
         body = ("\\footnotesize\n\\setlength{\\tabcolsep}{4pt}\n\\begin{tabular}{l" + "c" * len(order) + "}\n"
                 "\\toprule\nRelease & " + head + " \\\\\n\\midrule\n" + "\n".join(rows)
                 + "\n\\bottomrule\n\\end{tabular}")
-        note = ("Test PR-AUC of the released run. Columns are ordered by the private leaderboard and rows by "
+        note = ("Test PR-AUC of the seed-0 release. Columns are ordered by the private leaderboard and rows by "
                 "$\\tau_{S\\to S}$; a release preserves the leaderboard when its row orders the columns as the first row does.")
         (out / f"tab_detectors_{tag}.tex").write_text(
             wrap(body, f"Per-detector results, {cap}.", f"tab:det{tag}", note))
@@ -377,7 +378,7 @@ def tabred(out):
             "\\cmidrule(lr){2-5}\\cmidrule(lr){6-7}\\cmidrule(lr){8-10}\n"
             " & KS & TVD & Corr & C2ST & Pos.\\ \\% & TSTR & $\\tau_{S\\to R}$ & $\\tau_{S\\to S}$ & [min, max] \\\\\n"
             "\\midrule\n" + "\n".join(rows) + "\n\\bottomrule\n\\end{tabular}")
-    note = (f"Public replication on TabReD homecredit-default (32{{,}}076 / 7{{,}}924 / 10{{,}}000 rows by time, "
+    note = (f"TabReD homecredit-default (32{{,}}076 / 7{{,}}924 / 10{{,}}000 rows by time, "
             f"5.0 / 3.3 / 2.3\\% positive), same protocol at a reduced budget (10 tuning trials, three detector seeds). "
             f"Every generator produced five releases; $\\tau_{{S\\to S}}$ is the mean over them and [min, max] their range, "
             f"and the other columns use the seed-0 release. The noise ceiling here is lower than on our benchmark: "
@@ -386,7 +387,8 @@ def tabred(out):
             f"{sum(1 for v in nf['pairwise_win_prob'].values() if v >= 0.975 or v <= 0.025)} of "
             f"{len(nf['pairwise_win_prob'])} detector pairs are separable. "
             "A generator marked undefined has no positive row in the synthetic test split of any of its five releases, "
-            "so no metric, and hence no ranking, is defined for it.")
+            "so no metric, and hence no ranking, is defined for it, although its training split has positives (Pos.\\ \\% is the synthetic training split); TVAE keeps one positive row per split, as on our "
+            "benchmark, so its $\\tau$ is not interpretable.")
     (out / "tab_tabred.tex").write_text(
         wrap(body, "External replication of the protocol on public data.", "tab:tabred", note))
 

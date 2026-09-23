@@ -64,10 +64,12 @@ def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--exp", default="exp/finsyn-v2")
     ap.add_argument("--out", default="within_generator.json")
+    ap.add_argument("--collapsed", default=None,
+                    help="붕괴로 볼 생성기(쉼표). 기본은 본 벤치마크의 넷. TabReD에서는 tvae(split마다 양성 1개)")
     a = ap.parse_args()
     E, OUT = ROOT / a.exp, a.out
-    if E.name != "finsyn-v2":  # '붕괴' 구분은 본 벤치마크의 것이다. 다른 데이터에서는 전부 한 묶음으로 본다
-        COLLAPSED = set()
+    if a.collapsed is not None:
+        COLLAPSED = set(filter(None, a.collapsed.split(",")))
     sm = json.loads((E / "standard_metrics_seeds.json").read_text())
     runs = {}
     for k, v in sm.items():
