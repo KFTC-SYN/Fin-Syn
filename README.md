@@ -1,6 +1,6 @@
 # Fin-Syn
 
-Anonymous supplement to the submission *Leaderboard Fidelity: What a Synthetic Release Preserves, and How to Measure It*.
+Anonymous supplement to the submission *Leaderboard Fidelity: Auditing Synthetic Releases of Private Financial Data*.
 
 ## Start here
 
