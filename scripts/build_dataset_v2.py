@@ -1,10 +1,10 @@
 """
-Fin-Syn v2 데이터셋 구축: orig_micro 행 + orig 전체 이력에서 계산한 과거-only 계좌 이력 피처, 시간 기준 분할.
+Fin-Syn v2 데이터셋 구축: 벤치마크 표본 행 + 전체 이체 패널에서 계산한 과거-only 계좌 이력 피처, 시간 기준 분할.
 
-v1(orig-micro-retry)은 distinct 2,157행을 91,005행으로 복제한 뒤 무작위 분할해 test의 99.65%가 train과 겹쳤다.
+초기 구성은 고유 2,157행을 91,005행으로 복제한 뒤 무작위 분할해 test의 99.65%가 train과 겹쳤다(논문 5.6절).
 v2 원칙
-  - 행: _datasets/orig_micro.parquet (완전 중복 제거, 복제 없음)
-  - 이력 피처: _datasets/orig.parquet 전체에서, 해당 거래의 (거래일자, 거래시간대)보다 엄격히 이전 거래만 사용
+  - 행: _datasets/sample.parquet (벤치마크 표본, 완전 중복 제거, 복제 없음)
+  - 이력 피처: _datasets/panel.parquet 전체에서, 해당 거래의 (거래일자, 거래시간대)보다 엄격히 이전 거래만 사용
     (같은 날·같은 시간대는 선후를 알 수 없으므로 제외). 레이블 유래 피처는 만들지 않는다.
   - 계좌 ID·거래일자 값 자체는 피처에서 제외
   - 분할: train 2021-09~2023-12 / val 2024-01~06 / test 2024-07~12
@@ -94,14 +94,14 @@ def distinct_before(ref_owner, ref_other, ref_t, q_owner, q_t):
     return n
 
 
-def build_features(orig: pd.DataFrame, rows: pd.DataFrame) -> pd.DataFrame:
+def build_features(panel: pd.DataFrame, rows: pd.DataFrame) -> pd.DataFrame:
     ids = {}
     for k in ["payer", "payee", "bankpair", "pair", "입금금융회사일련번호", "출금금융회사일련번호"]:
-        codes, uniq = pd.factorize(pd.concat([orig[k], rows[k]], ignore_index=True))
-        ids[k] = (codes[: len(orig)], codes[len(orig):])
+        codes, uniq = pd.factorize(pd.concat([panel[k], rows[k]], ignore_index=True))
+        ids[k] = (codes[: len(panel)], codes[len(panel):])
 
-    ot, qt = orig["t"].to_numpy(), rows["t"].to_numpy()
-    amt = orig["거래금액"].to_numpy()
+    ot, qt = panel["t"].to_numpy(), rows["t"].to_numpy()
+    amt = panel["거래금액"].to_numpy()
     f = pd.DataFrame(index=rows.index)
 
     # 송금 계좌 이력 (송금은행도 볼 수 있는 정보)
@@ -143,17 +143,17 @@ def build_features(orig: pd.DataFrame, rows: pd.DataFrame) -> pd.DataFrame:
 
 def main():
     ap = argparse.ArgumentParser()
-    ap.add_argument("--orig", default="_datasets/orig.parquet")
-    ap.add_argument("--micro", default="_datasets/orig_micro.parquet")
+    ap.add_argument("--panel", default="_datasets/panel.parquet")
+    ap.add_argument("--sample", default="_datasets/sample.parquet")
     ap.add_argument("--out", default="data/finsyn-v2")
     ap.add_argument("--train_end", default="20231231")
     ap.add_argument("--val_end", default="20240630")
     args = ap.parse_args()
 
-    orig, rows = load(args.orig), load(args.micro)
-    print(f"orig {len(orig):,} rows | micro (dedup) {len(rows):,} rows, {rows.y.sum():,} suspicious")
+    panel, rows = load(args.panel), load(args.sample)
+    print(f"panel {len(panel):,} rows | sample (dedup) {len(rows):,} rows, {rows.y.sum():,} suspicious")
 
-    feats = build_features(orig, rows)
+    feats = build_features(panel, rows)
     date = rows["거래일자"]
     split = np.where(date <= args.train_end, "train", np.where(date <= args.val_end, "val", "test"))
 

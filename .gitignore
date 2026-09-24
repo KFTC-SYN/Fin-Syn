@@ -17,7 +17,7 @@ exp/*/_diag/
 exp/*/_unfiltered/
 
 # v1 실험(복제 행 + 무작위 분할)은 논문이 무효라고 지적한 결과다. 공개 저장소에 두지 않는다.
-exp/orig-micro-retry/
+exp/*-retry/
 
 # 상류 생성기 저장소(tabsyn/TabDiff/FinDiff/tabm)는 소스만 공개한다.
 # 학습 산출물과 상류가 배포한 실험 자료가 4.4GB 중 99.9%를 차지한다.

@@ -21,7 +21,7 @@ D = ROOT / "data/finsyn-v2"
 
 
 def main():
-    o = pd.read_parquet(ROOT / "_datasets/orig.parquet")
+    o = pd.read_parquet(ROOT / "_datasets/panel.parquet")
     y = o["이상거래여부"].notna().astype(int)
     payer = o["출금금융회사일련번호"].astype(str) + "_" + o["출금계좌일련번호"].astype(str)
     payee = o["입금금융회사일련번호"].astype(str) + "_" + o["입금계좌일련번호"].astype(str)

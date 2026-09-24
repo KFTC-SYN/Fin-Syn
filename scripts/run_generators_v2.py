@@ -30,7 +30,7 @@ import tomli_w
 ROOT = Path(__file__).resolve().parents[1]
 REAL = ROOT / "data/finsyn-v2"      # --real 로 교체 가능
 PARTS = ["train", "val", "test"]
-TEMPLATE = ROOT / "exp/orig-micro-retry"  # 키 구조 참조용 (값은 아래 DEFAULTS로 덮어씀)
+TEMPLATE = ROOT / "exp/finsyn-v2/gen"  # 시드 0 train 기간 설정을 키 구조 참조용으로 쓴다(값은 아래 DEFAULTS로 덮어씀)
 GEN_ROOT = ROOT / "exp/finsyn-v2/gen"
 SYN_ROOT = ROOT / "exp/finsyn-v2/synth"
 TIME_CAP_H = 3.0  # 모든 생성기 공통 학습시간 상한(시간, part당)
@@ -133,7 +133,7 @@ def prepare(models, seed=0):
                                              "integer_columns": int_idx, "problem_type": {"Classification": "y"}}
             p.write_text(json.dumps(cols, indent=4))
         for part in PARTS:
-            cfg = tomli.loads((TEMPLATE / spec["template"] / "config.toml").read_text())
+            cfg = tomli.loads((TEMPLATE / model / "train" / "config.toml").read_text())
             out = gen_dir(model, part, seed)
             out.mkdir(parents=True, exist_ok=True)
             cfg.update(parent_dir=str(out.relative_to(ROOT)), real_data_path=str(part_dir(part).relative_to(ROOT)) + "/", seed=seed)

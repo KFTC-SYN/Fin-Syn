@@ -3,8 +3,8 @@
 
   finsyn-v2         : 시간 기준 분할 (주 설정, build_dataset_v2.py)
   finsyn-v2-random  : 같은 행을 층화 무작위 70/15/15 분할
-  finsyn-v2-dup     : v1(orig-micro-retry) 방식 재현 — v1과 같은 클래스 구성의 고유 행 풀(정상 1,530 / 의심 627)을
-                      v2에서 뽑아 v1의 클래스별 복제 배수(정상 ≈58.3×, 의심 ≈2.78×)로 복제한 뒤 층화 무작위 70/15/15 분할
+  finsyn-v2-dup     : 초기 구성(논문 5.6절의 복제 구성) 재현. 초기 구성과 같은 클래스 구성의 고유 행 풀(정상 1,530 / 의심 627)을
+                      v2에서 뽑아 초기 구성의 클래스별 복제 배수(정상 ≈58.3×, 의심 ≈2.78×)로 복제한 뒤 층화 무작위 70/15/15 분할
 
 Usage:
     python scripts/make_conditions_v2.py --src data/finsyn-v2

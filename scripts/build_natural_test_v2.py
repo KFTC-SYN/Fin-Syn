@@ -25,17 +25,17 @@ ROOT = Path(__file__).resolve().parents[1]
 
 def main():
     ap = argparse.ArgumentParser()
-    ap.add_argument("--orig", default=str(ROOT / "_datasets/orig.parquet"))
+    ap.add_argument("--panel", default=str(ROOT / "_datasets/panel.parquet"))
     ap.add_argument("--src", default=str(ROOT / "data/finsyn-v2"))
     ap.add_argument("--out", default=str(ROOT / "data/finsyn-v2-natural"))
     ap.add_argument("--start", default="20240701")
     ap.add_argument("--end", default="20241231")
     args = ap.parse_args()
 
-    orig = load(args.orig)
-    rows = orig[(orig["거래일자"] >= args.start) & (orig["거래일자"] <= args.end)].reset_index(drop=True)
+    panel = load(args.panel)
+    rows = panel[(panel["거래일자"] >= args.start) & (panel["거래일자"] <= args.end)].reset_index(drop=True)
     print(f"natural test rows: {len(rows):,} ({rows.y.mean():.3%} flagged)")
-    feats = build_features(orig, rows)
+    feats = build_features(panel, rows)
     cat = pd.DataFrame({
         "hour_band": rows["거래시간대"],
         "dow": pd.to_datetime(rows["거래일자"], format="%Y%m%d").dt.dayofweek.astype(str),

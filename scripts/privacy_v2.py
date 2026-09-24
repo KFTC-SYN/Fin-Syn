@@ -20,7 +20,7 @@ DCR(최근접 실제 레코드까지의 거리) 중앙값만으로는 "이 값�
   random  : 위 설명대로 학습기간의 무작위 비회원 이체. 벤치마크(사례-대조 표본)와 분포가 달라
             일부 릴리스에서 MIA < 0.5가 나왔다(9/19 점검). 비교용으로 남겨 둔다.
   matched : 벤치마크와 같은 표집 규칙으로 만든 비회원. 벤치마크 표집 틀(30만 건 부분표본)과 겹치지 않는
-            추출본 이체에서 30만 건을 무작위로 뽑고, _datasets/create_orig_micro.py와 같은 규칙
+            추출본 이체에서 30만 건을 무작위로 뽑고, 벤치마크 표본을 만든 것과 같은 규칙
             (플래그 이체 전부 + 플래그 계좌에서 3-hop 이내 계좌의 정상 이체)을 적용한 뒤 학습기간으로 제한한다.
             결과는 privacy_matched.json.
 
@@ -57,15 +57,15 @@ def load_split(d, s):
     return Xn, Xc
 
 
-def build_holdout(orig_path, n, seed):
+def build_holdout(panel_path, n, seed):
     """학습기간 중 벤치마크에 포함되지 않은 이체 n건을 같은 피처 규칙으로 만든다."""
-    orig = load_raw(orig_path)
+    panel = load_raw(panel_path)
     bench = pd.read_parquet(REAL / "full_with_ids_DO_NOT_RELEASE.parquet")
     lo, hi = bench.loc[bench.split == "train", "거래일자"].min(), bench.loc[bench.split == "train", "거래일자"].max()
 
     key = lambda d: d[RAW_KEY].astype(str).agg("|".join, axis=1)
     used = set(key(bench[bench.split == "train"]))
-    period = orig[(orig["거래일자"] >= lo) & (orig["거래일자"] <= hi)].reset_index(drop=True)
+    period = panel[(panel["거래일자"] >= lo) & (panel["거래일자"] <= hi)].reset_index(drop=True)
     mask = ~key(period).isin(used)
     pool = period[mask].reset_index(drop=True)
     print(f"holdout pool: {len(pool):,} of {len(period):,} train-period transfers "
@@ -74,7 +74,7 @@ def build_holdout(orig_path, n, seed):
     rng = np.random.default_rng(seed)
     idx = np.sort(rng.choice(len(pool), min(n, len(pool)), replace=False))
     rows = pool.iloc[idx].reset_index(drop=True)
-    feats = build_features(orig, rows)
+    feats = build_features(panel, rows)
     Xc = pd.DataFrame({
         "hour_band": rows["거래시간대"],
         "dow": pd.to_datetime(rows["거래일자"], format="%Y%m%d").dt.dayofweek.astype(str),
@@ -94,12 +94,12 @@ def _key(d, cols):
     return k
 
 
-def build_matched_holdout(orig_path, n, seed, frame_size=300_000, hops=3):
+def build_matched_holdout(panel_path, n, seed, frame_size=300_000, hops=3):
     """벤치마크와 같은 표집 규칙(사례-대조, 계좌 3-hop 이웃)으로 만든 비회원 이체 n건."""
-    orig = load_raw(orig_path)
-    mini = load_raw(str(ROOT / "_datasets/orig_mini.parquet"))
-    in_frame = _key(orig, RAW_KEY + ["y"]).isin(set(_key(mini, RAW_KEY + ["y"])))
-    pool = orig[~in_frame].reset_index(drop=True)
+    panel = load_raw(panel_path)
+    frame_rows = load_raw(str(ROOT / "_datasets/frame.parquet"))  # 벤치마크 표집 틀(30만 건)
+    in_frame = _key(panel, RAW_KEY + ["y"]).isin(set(_key(frame_rows, RAW_KEY + ["y"])))
+    pool = panel[~in_frame].reset_index(drop=True)
     frame = pool.sample(n=min(frame_size, len(pool)), random_state=seed).reset_index(drop=True)
     flagged, normal = frame[frame.y == 1], frame[frame.y == 0]
     acc = set(flagged.payer) | set(flagged.payee)
@@ -123,7 +123,7 @@ def build_matched_holdout(orig_path, n, seed, frame_size=300_000, hops=3):
     idx = np.r_[rng.choice(pos, min(n_pos, len(pos)), replace=False), rng.choice(neg, n - min(n_pos, len(pos)), replace=False)]
     rows = sampled.iloc[np.sort(idx)].reset_index(drop=True)
     print(f"matched holdout rows {len(rows):,}, flagged {rows.y.mean():.2%}", flush=True)
-    feats = build_features(orig, rows)
+    feats = build_features(panel, rows)
     Xc = pd.DataFrame({
         "hour_band": rows["거래시간대"],
         "dow": pd.to_datetime(rows["거래일자"], format="%Y%m%d").dt.dayofweek.astype(str),
@@ -158,7 +158,7 @@ def nn_dist(fit, query, k=1):
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--models", required=True)
-    ap.add_argument("--orig", default=str(ROOT / "_datasets/orig.parquet"))
+    ap.add_argument("--panel", default=str(ROOT / "_datasets/panel.parquet"))
     ap.add_argument("--n", type=int, default=20000, help="holdout/합성 표본 크기")
     ap.add_argument("--seed", type=int, default=0)
     ap.add_argument("--holdout", choices=["random", "matched"], default="random")
@@ -171,7 +171,7 @@ def main():
     per_seed = seeds != [0]
     if args.out is None:
         args.out = str(E / ("privacy" + ("_matched" if args.holdout == "matched" else "") + ("_seeds" if per_seed else "") + ".json"))
-    hn, hc = (build_matched_holdout if args.holdout == "matched" else build_holdout)(args.orig, args.n, args.seed)
+    hn, hc = (build_matched_holdout if args.holdout == "matched" else build_holdout)(args.panel, args.n, args.seed)
     enc = Encoder(rn, rc)
     R, H = enc(rn, rc), enc(hn, hc)
     rng = np.random.default_rng(args.seed)
