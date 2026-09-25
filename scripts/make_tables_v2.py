@@ -157,7 +157,7 @@ def conditions(out):
         sep_counts.append((sum(1 for v in n["pairwise_win_prob"].values() if v >= 0.975 or v <= 0.025),
                            len(n["pairwise_win_prob"])))
         f = json.loads((d / "fidelity_vs_leaderboard_real.json").read_text()) if tag != "real" else None
-        tau = "1.000" if f is None else f"{f['kendall_tau']:.3f}"
+        tau = "1.00" if f is None else f"{f['kendall_tau']:.2f}"  # 표 2와 같이 공개본 tau는 둘째 자리(9/25)
         reg = "0.000" if f is None else f"{f['selection_regret_pr_auc']:.3f}"
         # 표는 소수 둘째 자리까지 보이므로 동점 판정도 그 자리에서 한다. 전체 정밀도로
         # 판정하면 "1.00"으로 보이는 칸이 굵지 않아 오식으로 읽힌다(9/22).
@@ -214,7 +214,7 @@ def augmentation(out):
     head = " & ".join(f"{int(f * 100)}\\%" for f in fracs)
     rows = [f"Real labels only & {' & '.join(f'{base[f]:.3f}' for f in fracs)} & none \\\\\n\\midrule"]
     rows += [f"+ {GEN.get(m, m)} & " + " & ".join(f"{delta[f][m]:+.3f}".replace("-", "$-$") for f in fracs)
-             + f" & ${tau[m]:+.3f}$ \\\\".replace("$-", "$-") for m in order]
+             + f" & ${tau[m]:+.2f}$ \\\\".replace("$-", "$-") for m in order]
     body = ("\\begin{tabular}{l" + "c" * len(fracs) + "c}\n\\toprule\n\\multirow{2}{*}{Training data} & \\multicolumn{" + str(len(fracs))
             + "}{c}{Fraction of real training labels} & \\multirow{2}{*}{$\\tau_{S\\to S}$} \\\\\n\\cmidrule(lr){2-" + str(len(fracs) + 1) + "}\n"
             + " & " + head + " & \\\\\n\\midrule\n" + "\n".join(rows)
