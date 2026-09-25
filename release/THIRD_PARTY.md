@@ -14,7 +14,7 @@ Every generator is run from its official implementation. Four of them (TabSyn, T
 | TabSyn | `amazon-science/tabsyn`, included at [`tabsyn/`](../tabsyn/) | commit `cb5ac0f` | Apache 2.0 |
 | TabDiff | `MinkaiXu/TabDiff`, included at [`TabDiff/`](../TabDiff/) | commit `5ecdb33` | MIT-style, Copyright 2024 Minkai Xu |
 | FinDiff | `sattarov/FinDiff`, included at [`FinDiff/`](../FinDiff/) | commit `45e9563` | MIT, Copyright 2024 Timur Sattarov |
-| TabM (12th detector, Appendix G) | `yandex-research/tabm`, included at [`tabm/`](../tabm/) | commit `28e47ae3` | Apache 2.0 |
+| TabM (12th detector, Appendix F) | `yandex-research/tabm`, included at [`tabm/`](../tabm/) | commit `28e47ae3` | Apache 2.0 |
 
 Two entries above, CTAB-GAN+ and TabDDPM, have no license file in the copy we obtained. We make no claim about the terms under which they may be redistributed, and a user reproducing our results with those two should obtain them from their own repositories.
 
