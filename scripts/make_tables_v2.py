@@ -292,17 +292,26 @@ def appendix_tables(out):
         lb = {m: json.loads((E / f"leaderboard_{m}_{tag}/results.json").read_text()) for m in models}
         short = {"nb": "NB", "dt": "DT", "lr": "LR", "knn": "kNN", "mlp": "MLP", "rf": "RF", "et": "ET",
                  "hgb": "HGB", "lgbm": "LGBM", "xgb": "XGB", "catboost": "CB"}
-        rows = ["Private data & " + " & ".join(f"{r[d]['summary']['pr_auc'][0]:.2f}" for d in order) + " \\\\",
+        def bold_row(vals):
+            # 본문 표 3과 같은 규칙: 행마다 보이는 자리(둘째 자리)에서 최고값과 동점을 굵게 한다(9/25).
+            # 모든 탐지기가 동점인 행(TVAE, CTAB-GAN+ 등)은 1등이 없으므로 굵게 하지 않는다.
+            txt = [f"{v:.2f}" if v is not None else "n/a" for v in vals]
+            num = [float(t) for t in txt if t != "n/a"]
+            if not num or min(num) == max(num):
+                return txt
+            return [f"\\textbf{{{t}}}" if t != "n/a" and float(t) == max(num) else t for t in txt]
+        rows = ["Private data & " + " & ".join(bold_row([r[d]['summary']['pr_auc'][0] for d in order])) + " \\\\",
                 "\\midrule"]
         for m in models:
-            cells = " & ".join(f"{lb[m][d]['summary']['pr_auc'][0]:.2f}" if d in lb[m] else "n/a" for d in order)
+            cells = " & ".join(bold_row([lb[m][d]['summary']['pr_auc'][0] if d in lb[m] else None for d in order]))
             rows.append(f"{GEN.get(m, m)} & {cells} \\\\")
         head = " & ".join(short[d] for d in order)
         body = ("\\footnotesize\n\\setlength{\\tabcolsep}{4pt}\n\\begin{tabular}{l" + "c" * len(order) + "}\n"
                 "\\toprule\nRelease & " + head + " \\\\\n\\midrule\n" + "\n".join(rows)
                 + "\n\\bottomrule\n\\end{tabular}")
         note = ("Test PR-AUC of the seed-0 release. Columns are ordered by the private leaderboard and rows by "
-                "$\\tau_{S\\to S}$; a release preserves the leaderboard when its row orders the columns as the first row does.")
+                "$\\tau_{S\\to S}$; a release preserves the leaderboard when its row orders the columns as the first row does. "
+                "Bold marks each row's highest score and ties at this precision; rows in which every detector ties carry no bold.")
         (out / f"tab_detectors_{tag}.tex").write_text(
             wrap(body, f"Per-detector results, {cap}.", f"tab:det{tag}", note))
 
@@ -365,10 +374,12 @@ def tabred(out):
         t = list(wg.get(m, {}).values())
         return -np.mean(t) if t else 9
     rows = []
+    best = max(np.mean(list(v.values())) for v in wg.values() if v)  # 표 2와 같이 최고 평균 tau_S->S만 굵게(9/25)
     for m in sorted(sm, key=key):
         v, b = sm[m], tau(m, "s2r")
         t = list(wg.get(m, {}).values())
-        s2s = (f"{fmt(np.mean(t))} & [{fmt(min(t))}, {fmt(max(t))}]" if t else "undefined & ")
+        head = (f"\\textbf{{{fmt(np.mean(t))}}}" if t and abs(np.mean(t) - best) < 1e-9 else (fmt(np.mean(t)) if t else ""))
+        s2s = (f"{head} & [{fmt(min(t))}, {fmt(max(t))}]" if t else "undefined & ")
         rows.append(f"{GEN.get(m, m)} & {v['ks_mean']:.3f} & {v['tvd_mean']:.3f} & {v['corr_rmse']:.3f} & "
                     f"{v['detection_auc']:.3f} & {100*v['pos_rate']:.2f} & {v['tstr_catboost_pr_auc']:.3f} & "
                     + (fmt(b) if b is not None else "n/a") + " & " + s2s + " \\\\")
@@ -388,7 +399,7 @@ def tabred(out):
             f"{len(nf['pairwise_win_prob'])} detector pairs are separable. "
             "A generator marked undefined has no positive row in the synthetic test split of any of its five releases, "
             "so no $S\\to S$ score, and hence no public-user ranking, is defined for it, although its training split has positives (Pos.\\ \\% is the synthetic training split); TVAE keeps one positive row per split, as on our "
-            "benchmark, so its $\\tau$ is not interpretable.")
+            "benchmark, so its $\\tau$ is not interpretable. Bold marks the highest $\\tau_{S\\to S}$.")
     (out / "tab_tabred.tex").write_text(
         wrap(body, "External replication of the protocol on public data.", "tab:tabred", note))
 
