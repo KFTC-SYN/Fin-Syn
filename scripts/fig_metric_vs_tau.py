@@ -177,9 +177,11 @@ def main():
     ax2.set_ylim(0, 0.8)
     ax2.set_ylabel("Agreement on paired runs")
     ax2.set_xlim(-0.7, len(items) - 0.3)
-    # 9/25: 막대·오차막대와 겹치지 않도록 이름을 축 오른쪽 바깥, 기준선 높이에 둔다.
-    ax2.text(1.01, 0.5, "Chance", fontsize=6.8, va="center", ha="left",
-             transform=ax2.get_yaxis_transform(), clip_on=False)
+    # 9/25: 축 밖에 두면 그림 폭이 늘어 subfigure 안에서 축소되므로, 오른쪽 위 빈 곳(0.7 이상)에 범례로 둔다.
+    from matplotlib.lines import Line2D
+    leg2 = ax2.legend([Line2D([], [], color="black", ls="--", lw=0.8)], ["Chance"], loc="upper right",
+                      frameon=True, handlelength=2.0, handletextpad=0.4, borderaxespad=0.2, borderpad=0.35)
+    leg2.get_frame().set(edgecolor="#b0b0b0", facecolor="white", linewidth=0.6)
     ax2.grid(axis="y", color=GREY, alpha=0.25, lw=0.5)
     ax2.set_axisbelow(True)
     out = Path(a.out)
