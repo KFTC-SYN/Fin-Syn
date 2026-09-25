@@ -132,7 +132,8 @@ def main():
                             color=BLUE, ha="left" if dx > 0 else ("right" if dx < 0 else "center"),
                             arrowprops=arrow)
 
-    FIXED = {"tabsyn": (-6, -3), "tabdiff": (7, 5)}
+    # 9/25: GReaT 이름표가 오른쪽 CTGAN 이름표와 맞닿아 왼쪽 빈 자리에 고정한다.
+    FIXED = {"tabsyn": (-6, -3), "tabdiff": (7, 5), "great": (-6, -3)}
     for m, xi, yi in placed:
         if m in FIXED:
             t = annotate(m, xi, yi, *FIXED[m])
@@ -176,7 +177,9 @@ def main():
     ax2.set_ylim(0, 0.8)
     ax2.set_ylabel("Agreement on paired runs")
     ax2.set_xlim(-0.7, len(items) - 0.3)
-    ax2.text(len(items) - 0.35, 0.51, "Chance", fontsize=6.8, va="bottom", ha="right")
+    # 9/25: 막대·오차막대와 겹치지 않도록 이름을 축 오른쪽 바깥, 기준선 높이에 둔다.
+    ax2.text(1.01, 0.5, "Chance", fontsize=6.8, va="center", ha="left",
+             transform=ax2.get_yaxis_transform(), clip_on=False)
     ax2.grid(axis="y", color=GREY, alpha=0.25, lw=0.5)
     ax2.set_axisbelow(True)
     out = Path(a.out)
