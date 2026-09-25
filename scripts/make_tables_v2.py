@@ -129,11 +129,11 @@ def generators(out):
              "Pos. \\% & TSTR (best) $\\uparrow$ & Copies \\% & DCR sh. $\\to .5$ \\\\\n\\midrule\n"
              + "\n".join(appx) + "\n\\bottomrule\n\\end{tabular}")
     anote = ("Separable-pair preservation and selection regret are means over that generator's releases; the remaining columns use "
-             "the seed-0 release, and TSTR here is the best of the eleven detectors, where Table~\\ref{tab:gen} reports CatBoost. The Copies removed column gives the share of rows identical to a private record, deleted before "
+             "the seed-0 release, and TSTR here is the best of the eleven detectors, where Table~\\ref{tab:gen} reports CatBoost. The Copies column gives the share of rows identical to a private record, deleted before "
              "publication. Across the sixty releases this affected all fifteen SMOTE splits, three TabDDPM runs and "
              "two GReaT runs; at seed 0, which this table reports, only SMOTE produced them. The private prevalence is 1.28\\%.")
     (out / "tab_generators_full.tex").write_text(wrap(
-        abody, "Remaining standard metrics for the seed-0 release of each generator.", "tab:genfull", anote))
+        abody, "Remaining standard metrics of each generator.", "tab:genfull", anote))
 
 
 WORD = {3: "three", 4: "four", 5: "five", 6: "six", 7: "seven", 8: "eight"}
@@ -234,12 +234,14 @@ def augmentation_ratio(out):
     import pandas as pd
 
     rr = json.loads((E / "augmentation_ratio.json").read_text())
-    base_keys = [v for k, v in rr.items() if k.startswith("real|0.05|lgbm")]
+    # 본문 보강 표(tab:aug)와 같이 LightGBM과 XGBoost를 평균한다(9/25 부록 점검: 예전에는 LightGBM만 썼는데
+    # Unrestricted 열은 두 탐지기 평균이라 한 표 안에서 설정이 섞여 있었다).
+    base_keys = [v for k, v in rr.items() if k.startswith(("real|0.05|lgbm|", "real|0.05|xgb|"))]
     base = sum(base_keys) / len(base_keys)
     per = {}
     for k, v in rr.items():
         parts = k.split("|")
-        if len(parts) == 5 and parts[1] == "0.05" and parts[2] == "lgbm":
+        if len(parts) == 5 and parts[1] == "0.05" and parts[2] in ("lgbm", "xgb"):
             per.setdefault(parts[0], {}).setdefault(parts[4], []).append(v)
     default = json.loads((E / "lf_analysis.json").read_text())["aug_gain_5pct"]
     order = sorted(per, key=lambda m: -default.get(m, float("-inf")))
@@ -254,10 +256,11 @@ def augmentation_ratio(out):
             "Release & 1:1 & 4:1 & Unrestricted \\\\\n\\midrule\n" + "\n".join(rows)
             + "\n\\bottomrule\n\\end{tabular}")
     note = ("Change in test PR-AUC against training on the 5\\% real subset alone "
-            f"(LightGBM, absolute baseline {base:.3f}), when the synthetic rows appended are capped at one and four "
+            f"(LightGBM and XGBoost, absolute baseline {base:.3f}), when the synthetic rows appended are capped at one and four "
             "times the number of real rows, and when the whole synthetic training split is appended "
-            "(about twenty times). The four releases that help unrestricted help at every ratio, and TVAE, GReaT, CTGAN, "
-            "CTAB-GAN+, and TabDiff hurt at every ratio; the three that change sign are within 0.004 of zero at 1:1.")
+            "(about twenty times, the setting of Table~\\ref{tab:aug}). The four releases that help unrestricted help at "
+            "every ratio, and the six that hurt most unrestricted hurt at every ratio; TabDDPM and FinDiff, the two that "
+            "change sign, are within 0.008 of zero at 1:1.")
     (out / "tab_aug_ratio.tex").write_text(wrap(
         body, "The releases that help do so at every mixing ratio.", "tab:augratio", note))
 
@@ -332,7 +335,7 @@ def tstr_vs_tau(out):
             f"{w['n_pairs_non_collapsed']} pairs among non-collapsed generators). The last two columns compare the run TSTR would "
             "select with the best run.")
     (out / "tab_tstr_vs_tau.tex").write_text(
-        wrap(body, "TSTR cannot tell a good run of a generator from a bad one.", "tab:tstrtau", note))
+        wrap(body, "TSTR does not reliably tell a good run of a generator from a bad one.", "tab:tstrtau", note))
 
 
 def tabred(out):
@@ -384,7 +387,7 @@ def tabred(out):
             f"{sum(1 for v in nf['pairwise_win_prob'].values() if v >= 0.975 or v <= 0.025)} of "
             f"{len(nf['pairwise_win_prob'])} detector pairs are separable. "
             "A generator marked undefined has no positive row in the synthetic test split of any of its five releases, "
-            "so no metric, and hence no ranking, is defined for it, although its training split has positives (Pos.\\ \\% is the synthetic training split); TVAE keeps one positive row per split, as on our "
+            "so no $S\\to S$ score, and hence no public-user ranking, is defined for it, although its training split has positives (Pos.\\ \\% is the synthetic training split); TVAE keeps one positive row per split, as on our "
             "benchmark, so its $\\tau$ is not interpretable.")
     (out / "tab_tabred.tex").write_text(
         wrap(body, "External replication of the protocol on public data.", "tab:tabred", note))
